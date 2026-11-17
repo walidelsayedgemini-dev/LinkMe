@@ -8,7 +8,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { YassinSays } from "@/components/yassin";
+import { CompanionSays, useCompanion } from "@/components/companion";
+import { getCompanionQuote } from "@/lib/companion-motivational-bank";
 import { cn } from "@/lib/utils";
 import type { AssessmentLevel } from "@shared/assessment";
 import { LEVEL_NAMES, LEVELS, formatNumber, levelIndex } from "./shared";
@@ -54,6 +55,8 @@ export function AssessmentIntro({
   onStartPractice,
   onForgetResume,
 }: AssessmentIntroProps) {
+  const { companion } = useCompanion();
+  const quote = getCompanionQuote(companion.id, "levelTestStart");
   const [mode, setMode] = useState<"placement" | "practice">("placement");
   const [practiceLevel, setPracticeLevel] = useState<AssessmentLevel>("A1");
   const currentLevelIndex =
@@ -80,10 +83,10 @@ export function AssessmentIntro({
           والاستماع.
         </p>
 
-        <YassinSays
+        <CompanionSays
           className="mt-6"
-          message="أنا معاك خطوة بخطوة. اختار قياس المستوى لو لسه بتبدأ، أو التدريب لو عايز تتمرن على مرحلة بعينها."
-          hint="الإجابة الغلط مش حكم عليك؛ هي بس بتورّينا إيه اللي نشتغل عليه بعد كده."
+          message={quote.text}
+          hint={quote.subtext}
         />
 
         <div

@@ -1,7 +1,8 @@
 import { ArrowLeft, BookOpen, Check, RefreshCw, Target } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { YassinSays } from "@/components/yassin";
+import { CompanionSays, useCompanion } from "@/components/companion";
+import { getCompanionQuote } from "@/lib/companion-motivational-bank";
 import { formatPrice } from "@/lib/format";
 import type { AssessmentSummary as Summary } from "@shared/assessment";
 import {
@@ -24,6 +25,8 @@ export function AssessmentSummary({
   loggedIn,
   onRestart,
 }: AssessmentSummaryProps) {
+  const { companion } = useCompanion();
+  const quote = getCompanionQuote(companion.id, "levelTestResult");
   const skills = (
     Object.keys(summary.skills) as (keyof typeof summary.skills)[]
   ).map(skill => ({
@@ -38,17 +41,13 @@ export function AssessmentSummary({
 
   return (
     <div className="assessment-summary-wrap">
-      <YassinSays
+      <CompanionSays
         size={64}
-        message={
-          mode === "practice"
-            ? "خلصنا التدريب. خُد من التقرير النقطة اللي تستاهل تمرينك الجاي."
-            : "وصلنا لتقدير مبدئي لمستواك — ودي بداية خطة مناسبة ليك."
-        }
+        message={quote.text}
         hint={
           strongest
-            ? `واضح إن عندك أساس كويس في ${SKILL_NAMES[strongest.skill]}. نقدر نبني عليه خطوة خطوة.`
-            : "كل مرحلة خلصتها بتدينا صورة أوضح عن طريقك."
+            ? `${quote.subtext} واضح إن عندك أساس كويس جداً في ${SKILL_NAMES[strongest.skill]}!`
+            : quote.subtext
         }
       />
 

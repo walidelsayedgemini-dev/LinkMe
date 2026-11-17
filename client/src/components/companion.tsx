@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Sparkles, RefreshCw, Heart, Check, Volume2, MessageCircle, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCompanion, COMPANIONS, CompanionId } from "@/contexts/CompanionContext";
+import { getCompanionQuote } from "@/lib/companion-motivational-bank";
+import { PronounceButton } from "@/components/pronounce-button";
 import {
   Dialog,
   DialogContent,
@@ -389,6 +391,113 @@ export function CompanionFloatingWidget() {
           اضغطني ✨
         </span>
       </button>
+    </div>
+  );
+}
+
+export function CompanionMotivationalBanner({ className }: { className?: string }) {
+  const { companion, toggleCompanion, setIsModalOpen } = useCompanion();
+  const [quoteIdx, setQuoteIdx] = useState(0);
+  const [animating, setAnimating] = useState(false);
+
+  const quote = getCompanionQuote(companion.id, "home", quoteIdx);
+  const otherId = companion.id === "yassin" ? "khadija" : "yassin";
+  const other = COMPANIONS[otherId];
+
+  const handleNext = () => {
+    setAnimating(true);
+    setTimeout(() => {
+      setQuoteIdx((prev) => prev + 1);
+      setAnimating(false);
+    }, 150);
+  };
+
+  const englishMotto =
+    companion.id === "khadija"
+      ? "You are doing amazing! Every small step leads to big confidence. Keep smiling and shining!"
+      : "Believe in yourself and take action! Fluency is built by showing up every single day!";
+
+  return (
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-3xl border p-6 sm:p-8 transition-all duration-500 shadow-md",
+        companion.id === "khadija"
+          ? "border-pink-200 bg-gradient-to-r from-pink-50/90 via-rose-50/70 to-purple-50/80 dark:border-pink-950/60 dark:from-pink-950/20 dark:via-purple-950/20 dark:to-background"
+          : "border-blue-200 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-sky-50/80 dark:border-blue-950/60 dark:from-blue-950/20 dark:via-indigo-950/20 dark:to-background",
+        className
+      )}
+      dir="rtl"
+    >
+      <div className="flex flex-col md:flex-row items-center gap-6">
+        <div className="relative shrink-0 text-center">
+          <CompanionAvatar size={96} className="hover:scale-105 transition-transform" />
+          <span
+            className={cn(
+              "mt-2 inline-block rounded-full px-3 py-0.5 text-xs font-bold text-white shadow-sm",
+              companion.accentBg
+            )}
+          >
+            {companion.name} {companion.favoriteEmoji}
+          </span>
+        </div>
+
+        <div className="flex-1 text-center md:text-start">
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-2">
+            <span
+              className={cn(
+                "rounded-full px-2.5 py-0.5 text-[11px] font-bold",
+                companion.id === "khadija"
+                  ? "bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-300"
+                  : "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+              )}
+            >
+              {companion.id === "khadija" ? "نصيحة خديجة الكيوت 🌸" : "جرعة حماس من ياسين 🚀"}
+            </span>
+            <span className="text-xs text-ink-soft">· {companion.badge}</span>
+          </div>
+
+          <p
+            className={cn(
+              "text-lg sm:text-xl font-bold leading-relaxed text-ink transition-opacity duration-200",
+              animating ? "opacity-0" : "opacity-100"
+            )}
+          >
+            "{quote.text}"
+          </p>
+          <p className="mt-1.5 text-xs sm:text-sm text-ink-soft">{quote.subtext}</p>
+
+          <div className="mt-4 flex flex-wrap items-center justify-center md:justify-start gap-2.5">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleNext}
+              className="rounded-full text-xs gap-1.5 border-line bg-card shadow-sm hover:scale-105"
+            >
+              <Sparkles className="size-3.5 text-amber-500" />
+              <span>{companion.id === "khadija" ? "نصيحة كيوت تانية 🌸" : "جرعة حماس تانية ⚡"}</span>
+            </Button>
+
+            <PronounceButton
+              text={englishMotto}
+              size="sm"
+              label={`اسمع نصيحة ${companion.name} بالإنجليزي 🔊`}
+              className="bg-card text-ink"
+            />
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={toggleCompanion}
+              className="rounded-full text-xs gap-1.5 text-ink-soft hover:text-ink hover:bg-paper"
+            >
+              <RefreshCw className="size-3.5" />
+              <span>بدّل لـ {other.name} ({other.badge})</span>
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

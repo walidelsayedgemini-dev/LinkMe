@@ -6,7 +6,8 @@ import {
   Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { YassinSays } from "@/components/yassin";
+import { CompanionSays, useCompanion } from "@/components/companion";
+import { getCompanionQuote } from "@/lib/companion-motivational-bank";
 import { PronounceButton } from "@/components/pronounce-button";
 import { cn } from "@/lib/utils";
 import type { AssessmentQuestion, QuestionFeedback } from "@shared/assessment";
@@ -54,6 +55,8 @@ export function QuestionCard({
   onNext,
   onPause,
 }: QuestionCardProps) {
+  const { companion } = useCompanion();
+  const companionPhrase = getCompanionQuote(companion.id, "levelTestQuestion", questionIndex);
   const hasAnswer = answeredIndex !== undefined;
   const isLast = questionIndex === total - 1;
   const canAdvance = hasAnswer && !answerPending && !actionPending;
@@ -227,20 +230,28 @@ export function QuestionCard({
       </section>
 
       <aside className="assessment-question-aside">
-        <YassinSays
+        <CompanionSays
           message={
             hasAnswer
               ? mode === "practice" && currentFeedback
                 ? currentFeedback.correct
-                  ? "برافو! اختيار مضبوط. اقرأ السبب عشان تثبّت المعلومة."
-                  : "ولا يهمك! لقينا نقطة جديدة نتعلمها. بص على الشرح وكمّل."
-                : "إجابتك اتسجلت. خد وقتك قبل ما تروح للسؤال اللي بعده."
-              : MOTIVATIONS[questionIndex % MOTIVATIONS.length]
+                  ? companion.id === "khadija"
+                    ? "يا روحي عليك! إجابة سكر وشطورة خالص 🧁✨ بص على السبب عشان تثبت يا عسل!"
+                    : "عاش يا وحش! ضربة معلم وتركيز في الجون 🎯💥 اقرأ السبب وثبّت الفكرة!"
+                  : companion.id === "khadija"
+                    ? "فداك يا قمراية! كل غلطة بنتعلم منها وبنقوى أكتر 🌸🧸 بص على الشرح ويلا نكمل!"
+                    : "ولا يهمك يا بطل! الأبطال بيتعلموا من كل حركة 💪🚀 بص على الشرح وانطلق!"
+                : companion.id === "khadija"
+                  ? "إجابتك السكر اتسجلت 🌸 خدي وقتك ويلا للسؤال الجاي!"
+                  : "إجابتك اتسجلت يا بطل 🚀 خد وقتك قبل ما تروح للتالي!"
+              : companionPhrase.text
           }
           hint={
-            mode === "practice"
-              ? "التدريب بيعرض شرح الإجابة بعد الاختيار."
-              : "في قياس المستوى، التقرير التفصيلي بيظهر بعد ما تخلص المرحلة."
+            hasAnswer
+              ? mode === "practice"
+                ? "التدريب بيعرض شرح الإجابة بعد الاختيار."
+                : "في قياس المستوى، التقرير التفصيلي بيظهر بعد ما تخلص المرحلة."
+              : companionPhrase.subtext ?? "جاوب بإحساسك، ومش مطلوب تكون متأكد 100%."
           }
         />
         <div className="assessment-keyboard-hint">

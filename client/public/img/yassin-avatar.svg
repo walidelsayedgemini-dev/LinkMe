@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <!-- Background Radiant Blue/Cyan Gradient -->
+    <radialGradient id="bgGradYassin" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#E0F2FE"/>
+      <stop offset="60%" stop-color="#BAE6FD"/>
+      <stop offset="100%" stop-color="#7DD3FC"/>
+    </radialGradient>
+    
+    <!-- Hair Gradient -->
+    <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="50%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+
+    <!-- Face Skin Gradient -->
+    <linearGradient id="skinGradYassin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF3E8"/>
+      <stop offset="60%" stop-color="#FCDDC7"/>
+      <stop offset="100%" stop-color="#F4C7A5"/>
+    </linearGradient>
+
+    <!-- Jacket Gradient -->
+    <linearGradient id="jacketGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="50%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+
+    <!-- Hoodie Inner -->
+    <linearGradient id="hoodieInner" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#93C5FD"/>
+      <stop offset="100%" stop-color="#60A5FA"/>
+    </linearGradient>
+
+    <!-- Eye Gradient -->
+    <radialGradient id="eyeGradYassin" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#6B3A1C"/>
+      <stop offset="70%" stop-color="#301608"/>
+      <stop offset="100%" stop-color="#130803"/>
+    </radialGradient>
+
+    <filter id="dropShadowYassin" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#1E3A8A" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Circular Outer Base -->
+  <circle cx="200" cy="200" r="195" fill="url(#bgGradYassin)" stroke="#FFFFFF" stroke-width="6"/>
+
+  <!-- Energy Sparks / Stars in Background -->
+  <g opacity="0.8">
+    <!-- Star 1 -->
+    <path d="M 60 110 Q 60 125 45 125 Q 60 125 60 140 Q 60 125 75 125 Q 60 125 60 110 Z" fill="#3B82F6" opacity="0.8"/>
+    <!-- Lightning Bolt 1 -->
+    <polygon points="330,85 315,115 328,115 320,145 345,110 332,110" fill="#FBBF24" opacity="0.9"/>
+    <!-- Sparkle 2 -->
+    <path d="M 335 220 Q 335 232 322 232 Q 335 232 335 244 Q 335 232 348 232 Q 335 232 335 220 Z" fill="#FFF" opacity="0.9"/>
+  </g>
+
+  <!-- Body / Blue Athletic Hoodie -->
+  <g filter="url(#dropShadowYassin)">
+    <path d="M 85 395 C 95 310, 135 285, 200 285 C 265 285, 305 310, 315 395 Z" fill="url(#jacketGrad)"/>
+    <!-- Collar V-neck / T-shirt -->
+    <path d="M 160 290 Q 200 340 240 290 Q 200 310 160 290 Z" fill="#FFFFFF"/>
+    <!-- Athletic Stripe on Shoulder -->
+    <path d="M 105 360 L 130 330" stroke="#93C5FD" stroke-width="6" stroke-linecap="round"/>
+    <path d="M 295 360 L 270 330" stroke="#93C5FD" stroke-width="6" stroke-linecap="round"/>
+  </g>
+
+  <!-- Neck -->
+  <path d="M 175 250 L 175 295 C 175 305, 225 305, 225 295 L 225 250 Z" fill="#F4C7A5"/>
+
+  <!-- Face Shape -->
+  <path d="M 135 155 C 130 215, 145 272, 200 272 C 255 272, 270 215, 265 155 C 265 140, 135 140, 135 155 Z" 
+        fill="url(#skinGradYassin)" filter="url(#dropShadowYassin)"/>
+
+  <!-- Ears -->
+  <path d="M 133 185 C 115 185, 115 215, 135 215 Z" fill="#F4C7A5"/>
+  <path d="M 267 185 C 285 185, 285 215, 265 215 Z" fill="#F4C7A5"/>
+
+  <!-- Cheerful Rosy Warm Cheeks -->
+  <ellipse cx="158" cy="225" rx="14" ry="8" fill="#F87171" opacity="0.3"/>
+  <ellipse cx="242" cy="225" rx="14" ry="8" fill="#F87171" opacity="0.3"/>
+
+  <!-- Eyebrows (Dynamic, Confident) -->
+  <path d="M 150 170 Q 168 160 186 168" stroke="#1E293B" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+  <path d="M 214 168 Q 232 160 250 170" stroke="#1E293B" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+
+  <!-- Big Confident Sparkling Eyes -->
+  <!-- Left Eye -->
+  <g>
+    <ellipse cx="168" cy="193" rx="14" ry="16" fill="url(#eyeGradYassin)"/>
+    <path d="M 152 188 Q 168 178 184 188" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    <circle cx="163" cy="187" r="5" fill="#FFFFFF"/>
+    <circle cx="173" cy="199" r="2.5" fill="#FFFFFF"/>
+  </g>
+
+  <!-- Right Eye -->
+  <g>
+    <ellipse cx="232" cy="193" rx="14" ry="16" fill="url(#eyeGradYassin)"/>
+    <path d="M 216 188 Q 232 178 248 188" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    <circle cx="227" cy="187" r="5" fill="#FFFFFF"/>
+    <circle cx="237" cy="199" r="2.5" fill="#FFFFFF"/>
+  </g>
+
+  <!-- Nose -->
+  <path d="M 197 205 Q 200 213 204 207" stroke="#D97706" stroke-width="3" stroke-linecap="round" fill="none"/>
+
+  <!-- Big Energetic Confident Smile -->
+  <path d="M 175 225 Q 200 250 225 225 Q 200 222 175 225 Z" fill="#DC2626"/>
+  <!-- Teeth -->
+  <path d="M 178 226 Q 200 238 222 226 Q 200 224 178 226 Z" fill="#FFFFFF"/>
+
+  <!-- Cool Modern Quiff / Pompadour Hair -->
+  <path d="M 132 155 C 130 90, 160 55, 205 55 C 255 55, 275 95, 270 155 C 265 130, 245 110, 200 110 C 160 110, 140 135, 132 155 Z" 
+        fill="url(#hairGrad)" filter="url(#dropShadowYassin)"/>
+  <!-- Hair Volume Tuft / Front Spike -->
+  <path d="M 165 75 C 185 45, 230 45, 245 75 C 235 60, 210 55, 185 62 Z" fill="#475569"/>
+
+  <!-- Headset / Wireless Earbud (Tech-Savvy Companion) -->
+  <circle cx="123" cy="198" r="6" fill="#2563EB" stroke="#FFF" stroke-width="1.5"/>
+</svg>

@@ -26,7 +26,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useCompanion, CompanionAvatar } from "@/components/companion";
+import { useCompanion, CompanionAvatar, CompanionMotivationalBanner } from "@/components/companion";
 import { trpc } from "@/lib/trpc";
 import { categoryIcon, FAQ_GROUPS } from "@/lib/content";
 
@@ -154,6 +154,7 @@ export default function Home() {
       </section>
 
       <section className="container pt-6">
+        <CompanionMotivationalBanner className="mb-6" />
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-line bg-card p-5">
           <p className="text-sm leading-relaxed text-ink-soft">
             ليه Link Me؟ فهم وممارسة ومتابعة —{" "}
