@@ -23,10 +23,11 @@ import { trpc } from "@/lib/trpc";
 import { formatDate, formatDateTime, formatMinutesShort } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { PremiumAccountSummary } from "@/components/premium-account-summary";
-import { YassinSays } from "@/components/yassin";
+import { YassinSays, useCompanion } from "@/components/companion";
 
 export default function Dashboard() {
   const { user, loading } = useAuth();
+  const { companion } = useCompanion();
   const [, navigate] = useLocation();
   const { data, isLoading, error: dashboardError, refetch: reloadDashboard } = trpc.learning.dashboard.useQuery(undefined, {
     enabled: Boolean(user),
@@ -143,11 +144,11 @@ export default function Dashboard() {
               className="mt-6 max-w-2xl"
               message={
                 <>
-                  أهلاً {user?.name?.split(" ")[0] ?? "يا صديقي"}! أنا{" "}
-                  <b>ياسين</b>، هكون معاك في كل خطوة.
+                  أهلاً {user?.name?.split(" ")[0] ?? (companion.id === "khadija" ? "يا سكر" : "يا بطل")}! أنا{" "}
+                  <b>{companion.name}</b> {companion.favoriteEmoji}، هكون معاك في كل خطوة.
                   {placement
                     ? ` تقديرك ${placement.belowA1 ? "أقل من A1" : placement.level} من آخر اختبار — جاهز نكمّل؟`
-                    : " لسه معملتش اختبار المستوى؟ خلّينا نبدأ بيه."}
+                    : " لسه معملتش اختبار المستوى؟ خلّينا نبدأ بيه سوا!"}
                 </>
               }
             />

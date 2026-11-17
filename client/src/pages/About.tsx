@@ -21,7 +21,7 @@ import {
 import { PageShell } from "@/components/layout/site-footer";
 import { LogoMark, LogoWord } from "@/components/brand";
 import { trpc } from "@/lib/trpc";
-import { YassinAvatar } from "@/components/yassin";
+import { CompanionAvatar } from "@/components/companion";
 import "./about.css";
 
 const VALUES = [
@@ -317,27 +317,29 @@ export default function About() {
         <div className="about-team__grid">
           <article className="about-profile-card">
             <div className="about-profile-card__avatar">
-              <YassinAvatar size={92} />
+              <CompanionAvatar size={92} forceId="yassin" />
             </div>
             <div className="about-profile-card__body">
               <p className="about-card-label">مرشد الرحلة</p>
-              <h3>{yassin?.name ?? "ياسين"}</h3>
-              <p className="about-profile-card__role">
-                {yassin?.title ?? "مساعدك في الرحلة"}
-              </p>
+              <h3>ياسين 🚀</h3>
+              <p className="about-profile-card__role">المرشد الذكي والنشيط</p>
               <p className="about-profile-card__bio">
-                {yassin?.bio ??
-                  "شخصية افتراضية بترافقك في الاختبارات والكورسات وتفكّرك إن الخطوة الصغيرة برضه تقدّم."}
+                بطل المغامرة، بيشرح بأسلوب عملي ومنطقي ويشجعك تتكلم بطلاقة وكسر حاجز الخوف.
               </p>
-              <Link href="/instructors/yassin" className="about-inline-link">
-                شوف ملف ياسين <ArrowLeft aria-hidden="true" />
-              </Link>
             </div>
-            {yassinLoading && (
-              <span className="about-profile-card__status">
-                جارٍ تحميل الملف…
-              </span>
-            )}
+          </article>
+          <article className="about-profile-card border-pink-200 dark:border-pink-900/40">
+            <div className="about-profile-card__avatar">
+              <CompanionAvatar size={92} forceId="khadija" />
+            </div>
+            <div className="about-profile-card__body">
+              <p className="about-card-label text-pink-600">مرشدة الرحلة الكيوت</p>
+              <h3>خديجة 🌸</h3>
+              <p className="about-profile-card__role">المرشدة الكيوت واللطيفة</p>
+              <p className="about-profile-card__bio">
+                لطيفة وكيوت جداً، صبورة وبتشرح بالراحة وبابتسامة وبتخلي المذاكرة ممتعة وخفيفة على القلب.
+              </p>
+            </div>
           </article>
           <article className="about-contact-card">
             <span className="about-contact-card__icon">

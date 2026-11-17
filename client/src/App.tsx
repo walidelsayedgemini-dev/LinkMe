@@ -36,6 +36,8 @@ const StudentProfile = lazy(() => import("./pages/StudentProfile"));
 const Path = lazy(() => import("./pages/Path"));
 const Kids = lazy(() => import("./pages/Kids"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+import { CompanionProvider } from "./contexts/CompanionContext";
+import { CompanionFloatingWidget, CompanionSelectionDialog } from "./components/companion";
 import { WhatsAppFab } from "./components/whatsapp";
 import { CornerProps } from "@/components/decor";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -170,17 +172,21 @@ function App() {
       <ThemeProvider defaultTheme="light" switchable>
         <TooltipProvider>
           <AuthProvider>
-            <ScrollToTop />
-            <RoutePrefetch />
-            <Toaster position="top-center" richColors />
-            <div aria-hidden className="global-notebook-grid notebook-grid" />
-            <StudyAtmosphere />
-            <CornerProps className="study-corners" />
-            <div className="relative z-[1]">
-              <SiteNavigation />
-              <Router />
-            </div>
-            <FloatingWhatsApp />
+            <CompanionProvider>
+              <ScrollToTop />
+              <RoutePrefetch />
+              <Toaster position="top-center" richColors />
+              <div aria-hidden className="global-notebook-grid notebook-grid" />
+              <StudyAtmosphere />
+              <CornerProps className="study-corners" />
+              <div className="relative z-[1]">
+                <SiteNavigation />
+                <Router />
+              </div>
+              <FloatingCompanion />
+              <FloatingWhatsApp />
+              <CompanionSelectionDialog />
+            </CompanionProvider>
           </AuthProvider>
         </TooltipProvider>
       </ThemeProvider>
@@ -191,6 +197,12 @@ function App() {
 export default App;
 
 const AUTH_PATHS = ["/login", "/signup", "/forgot-password", "/reset-password"];
+
+function FloatingCompanion() {
+  const [location] = useLocation();
+  if (AUTH_PATHS.some(path => location.startsWith(path))) return null;
+  return <CompanionFloatingWidget />;
+}
 
 /** The floating WhatsApp shortcut is hidden on the auth screens, which are full-height. */
 function FloatingWhatsApp() {

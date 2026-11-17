@@ -16,7 +16,7 @@ import {
   User,
 } from "lucide-react";
 import { Logo, LogoMark, LogoWord } from "@/components/brand";
-import { YassinAvatar } from "@/components/yassin";
+import { YassinAvatar, useCompanion } from "@/components/companion";
 import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
 import "./auth.css";
@@ -69,6 +69,7 @@ export function AuthLayout({
   footer?: ReactNode;
   badge?: string;
 }) {
+  const { companion } = useCompanion();
   return (
     <main
       dir="rtl"
@@ -112,8 +113,7 @@ export function AuthLayout({
           <div className="mt-5 flex items-center gap-3 rounded-2xl border border-line bg-card/80 p-3.5 shadow-[0_18px_40px_-38px_rgba(10,27,51,0.65)]">
             <YassinAvatar size={42} className="auth-guide-avatar" />
             <p className="text-xs leading-6 text-ink-soft">
-              <span className="font-semibold text-ink">ياسين</span> · مساعد
-              افتراضي في الرحلة — هيساعدك تبدأ من الخطوة المناسبة.
+              <span className="font-semibold text-ink">{companion.name} {companion.favoriteEmoji}</span> · {companion.role} — هيساعدك تبدأ من الخطوة المناسبة.
             </p>
           </div>
         </div>

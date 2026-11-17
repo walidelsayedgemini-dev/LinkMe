@@ -26,7 +26,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { YassinAvatar } from "@/components/yassin";
+import { useCompanion, CompanionAvatar } from "@/components/companion";
 import { trpc } from "@/lib/trpc";
 import { categoryIcon, FAQ_GROUPS } from "@/lib/content";
 
@@ -46,6 +46,7 @@ function Label({
 }
 
 export default function Home() {
+  const { companion } = useCompanion();
   const featured = trpc.catalog.featured.useQuery();
   const categories = trpc.catalog.categories.useQuery();
   const instructors = trpc.catalog.instructors.useQuery({});
@@ -337,9 +338,9 @@ export default function Home() {
         <div className="grid items-center gap-7 rounded-[28px] border border-line bg-iris-soft p-6 sm:p-10 lg:grid-cols-[1fr_auto]">
           <div>
             <div className="mb-4 flex items-center gap-3">
-              <YassinAvatar size={50} />
-              <span className="text-xs text-ink-soft">
-                ياسين · مرشدك الافتراضي
+              <CompanionAvatar size={50} />
+              <span className="text-xs font-semibold text-ink-soft">
+                {companion.name} · {companion.badge} {companion.favoriteEmoji}
               </span>
             </div>
             <h2 className="text-3xl leading-snug text-ink sm:text-4xl">
@@ -349,7 +350,7 @@ export default function Home() {
             </h2>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-ink-soft">
               بنك 1000 سؤال، ومراحل قصيرة من A1 لحد C2. كل مرحلة 12 سؤال مع
-              ياسين، وتقدر ترتاح وتكمّل وقت ما تحب. نتيجة تقديرية وترشيحات تناسب
+              {" "}{companion.name}، وتقدر ترتاح وتكمّل وقت ما تحب. نتيجة تقديرية وترشيحات تناسب
               إجاباتك، مش شهادة مستوى معتمدة.
             </p>
           </div>

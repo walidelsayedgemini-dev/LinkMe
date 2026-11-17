@@ -19,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useCompanion, CompanionAvatar } from "@/components/companion";
 import { Logo } from "@/components/brand";
 import { UserAvatar } from "@/components/bits";
 import { Button } from "@/components/ui/button";
@@ -58,6 +59,7 @@ export function SiteHeader() {
   const [location, navigate] = useLocation();
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { companion, toggleCompanion, setIsModalOpen } = useCompanion();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -197,6 +199,22 @@ export function SiteHeader() {
             <Search className="size-[18px]" />
           </button>
           {themeButton}
+          <button
+            type="button"
+            onClick={toggleCompanion}
+            aria-label={`تبديل المرشد (الحالي: ${companion.name})`}
+            className={cn(
+              "flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-bold transition hover:scale-105 active:scale-95 shadow-sm",
+              companion.id === "khadija"
+                ? "border-pink-300 bg-pink-50/90 text-pink-700 hover:bg-pink-100 dark:bg-pink-950/50 dark:text-pink-300"
+                : "border-blue-300 bg-blue-50/90 text-blue-700 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-300"
+            )}
+            title={`المرشد الحالي: ${companion.name} (${companion.badge}) — اضغط للتبديل`}
+          >
+            <CompanionAvatar size={24} />
+            <span className="hidden sm:inline font-semibold">{companion.name}</span>
+            <span className="text-[10px] opacity-75">{companion.favoriteEmoji}</span>
+          </button>
           {user ? (
             <DropdownMenu dir="rtl">
               <DropdownMenuTrigger asChild>

@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradients -->
+    <radialGradient id="bgGrad" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#FFE4EC"/>
+      <stop offset="60%" stop-color="#FFD1DF"/>
+      <stop offset="100%" stop-color="#FFA8C5"/>
+    </radialGradient>
+    
+    <!-- Hijab Gradients -->
+    <linearGradient id="hijabGrad" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#F472B6"/>
+      <stop offset="45%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#BE185D"/>
+    </linearGradient>
+
+    <linearGradient id="hijabInner" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBCFE8"/>
+      <stop offset="100%" stop-color="#F472B6"/>
+    </linearGradient>
+
+    <!-- Face Skin Gradient (Warm Egyptian Olive / Peachy) -->
+    <linearGradient id="skinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF0E5"/>
+      <stop offset="60%" stop-color="#FDE2D0"/>
+      <stop offset="100%" stop-color="#F8CBB2"/>
+    </linearGradient>
+
+    <!-- Blush Radial -->
+    <radialGradient id="blush" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FF4B72" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#FF4B72" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Eye Gradient -->
+    <radialGradient id="eyeGrad" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#5A2E16"/>
+      <stop offset="70%" stop-color="#261005"/>
+      <stop offset="100%" stop-color="#0F0502"/>
+    </radialGradient>
+
+    <!-- Dress Gradient -->
+    <linearGradient id="dressGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="50%" stop-color="#A855F7"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#831843" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Circular Base -->
+  <circle cx="200" cy="200" r="195" fill="url(#bgGrad)" stroke="#FFFFFF" stroke-width="6"/>
+
+  <!-- Sparkles & Hearts in Background -->
+  <g opacity="0.75">
+    <!-- Star 1 -->
+    <path d="M 60 110 Q 60 125 45 125 Q 60 125 60 140 Q 60 125 75 125 Q 60 125 60 110 Z" fill="#FFF" opacity="0.9"/>
+    <!-- Star 2 -->
+    <path d="M 330 90 Q 330 102 318 102 Q 330 102 330 114 Q 330 102 342 102 Q 330 102 330 90 Z" fill="#FFF" opacity="0.85"/>
+    <!-- Star 3 -->
+    <path d="M 345 230 Q 345 240 335 240 Q 345 240 345 250 Q 345 240 355 240 Q 345 240 345 230 Z" fill="#FFF" opacity="0.7"/>
+    <!-- Heart 1 -->
+    <path d="M 75 220 C 65 210, 50 215, 50 227 C 50 240, 75 255, 75 255 C 75 255, 100 240, 100 227 C 100 215, 85 210, 75 220 Z" fill="#FF85A2" opacity="0.6"/>
+  </g>
+
+  <!-- Body / Shoulders Dress -->
+  <g filter="url(#dropShadow)">
+    <path d="M 90 395 C 100 320, 140 295, 200 295 C 260 295, 300 320, 310 395 Z" fill="url(#dressGrad)"/>
+    <!-- Collar Detail -->
+    <path d="M 160 300 C 180 325, 220 325, 240 300 C 230 335, 170 335, 160 300 Z" fill="#FFFFFF" opacity="0.95"/>
+    <!-- Cute Pendant -->
+    <circle cx="200" cy="335" r="7" fill="#FBBF24" stroke="#FFF" stroke-width="2"/>
+  </g>
+
+  <!-- Hijab Outer Shape -->
+  <path d="M 200 48 C 115 48, 85 110, 85 200 C 85 270, 110 325, 150 350 C 175 365, 225 365, 250 350 C 290 325, 315 270, 315 200 C 315 110, 285 48, 200 48 Z" 
+        fill="url(#hijabGrad)" filter="url(#dropShadow)"/>
+
+  <!-- Hijab Fold Highlight -->
+  <path d="M 120 110 C 160 65, 240 65, 280 110 C 260 85, 220 70, 180 75 C 145 80, 130 95, 120 110 Z" fill="#FCE7F3" opacity="0.45"/>
+
+  <!-- Inner Hijab Underscarf (Band) -->
+  <path d="M 135 155 C 150 120, 250 120, 265 155 C 250 140, 150 140, 135 155 Z" fill="#FFFFFF"/>
+
+  <!-- Cute Face Shape -->
+  <path d="M 142 165 C 132 205, 142 260, 200 268 C 258 260, 268 205, 258 165 C 245 150, 155 150, 142 165 Z" fill="url(#skinGrad)" filter="url(#dropShadow)"/>
+
+  <!-- Cheerful Rosy Cheeks -->
+  <ellipse cx="160" cy="225" rx="18" ry="11" fill="url(#blush)"/>
+  <ellipse cx="240" cy="225" rx="18" ry="11" fill="url(#blush)"/>
+
+  <!-- Eyebrows (Curved, Friendly) -->
+  <path d="M 152 178 Q 166 172 180 177" stroke="#78350F" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <path d="M 220 177 Q 234 172 248 178" stroke="#78350F" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+
+  <!-- Large Cute Sparkling Eyes -->
+  <!-- Left Eye -->
+  <g>
+    <!-- Eye Base -->
+    <ellipse cx="168" cy="200" rx="15" ry="18" fill="url(#eyeGrad)"/>
+    <!-- Top Eyelash / Eyelid Line -->
+    <path d="M 150 196 Q 168 184 186 195" stroke="#1E1B4B" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M 183 192 L 189 187" stroke="#1E1B4B" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Main Big Sparkle Reflection -->
+    <circle cx="163" cy="193" r="6" fill="#FFFFFF"/>
+    <!-- Secondary Sparkle -->
+    <circle cx="174" cy="207" r="3" fill="#FFFFFF"/>
+    <circle cx="164" cy="210" r="1.5" fill="#FFFFFF" opacity="0.8"/>
+  </g>
+
+  <!-- Right Eye -->
+  <g>
+    <!-- Eye Base -->
+    <ellipse cx="232" cy="200" rx="15" ry="18" fill="url(#eyeGrad)"/>
+    <!-- Top Eyelash / Eyelid Line -->
+    <path d="M 214 195 Q 232 184 250 196" stroke="#1E1B4B" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M 247 192 L 253 187" stroke="#1E1B4B" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Main Big Sparkle Reflection -->
+    <circle cx="227" cy="193" r="6" fill="#FFFFFF"/>
+    <!-- Secondary Sparkle -->
+    <circle cx="238" cy="207" r="3" fill="#FFFFFF"/>
+    <circle cx="228" cy="210" r="1.5" fill="#FFFFFF" opacity="0.8"/>
+  </g>
+
+  <!-- Cute Little Nose -->
+  <path d="M 197 215 Q 200 219 203 215" stroke="#E07A5F" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+
+  <!-- Big Sweet Happy Smile -->
+  <path d="M 185 233 Q 200 248 215 233" fill="#E11D48" stroke="#BE123C" stroke-width="2" stroke-linecap="round"/>
+  <!-- Smile Teeth Highlight -->
+  <path d="M 189 234 Q 200 242 211 234 Q 200 232 189 234 Z" fill="#FFFFFF"/>
+
+  <!-- Hijab Wrap Across Neck (Front Layer) -->
+  <path d="M 148 262 C 165 285, 235 285, 252 262 C 275 300, 240 340, 200 345 C 160 340, 125 300, 148 262 Z" 
+        fill="url(#hijabInner)" opacity="0.95"/>
+
+  <!-- Cute Flower Hairpin on Hijab (Side) -->
+  <g transform="translate(108, 140)">
+    <!-- Flower Petals -->
+    <circle cx="0" cy="-10" r="8" fill="#FDE047"/>
+    <circle cx="10" cy="-3" r="8" fill="#FDE047"/>
+    <circle cx="6" cy="9" r="8" fill="#FDE047"/>
+    <circle cx="-6" cy="9" r="8" fill="#FDE047"/>
+    <circle cx="-10" cy="-3" r="8" fill="#FDE047"/>
+    <!-- Flower Center -->
+    <circle cx="0" cy="0" r="7" fill="#F97316" stroke="#FFF" stroke-width="1.5"/>
+  </g>
+
+  <!-- Sparkle near Face -->
+  <g transform="translate(275, 175)">
+    <path d="M 0 -12 Q 0 0 -12 0 Q 0 0 0 12 Q 0 0 12 0 Q 0 0 0 -12 Z" fill="#FBBF24"/>
+  </g>
+</svg>
