@@ -90,7 +90,7 @@ export function CertificateModal({
     ctx.fillRect(36, 36, cornerSize, cornerSize);
     ctx.fillRect(1164 - cornerSize, 36, cornerSize, cornerSize);
     ctx.fillRect(36, 804 - cornerSize, cornerSize, cornerSize);
-    ctx.fillRect(1164 - cornerSize, 804 - cornerSize, cornerSize);
+    ctx.fillRect(1164 - cornerSize, 804 - cornerSize, cornerSize, cornerSize);
 
     // Academy header
     ctx.fillStyle = "#92400e";
@@ -138,7 +138,11 @@ export function CertificateModal({
     // Level Badge
     ctx.fillStyle = "#fef3c7";
     ctx.beginPath();
-    ctx.roundRect(400, 525, 400, 45, [22]);
+    if ((ctx as any).roundRect) {
+      (ctx as any).roundRect(400, 525, 400, 45, [22]);
+    } else {
+      ctx.rect(400, 525, 400, 45);
+    }
     ctx.fill();
     ctx.strokeStyle = "#d97706";
     ctx.lineWidth = 1.5;
