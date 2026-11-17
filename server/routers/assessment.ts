@@ -328,9 +328,7 @@ export const assessmentRouter = router({
         if (!session.state.questionIds.includes(input.questionId))
           error("BAD_REQUEST", "السؤال مش موجود في المرحلة الحالية.");
         const existing = session.state.answers[input.questionId];
-        if (existing !== undefined) {
-          if (existing !== input.optionIndex)
-            error("CONFLICT", "الإجابة لا يمكن تغييرها بعد إرسالها.");
+        if (existing === input.optionIndex) {
           return session.state;
         }
         const question = currentQuestions(session.state).find(
