@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useCompanion, CompanionAvatar } from "@/components/companion";
+import { HeaderStreakIndicator } from "@/components/gamification-badges";
 import { Logo } from "@/components/brand";
 import { UserAvatar } from "@/components/bits";
 import { Button } from "@/components/ui/button";
@@ -198,6 +199,7 @@ export function SiteHeader() {
           >
             <Search className="size-[18px]" />
           </button>
+          <HeaderStreakIndicator />
           {themeButton}
           <button
             type="button"

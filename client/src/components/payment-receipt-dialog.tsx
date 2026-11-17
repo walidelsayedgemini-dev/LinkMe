@@ -11,6 +11,8 @@ import {
   Phone,
   ShieldCheck,
   Smartphone,
+  Sparkles,
+  Tag,
   UploadCloud,
   X,
 } from "lucide-react";
@@ -24,6 +26,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCompanion, CompanionAvatar } from "@/components/companion";
+import { soundEffects } from "@/lib/sound-effects";
 import { trpc } from "@/lib/trpc";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -32,6 +36,7 @@ import {
   type PaymentMethodType,
   type TargetItemType,
 } from "../../../shared/payment-config";
+import { applyPromoCode, type PromoCode } from "../../../shared/promo-codes";
 import { inputClass } from "@/pages/auth-layout";
 import { Link } from "wouter";
 
@@ -55,9 +60,16 @@ export function PaymentReceiptDialog({
   currency = "EGP",
 }: Props) {
   const { user } = useAuth();
+  const { companion } = useCompanion();
   const [selectedMethod, setSelectedMethod] =
     useState<PaymentMethodType>("vodafone_cash");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  // Promo code engine state
+  const [promoCodeInput, setPromoCodeInput] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
+  const [discountCents, setDiscountCents] = useState(0);
+  const finalAmountCents = Math.max(0, amountCents - discountCents);
 
   const [senderPhoneOrHandle, setSenderPhoneOrHandle] = useState(
     user?.phone ?? ""
@@ -72,6 +84,29 @@ export function PaymentReceiptDialog({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const utils = trpc.useUtils();
+
+  const handleApplyPromo = () => {
+    if (!promoCodeInput.trim()) return;
+    const res = applyPromoCode(promoCodeInput, amountCents);
+    if (res.valid && res.promo) {
+      soundEffects.playCorrect();
+      setAppliedPromo(res.promo);
+      setDiscountCents(res.discountCents);
+      toast.success(
+        `تم تطبيق كود الخصم! وفّرت ${formatPrice(res.discountCents, currency, false)} 🎉`
+      );
+    } else {
+      soundEffects.playIncorrect();
+      toast.error(res.messageAr);
+    }
+  };
+
+  const handleRemovePromo = () => {
+    soundEffects.playClick();
+    setAppliedPromo(null);
+    setDiscountCents(0);
+    setPromoCodeInput("");
+  };
 
   const submitReceipt = trpc.receipts.submit.useMutation({
     onSuccess: data => {
@@ -163,16 +198,20 @@ export function PaymentReceiptDialog({
       return;
     }
 
+    const submissionNote = appliedPromo
+      ? `[كود الخصم المطبق: ${appliedPromo.code} - وفر ${formatPrice(discountCents, currency, false)}] ${note.trim()}`.trim()
+      : note.trim() || undefined;
+
     submitReceipt.mutate({
       method: selectedMethod,
       targetType,
       targetId,
       targetTitle,
-      amountCents,
+      amountCents: finalAmountCents,
       senderPhoneOrHandle: senderPhoneOrHandle.trim(),
       transactionReference: transactionRef.trim() || undefined,
       receiptImage: imageBase64,
-      note: note.trim() || undefined,
+      note: submissionNote,
     });
   };
 
@@ -181,6 +220,9 @@ export function PaymentReceiptDialog({
     setImageBase64(null);
     setTransactionRef("");
     setNote("");
+    setAppliedPromo(null);
+    setDiscountCents(0);
+    setPromoCodeInput("");
   };
 
   return (
@@ -215,12 +257,82 @@ export function PaymentReceiptDialog({
             <h4 className="text-sm font-bold text-ink mt-0.5">{targetTitle}</h4>
           </div>
           <div className="text-start sm:text-end">
-            <p className="text-xs text-ink-soft">المبلغ المطلوب بدقة</p>
-            <span className="text-lg font-black text-iris">
-              {formatPrice(amountCents, currency, false)}
-            </span>
+            <p className="text-xs text-ink-soft">المبلغ المطلوب للتحويل</p>
+            <div className="flex items-baseline gap-2">
+              {appliedPromo && (
+                <span className="text-xs text-ink-soft line-through">
+                  {formatPrice(amountCents, currency, false)}
+                </span>
+              )}
+              <span className="text-lg font-black text-iris">
+                {formatPrice(finalAmountCents, currency, false)}
+              </span>
+            </div>
           </div>
         </div>
+
+        {/* Promo Code Input & Status */}
+        {!isSuccess && (
+          <div className="rounded-2xl border border-line bg-card p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-1.5 text-xs font-bold text-ink">
+                <Tag className="size-3.5 text-iris" /> هل لديك كود خصم؟
+              </span>
+              <span className="text-[10px] text-ink-soft">
+                جرّب كود <strong className="text-iris font-mono">LINKME20</strong> أو <strong className="text-iris font-mono">{companion.id === "khadija" ? "KHADIJA" : "YASSIN"}</strong>
+              </span>
+            </div>
+
+            {appliedPromo ? (
+              <div className="flex items-center justify-between rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-2.5 text-xs">
+                <div className="flex items-center gap-2">
+                  <CompanionAvatar size={28} />
+                  <div>
+                    <span className="font-bold text-emerald-700 dark:text-emerald-400">
+                      تم تفعيل كود ({appliedPromo.code}): {appliedPromo.descriptionAr}
+                    </span>
+                    <p className="text-[11px] text-ink-soft">
+                      {companion.id === "khadija"
+                        ? appliedPromo.companionMessage?.khadija ?? "تم تطبيق الخصم يا قمر! 🌸"
+                        : appliedPromo.companionMessage?.yassin ?? "تم تطبيق الخصم يا وحش! 🔥"}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRemovePromo}
+                  className="text-xs text-rose-600 hover:text-rose-700 font-bold px-2 py-1"
+                >
+                  إلغاء
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={promoCodeInput}
+                  onChange={(e) => setPromoCodeInput(e.target.value)}
+                  placeholder="أدخل كود الخصم (مثال: LINKME20)"
+                  className="h-9 flex-1 rounded-xl border border-line bg-paper px-3 text-xs uppercase font-mono tracking-wider focus:outline-none focus:ring-1 focus:ring-iris"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleApplyPromo();
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleApplyPromo}
+                  className="h-9 rounded-xl bg-iris px-4 text-xs font-bold text-white hover:bg-iris-deep"
+                >
+                  تطبيق الكود
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* If successfully submitted */}
         {isSuccess ? (

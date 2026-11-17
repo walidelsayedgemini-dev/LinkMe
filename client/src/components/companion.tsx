@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useCompanion, COMPANIONS, CompanionId } from "@/contexts/CompanionContext";
 import { getCompanionQuote } from "@/lib/companion-motivational-bank";
 import { PronounceButton } from "@/components/pronounce-button";
+import { VoicePracticeDialog } from "@/components/voice-practice-dialog";
 import {
   Dialog,
   DialogContent,
@@ -304,6 +305,7 @@ export function CompanionFloatingWidget() {
   const { companion, toggleCompanion, setIsModalOpen } = useCompanion();
   const [expanded, setExpanded] = useState(false);
   const [quoteIdx, setQuoteIdx] = useState(0);
+  const [voiceOpen, setVoiceOpen] = useState(false);
 
   const nextQuote = () => {
     setQuoteIdx((prev) => (prev + 1) % companion.quotes.length);
@@ -344,6 +346,18 @@ export function CompanionFloatingWidget() {
             </button>
           </div>
 
+          {/* Voice Practice Shortcut */}
+          <button
+            type="button"
+            onClick={() => {
+              setExpanded(false);
+              setVoiceOpen(true);
+            }}
+            className="mb-2 w-full flex items-center justify-center gap-2 rounded-xl bg-iris/10 hover:bg-iris/20 text-iris py-2 px-3 text-xs font-bold transition border border-iris/20 shadow-xs"
+          >
+            <span>🎙️ معمل نطق الإنجليزي بالصوت</span>
+          </button>
+
           <div className="flex items-center gap-2 pt-1">
             <button
               onClick={toggleCompanion}
@@ -370,6 +384,9 @@ export function CompanionFloatingWidget() {
           </div>
         </div>
       )}
+
+      {/* Voice Practice Modal */}
+      <VoicePracticeDialog open={voiceOpen} onOpenChange={setVoiceOpen} />
 
       {/* Floating Avatar Trigger Button */}
       <button

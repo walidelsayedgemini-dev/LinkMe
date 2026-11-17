@@ -42,6 +42,7 @@ import { WhatsAppFab } from "./components/whatsapp";
 import { CornerProps } from "@/components/decor";
 import { SiteHeader } from "@/components/layout/site-header";
 import { StudyAtmosphere } from "@/components/study-atmosphere";
+import { PwaInstallPrompt } from "@/components/pwa-install-prompt";
 
 const ROUTE_LOADERS: Record<string, () => Promise<unknown>> = {
   "/about": () => import("./pages/About"),
@@ -185,6 +186,7 @@ function App() {
               </div>
               <FloatingCompanion />
               <FloatingWhatsApp />
+              <PwaInstallPrompt />
               <CompanionSelectionDialog />
             </CompanionProvider>
           </AuthProvider>

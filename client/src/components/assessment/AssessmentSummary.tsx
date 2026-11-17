@@ -1,9 +1,12 @@
-import { ArrowLeft, BookOpen, Check, RefreshCw, Target } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowLeft, BookOpen, Check, RefreshCw, Target, Award } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { CompanionSays, useCompanion } from "@/components/companion";
 import { getCompanionQuote } from "@/lib/companion-motivational-bank";
+import { soundEffects } from "@/lib/sound-effects";
 import { formatPrice } from "@/lib/format";
+import { CertificateModal } from "@/components/certificate-modal";
 import type { AssessmentSummary as Summary } from "@shared/assessment";
 import {
   LEVEL_DESCRIPTIONS,
@@ -27,6 +30,11 @@ export function AssessmentSummary({
 }: AssessmentSummaryProps) {
   const { companion } = useCompanion();
   const quote = getCompanionQuote(companion.id, "levelTestResult");
+  const [certOpen, setCertOpen] = useState(false);
+
+  useEffect(() => {
+    soundEffects.playTrophy();
+  }, []);
   const skills = (
     Object.keys(summary.skills) as (keyof typeof summary.skills)[]
   ).map(skill => ({
@@ -169,7 +177,18 @@ export function AssessmentSummary({
         </section>
       </div>
 
-      <div className="assessment-summary-actions">
+      <div className="assessment-summary-actions flex flex-wrap items-center justify-center gap-3">
+        <Button
+          type="button"
+          className="rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold shadow-md gap-2"
+          onClick={() => {
+            soundEffects.playClick();
+            setCertOpen(true);
+          }}
+        >
+          <Award className="size-4" />
+          عرض وطباعة شهادة مستواك 🎓
+        </Button>
         <Button
           type="button"
           variant="outline"
@@ -179,11 +198,18 @@ export function AssessmentSummary({
           <RefreshCw className="size-4" />{" "}
           {mode === "practice" ? "تدريب مرحلة تانية" : "إعادة قياس المستوى"}
         </Button>
-        <p className="assessment-disclaimer">
+        <p className="assessment-disclaimer w-full text-center">
           النتيجة تقديرية مبنية على النص فقط، ولا تمثل اعتماد CEFR أو اختبار
           تحدث واستماع.
         </p>
       </div>
+
+      <CertificateModal
+        open={certOpen}
+        onOpenChange={setCertOpen}
+        levelTitle={summary.belowA1 ? "Pre-A1 Foundation" : `Level ${summary.level} — English Proficiency`}
+        courseTitle="اختبار تحديد المستوى المعتمد من Link Me"
+      />
     </div>
   );
 }

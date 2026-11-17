@@ -5,9 +5,11 @@ import {
   CircleAlert,
   Loader2,
 } from "lucide-react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { CompanionSays, useCompanion } from "@/components/companion";
 import { getCompanionQuote } from "@/lib/companion-motivational-bank";
+import { soundEffects } from "@/lib/sound-effects";
 import { PronounceButton } from "@/components/pronounce-button";
 import { cn } from "@/lib/utils";
 import type { AssessmentQuestion, QuestionFeedback } from "@shared/assessment";
@@ -62,6 +64,16 @@ export function QuestionCard({
   const canAdvance = hasAnswer && !answerPending && !actionPending;
   const currentFeedback =
     feedback?.questionId === question.id ? feedback : null;
+
+  useEffect(() => {
+    if (currentFeedback) {
+      if (currentFeedback.correct) {
+        soundEffects.playCorrect();
+      } else {
+        soundEffects.playIncorrect();
+      }
+    }
+  }, [currentFeedback?.questionId, currentFeedback?.correct]);
 
   return (
     <div className="assessment-question-layout">

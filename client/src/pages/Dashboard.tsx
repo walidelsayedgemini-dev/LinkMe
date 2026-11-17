@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import {
   ArrowLeft,
+  Award,
   BookOpen,
   CheckCircle2,
   ClipboardList,
@@ -8,6 +10,7 @@ import {
   Flame,
   Gauge,
   Heart,
+  Mic,
   PlayCircle,
   ShieldCheck,
   Sparkles,
@@ -24,10 +27,14 @@ import { formatDate, formatDateTime, formatMinutesShort } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { PremiumAccountSummary } from "@/components/premium-account-summary";
 import { YassinSays, useCompanion } from "@/components/companion";
+import { VoicePracticeDialog } from "@/components/voice-practice-dialog";
+import { CertificateModal } from "@/components/certificate-modal";
 
 export default function Dashboard() {
   const { user, loading } = useAuth();
   const { companion } = useCompanion();
+  const [voiceOpen, setVoiceOpen] = useState(false);
+  const [certOpen, setCertOpen] = useState(false);
   const [, navigate] = useLocation();
   const { data, isLoading, error: dashboardError, refetch: reloadDashboard } = trpc.learning.dashboard.useQuery(undefined, {
     enabled: Boolean(user),
@@ -109,6 +116,21 @@ export default function Dashboard() {
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                onClick={() => setVoiceOpen(true)}
+                className="rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-1.5 shadow-sm"
+              >
+                <Mic className="size-4" /> تدريب النطق بالصوت
+              </Button>
+              <Button
+                type="button"
+                onClick={() => setCertOpen(true)}
+                variant="outline"
+                className="rounded-full border-amber-500/50 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold gap-1.5"
+              >
+                <Award className="size-4 text-amber-500" /> شهادتي المعتمدة
+              </Button>
               <Button
                 asChild
                 className="rounded-full bg-iris text-white hover:bg-iris-deep"
@@ -484,6 +506,14 @@ export default function Dashboard() {
           </Button>
         </div>
       </section>
+
+      <VoicePracticeDialog open={voiceOpen} onOpenChange={setVoiceOpen} />
+      <CertificateModal
+        open={certOpen}
+        onOpenChange={setCertOpen}
+        defaultStudentName={user?.name || "بطل Link Me"}
+        levelTitle={placement?.level ? `Level ${placement.level} — English Proficiency` : "Level B1 — Intermediate Independent User"}
+      />
     </PageShell>
   );
 }

@@ -1,0 +1,43 @@
+{
+  "name": "لينك مي | Link Me English",
+  "short_name": "Link Me",
+  "description": "منصة تعلّم الإنجليزية الاحترافية باللهجة المصرية، مع مرشديك ياسين وخديجة واختبار المستوى التفاعلي وتدريب النطق بالذكاء الاصطناعي",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait",
+  "dir": "rtl",
+  "lang": "ar-EG",
+  "categories": ["education", "learning"],
+  "icons": [
+    {
+      "src": "/brand-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/img/yassin-avatar.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "اختبار المستوى",
+      "short_name": "المستوى",
+      "description": "حدد مستواك في الإنجليزي في دقائق",
+      "url": "/level-test",
+      "icons": [{ "src": "/brand-icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "لوحة التعلّم",
+      "short_name": "لوحتي",
+      "description": "استكمل دروسك وتتبع تقدمك",
+      "url": "/dashboard",
+      "icons": [{ "src": "/brand-icon.svg", "sizes": "any" }]
+    }
+  ]
+}
