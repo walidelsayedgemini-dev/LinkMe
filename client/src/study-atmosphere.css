@@ -1,0 +1,300 @@
+.study-atmosphere {
+  --study-ink: color-mix(in srgb, var(--color-ink) 38%, transparent);
+  --study-iris: color-mix(in srgb, var(--color-iris) 42%, transparent);
+  --study-line: color-mix(in srgb, var(--color-line) 68%, transparent);
+  --study-yellow: color-mix(in srgb, #ffd166 30%, var(--color-card));
+  --study-mint: color-mix(in srgb, #91d9c4 22%, var(--color-card));
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  isolation: isolate;
+}
+
+.study-atmosphere__pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.42;
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 0 24px,
+      var(--color-line) 24px 25px,
+      transparent 25px 100%
+    ),
+    linear-gradient(var(--color-line) 1px, transparent 1px);
+  background-size:
+    100% 100%,
+    100% 34px;
+  mask-image: linear-gradient(
+    90deg,
+    black,
+    transparent 30%,
+    transparent 70%,
+    black
+  );
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    black,
+    transparent 30%,
+    transparent 70%,
+    black
+  );
+}
+
+.study-atmosphere__margin {
+  position: absolute;
+  width: clamp(5.5rem, 10vw, 8.5rem);
+  height: clamp(11rem, 20vw, 16rem);
+}
+
+.study-atmosphere__margin--start {
+  inset-inline-start: clamp(0.55rem, 3.5vw, 4rem);
+  top: clamp(7.5rem, 18vh, 12rem);
+}
+
+.study-atmosphere__margin--end {
+  inset-inline-end: clamp(0.55rem, 3.5vw, 4rem);
+  bottom: clamp(5.5rem, 13vh, 9rem);
+}
+
+.study-atmosphere__paper {
+  position: absolute;
+  display: block;
+  width: clamp(4.3rem, 7vw, 6.2rem);
+  aspect-ratio: 0.82;
+  border: 1px solid var(--study-line);
+  border-radius: 0.18rem 0.65rem 0.3rem 0.25rem;
+  box-shadow: 0 16px 24px -25px var(--color-ink);
+  transform: rotate(-7deg);
+}
+
+.study-atmosphere__paper--blue {
+  inset-inline-start: 0;
+  top: 0.35rem;
+  background: color-mix(in srgb, var(--color-iris-soft) 74%, var(--color-card));
+}
+
+.study-atmosphere__paper--mint {
+  inset-inline-end: 0;
+  bottom: 0.7rem;
+  transform: rotate(7deg);
+  background: var(--study-mint);
+}
+
+.study-atmosphere__paper::after {
+  position: absolute;
+  inset-inline-end: 0.45rem;
+  bottom: 0.42rem;
+  width: 0.72rem;
+  height: 0.72rem;
+  border-inline-end: 1px solid var(--study-iris);
+  border-bottom: 1px solid var(--study-iris);
+  border-radius: 0 0 0.15rem 0;
+  content: "";
+  opacity: 0.72;
+}
+
+.study-atmosphere__paper--mint::after {
+  border-color: color-mix(in srgb, #32997d 52%, var(--color-line));
+}
+
+.study-atmosphere__paper-lines {
+  position: absolute;
+  inset: 1.45rem 0.65rem auto;
+  height: 1px;
+  background: var(--study-line);
+  box-shadow:
+    0 0.7rem 0 var(--study-line),
+    0 1.4rem 0 var(--study-line),
+    0 2.1rem 0 var(--study-line);
+  opacity: 0.86;
+}
+
+.study-atmosphere__paper-lines--short {
+  inset-inline-end: 1.1rem;
+  inset-inline-start: 0.65rem;
+  top: 4.25rem;
+  width: 55%;
+  box-shadow: none;
+}
+
+.study-atmosphere__paper-check {
+  position: absolute;
+  top: 0.72rem;
+  inset-inline-end: 0.68rem;
+  width: 0.7rem;
+  height: 0.38rem;
+  border-inline-start: 1.5px solid var(--color-iris);
+  border-bottom: 1.5px solid var(--color-iris);
+  transform: rotate(-45deg);
+  opacity: 0.66;
+}
+
+.study-atmosphere__memo {
+  position: absolute;
+  inset-inline-start: 1.1rem;
+  top: 7rem;
+  width: 3.9rem;
+  height: 2.7rem;
+  border-inline-start: 1px solid var(--study-line);
+  border-bottom: 1px solid var(--study-line);
+  transform: rotate(4deg);
+  opacity: 0.7;
+}
+
+.study-atmosphere__memo::before,
+.study-atmosphere__memo::after {
+  position: absolute;
+  inset-inline-start: 0.55rem;
+  width: 2.3rem;
+  height: 1px;
+  background: var(--study-ink);
+  content: "";
+}
+
+.study-atmosphere__memo::before {
+  top: 0.65rem;
+}
+
+.study-atmosphere__memo::after {
+  top: 1.1rem;
+  width: 1.65rem;
+}
+
+.study-atmosphere__underline {
+  position: absolute;
+  inset-inline-end: 0.2rem;
+  top: 1.2rem;
+  width: 4.6rem;
+  height: 0.55rem;
+  border-bottom: 2px solid var(--study-yellow);
+  border-radius: 50%;
+  transform: rotate(-4deg);
+}
+
+.study-atmosphere__dash {
+  position: absolute;
+  inset-inline-start: 0.2rem;
+  top: 4rem;
+  width: 2rem;
+  height: 0.45rem;
+  border-top: 1.5px solid var(--study-iris);
+  border-bottom: 1.5px solid var(--study-iris);
+  transform: rotate(-10deg);
+  opacity: 0.7;
+}
+
+.study-atmosphere__geometry {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  opacity: 0.5;
+}
+
+.study-atmosphere__line {
+  fill: none;
+  stroke: var(--study-iris);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.25;
+  vector-effect: non-scaling-stroke;
+}
+
+.study-atmosphere__line--soft {
+  stroke: var(--study-line);
+  stroke-width: 1;
+}
+
+.study-atmosphere__dot {
+  fill: var(--study-yellow);
+}
+
+.study-atmosphere__dot--small {
+  fill: var(--study-iris);
+}
+
+.study-atmosphere__motion {
+  animation: study-atmosphere-drift 10s ease-in-out infinite;
+  will-change: transform;
+}
+
+.study-atmosphere--paused .study-atmosphere__motion {
+  animation-play-state: paused;
+}
+
+@keyframes study-atmosphere-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-7deg);
+  }
+  50% {
+    transform: translate3d(0, -5px, 0) rotate(-4deg);
+  }
+}
+
+@media (max-width: 639px) {
+  .study-atmosphere__pattern {
+    opacity: 0.26;
+    mask-image: linear-gradient(
+      90deg,
+      black,
+      transparent 22%,
+      transparent 78%,
+      black
+    );
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      black,
+      transparent 22%,
+      transparent 78%,
+      black
+    );
+  }
+
+  .study-atmosphere__margin {
+    width: 4.7rem;
+    height: 10rem;
+  }
+
+  .study-atmosphere__paper {
+    width: 3.9rem;
+  }
+
+  .study-atmosphere__margin--start {
+    top: 7rem;
+  }
+
+  .study-atmosphere__margin--end {
+    bottom: 4.8rem;
+  }
+
+  .study-atmosphere__geometry {
+    opacity: 0.32;
+  }
+
+  .study-atmosphere__memo {
+    inset-inline-start: 0.7rem;
+    top: 6.4rem;
+    transform: scale(0.82) rotate(4deg);
+    transform-origin: top start;
+  }
+
+  .study-atmosphere__underline {
+    inset-inline-end: -0.2rem;
+    transform: scale(0.82) rotate(-4deg);
+    transform-origin: top end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .study-atmosphere__motion {
+    animation: none;
+    transform: none;
+    will-change: auto;
+  }
+}

@@ -1,0 +1,520 @@
+import {
+  ArrowLeft,
+  ArrowDown,
+  BookOpen,
+  Check,
+  Clock3,
+  Gauge,
+  GraduationCap,
+  MessageCircle,
+  Sparkles,
+  Video,
+} from "lucide-react";
+import { useEffect } from "react";
+import { Link } from "wouter";
+import { PageShell } from "@/components/layout/site-footer";
+import { SectionHeading } from "@/components/bits";
+import { CourseCard } from "@/components/course-card";
+import { LearningPreview } from "@/components/learning-preview";
+import { HeroLogo } from "@/components/hero-logo";
+import { Reveal } from "@/components/reveal";
+import { PlanCards } from "@/components/plan-cards";
+import { Button } from "@/components/ui/button";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { YassinAvatar } from "@/components/yassin";
+import { trpc } from "@/lib/trpc";
+import { categoryIcon, FAQ_GROUPS } from "@/lib/content";
+
+function Label({
+  number,
+  children,
+}: {
+  number: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <p className="editorial-label mb-4">
+      <span className="section-number">{number}</span>
+      {children}
+    </p>
+  );
+}
+
+export default function Home() {
+  const featured = trpc.catalog.featured.useQuery();
+  const categories = trpc.catalog.categories.useQuery();
+  const instructors = trpc.catalog.instructors.useQuery({});
+  const lead = instructors.data?.find(item => item.slug === "yassin");
+
+  useEffect(() => {
+    const hash = window.location.hash.slice(1);
+    if (!hash) return;
+    const timer = setTimeout(
+      () =>
+        document
+          .getElementById(hash)
+          ?.scrollIntoView({ block: "start", behavior: "smooth" }),
+      100
+    );
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <PageShell className="site-page">
+      <section id="top" className="home-hero scroll-mt-24">
+        <div className="container">
+          <div className="hero-layout">
+            <div>
+              <p className="editorial-label">
+                LINK ME · إنجليزي أونلاين، بروح مصرية
+              </p>
+              <h1 className="mt-5">
+                اتكلّم إنجليزي.
+                <br />
+                <span className="hl-word">من غير ما تترجم.</span>
+              </h1>
+              <p className="hero-copy mt-5 text-ink-soft">
+                مش محتاج تحفظ كلمات أكتر. محتاج تستخدم اللي تعرفه. شرح بسيط،
+                مواقف من حياتك، ومدرّس يتابعك خطوة بخطوة — لحد ما الكلام ييجي
+                لوحده.
+              </p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Button
+                  asChild
+                  className="h-12 rounded-full bg-iris px-6 text-white hover:bg-iris-deep"
+                >
+                  <Link href="/courses">
+                    شوف الكورسات <ArrowLeft className="size-4" />
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="h-12 rounded-full border-line bg-card px-5 text-ink"
+                >
+                  <Link href="/level-test">
+                    <Gauge className="size-4 text-iris" /> اعرف مستواك
+                  </Link>
+                </Button>
+              </div>
+              <div className="hero-benefits">
+                <span>
+                  <Check /> شرح بالمصري
+                </span>
+                <span>
+                  <Check /> محاضرات أونلاين
+                </span>
+                <span>
+                  <Check /> متابعة لتقدّمك
+                </span>
+              </div>
+              <a
+                href="#courses"
+                className="mt-8 inline-flex items-center gap-2 text-xs text-ink-soft"
+              >
+                <ArrowDown className="size-3.5" /> اكتشف خطوتك الجاية
+              </a>
+            </div>
+            <HeroLogo />
+          </div>
+          <div className="home-trust">
+            {[
+              {
+                icon: Video,
+                title: "معلّم معاك، مش فيديو وبس",
+                text: "جلسات لايف ومساحة تسأل وتجرب",
+              },
+              {
+                icon: BookOpen,
+                title: "من أول كلمة لأول محادثة",
+                text: "مسار تأسيس واضح من 12 مستوى",
+              },
+              {
+                icon: GraduationCap,
+                title: "كل خطوة ليها متابعة",
+                text: "حضور، مهام وتقييم في حسابك",
+              },
+            ].map(({ icon: Icon, title, text }) => (
+              <div key={title}>
+                <Icon className="size-6 shrink-0 text-iris" strokeWidth={1.6} />
+                <div>
+                  <p>{title}</p>
+                  <small>{text}</small>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="container pt-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-line bg-card p-5">
+          <p className="text-sm leading-relaxed text-ink-soft">
+            ليه Link Me؟ فهم وممارسة ومتابعة —{" "}
+            <span className="text-iris">رحلة ليها معنى.</span>
+          </p>
+          <Link
+            href="/about"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-iris"
+          >
+            اعرف المنصة وقيمها <ArrowLeft className="size-4" />
+          </Link>
+        </div>
+      </section>
+      <section id="courses" className="home-section container">
+        <Label number="01">الكورسات والمسارات</Label>
+        <SectionHeading
+          title={
+            <>
+              ابدأ من الكورس <span className="hl-word">اللي يخصك.</span>
+            </>
+          }
+          description="محادثة، قواعد، سفر أو شغل. افتح الكورس واعرف المنهج، المستوى وتفاصيل الحجز قبل ما تختار."
+          action={
+            <Button asChild variant="outline" className="rounded-full bg-card">
+              <Link href="/courses">
+                كل الكورسات <ArrowLeft className="size-4" />
+              </Link>
+            </Button>
+          }
+        />
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {featured.isLoading
+            ? [1, 2, 3].map(i => (
+                <div
+                  key={i}
+                  className="h-[390px] animate-pulse rounded-3xl bg-paper-deep"
+                  aria-label="جارٍ تحميل الكورس"
+                />
+              ))
+            : featured.data
+                ?.slice(0, 6)
+                .map(course => (
+                  <CourseCard
+                    key={course.id}
+                    course={course}
+                    className="h-full"
+                  />
+                ))}
+        </div>
+        {featured.isError && (
+          <div className="mt-6 rounded-2xl border border-line bg-card p-5 text-sm text-ink-soft">
+            مش قدرنا نحمّل الكورسات.{" "}
+            <button
+              onClick={() => void featured.refetch()}
+              className="font-semibold text-iris"
+            >
+              جرّب تاني
+            </button>
+          </div>
+        )}
+
+        <div className="mt-8 grid gap-5 lg:grid-cols-[1.2fr_1fr]">
+          <article className="path-tile path-tile-emphasis">
+            <span className="path-index">
+              THE INDEPENDENCE PATH / 12 LEVELS
+            </span>
+            <h3>
+              من الصفر لحد <span className="hl-word latin">B1.</span>
+            </h3>
+            <p>
+              رحلة متكاملة: 3 مستويات Pre-Starter، و6 أساسية، و3 محادثة متقدمة.
+              تبدأ من مستواك، وتكمّل بخطوات واضحة.
+            </p>
+            <div className="path-levels">
+              <span>01–03 · Pre-Starter</span>
+              <span>04–09 · Core</span>
+              <span>10–12 · Conversation</span>
+            </div>
+            <Link href="/path">
+              اكتشف المسار وتفاصيل الحجز <ArrowLeft className="size-4" />
+            </Link>
+          </article>
+          <article className="path-tile">
+            <span className="path-index">KIDS INTERACTIVE / KG → PREP 3</span>
+            <h3>
+              الإنجليزي للصغيرين <span className="hl-word">لعبة.</span>
+            </h3>
+            <p>
+              من KG لحد تالتة إعدادي: شرح بالأنيميشن وحل الكتب الخارجية.
+              فيديوهات للترم أو سيشن خاصة حسب احتياج ابنك.
+            </p>
+            <Link href="/kids">
+              شوف إنجليزي الأطفال <ArrowLeft className="size-4" />
+            </Link>
+          </article>
+        </div>
+        <div className="mt-9 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {categories.data
+            ?.filter(c => !["kids", "path"].includes(c.slug))
+            .map(category => {
+              const Icon = categoryIcon(category.icon);
+              return (
+                <Link
+                  key={category.id}
+                  href={`/courses?category=${category.slug}`}
+                  className="category-card"
+                >
+                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-iris-soft text-iris">
+                    <Icon className="size-5" strokeWidth={1.6} />
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className="text-ink">{category.nameAr}</h3>
+                    <span className="latin text-[10px] text-ink-soft">
+                      {category.nameEn}
+                    </span>
+                    <p>{category.description}</p>
+                  </div>
+                </Link>
+              );
+            })}
+        </div>
+      </section>
+
+      <section id="method" className="home-section container">
+        <div className="section-divider !mt-0 mb-10" />
+        <Label number="02">طريقتنا في التعلّم</Label>
+        <div className="grid gap-10 lg:grid-cols-[1fr_1fr] lg:gap-20">
+          <div>
+            <SectionHeading
+              title={
+                <>
+                  افهمها. جرّبها.
+                  <br />
+                  <span className="hl-word">اتكلّم بيها.</span>
+                </>
+              }
+              description="مش هنسيبك قدام منهج طويل من غير اتجاه. كل مرحلة هدف واضح، وكل تدريب خطوة للكلام بثقة."
+            />
+            <Button
+              asChild
+              variant="outline"
+              className="mt-7 rounded-full bg-card"
+            >
+              <Link href="/method">
+                اعرف منهجيتنا <ArrowLeft className="size-4" />
+              </Link>
+            </Button>
+          </div>
+          <div>
+            {[
+              {
+                title: "نبدأ من مكانك",
+                text: "اختبار قصير يساعدك تختار نقطة بداية تناسب معرفتك الحالية.",
+              },
+              {
+                title: "نحوّل القاعدة لموقف",
+                text: "تعارف، مطعم، اجتماع أو سفر. تفهم المعنى وتجرّب الجملة بدل الحفظ وبس.",
+              },
+              {
+                title: "نكمل ونتابع معاك",
+                text: "شوف تقدّمك، حضورك ومهامك في بروفايلك، واستقبل تقييم المدرّس.",
+              },
+            ].map((step, i) => (
+              <div className="method-step" key={step.title}>
+                <span>0{i + 1}</span>
+                <div>
+                  <h3 className="text-ink">{step.title}</h3>
+                  <p>{step.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="home-section container">
+        <LearningPreview />
+      </section>
+
+      <section id="level-test" className="home-section container">
+        <Label number="03">اختبار تحديد المستوى</Label>
+        <div className="grid items-center gap-7 rounded-[28px] border border-line bg-iris-soft p-6 sm:p-10 lg:grid-cols-[1fr_auto]">
+          <div>
+            <div className="mb-4 flex items-center gap-3">
+              <YassinAvatar size={50} />
+              <span className="text-xs text-ink-soft">
+                ياسين · مرشدك الافتراضي
+              </span>
+            </div>
+            <h2 className="text-3xl leading-snug text-ink sm:text-4xl">
+              مش عارف تبدأ منين؟
+              <br />
+              <span className="hl-word">نلاقيها مع بعض.</span>
+            </h2>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-ink-soft">
+              بنك 1000 سؤال، ومراحل قصيرة من A1 لحد C2. كل مرحلة 12 سؤال مع
+              ياسين، وتقدر ترتاح وتكمّل وقت ما تحب. نتيجة تقديرية وترشيحات تناسب
+              إجاباتك، مش شهادة مستوى معتمدة.
+            </p>
+          </div>
+          <div className="flex flex-col gap-3">
+            <Button
+              asChild
+              className="h-12 rounded-full bg-iris px-7 text-white hover:bg-iris-deep"
+            >
+              <Link href="/level-test">
+                يلا نعرف مستواك <ArrowLeft className="size-4" />
+              </Link>
+            </Button>
+            <span className="text-center text-xs text-ink-soft">
+              متاح من غير إنشاء حساب
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <section id="instructors" className="home-section container">
+        <Label number="04">المدرّس والمتابعة</Label>
+        <div className="grid items-center gap-10 lg:grid-cols-[1fr_1fr]">
+          <div>
+            <SectionHeading
+              title={
+                <>
+                  ورا كل خطوة،
+                  <br />
+                  <span className="hl-word">معلّم معاك.</span>
+                </>
+              }
+              description="أ. ياسين بيبسّط القاعدة ويقرّبها لمواقف من حياتك. الهدف مش تحفظ الإجابة؛ الهدف تعرف تستخدم الإنجليزي بنفسك."
+            />
+            <div className="mt-6 flex flex-wrap gap-2">
+              {["تأسيس المبتدئين", "محادثة عملية", "متابعة وتقييم"].map(s => (
+                <span
+                  key={s}
+                  className="rounded-full border border-line bg-card px-3 py-1.5 text-xs text-ink-soft"
+                >
+                  {s}
+                </span>
+              ))}
+            </div>
+            <Button
+              asChild
+              variant="outline"
+              className="mt-7 rounded-full bg-card"
+            >
+              <Link href={lead ? "/instructors/yassin" : "/instructors"}>
+                اعرف أ. ياسين <ArrowLeft className="size-4" />
+              </Link>
+            </Button>
+          </div>
+          <div className="rounded-[28px] border border-line bg-card p-7 sm:p-9">
+            <div className="flex items-center gap-4">
+              <span className="grid size-14 place-items-center rounded-2xl bg-iris-soft text-iris">
+                <MessageCircle className="size-7" />
+              </span>
+              <div>
+                <h3 className="text-lg text-ink">مساحة تتكلم، مش تتفرّج.</h3>
+                <p className="mt-1 text-xs text-ink-soft">
+                  جلسات أونلاين مباشرة
+                </p>
+              </div>
+            </div>
+            <p className="mt-5 text-sm leading-[1.9] text-ink-soft">
+              تسأل، تجاوب، تغلط وتجرّب تاني. في حسابك هتلاقي الجلسات، التكليفات
+              وملاحظات المدرّس؛ عشان تعرف إيه اللي اتحسن وإيه خطوتك الجاية.
+            </p>
+            <Link
+              href="/instructors"
+              className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-iris"
+            >
+              قسم المدربين <ArrowLeft className="size-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section id="pricing" className="home-section container">
+        <Label number="05">الخطط والحجز</Label>
+        <SectionHeading
+          title={
+            <>
+              اختار بداية <span className="hl-word">على قدك.</span>
+            </>
+          }
+          description="شوف الباقة ومزاياها، وسيب بياناتك لتأكيد التفاصيل والدفع على واتساب. طلب الحجز مش تأكيد دفع."
+        />
+        <div className="mt-8">
+          <PlanCards />
+        </div>
+      </section>
+
+      <section id="faq" className="home-section container">
+        <Label number="06">قبل ما تبدأ</Label>
+        <div className="grid gap-8 lg:grid-cols-[.8fr_1.2fr]">
+          <div>
+            <SectionHeading
+              title={
+                <>
+                  أسئلة تستاهل <span className="hl-word">إجابة.</span>
+                </>
+              }
+              description="ولو سؤالك مش هنا، كلّمنا ونساعدك تختار."
+            />
+            <Button
+              asChild
+              variant="outline"
+              className="mt-6 rounded-full bg-card"
+            >
+              <Link href="/faq">
+                كل الأسئلة <ArrowLeft className="size-4" />
+              </Link>
+            </Button>
+          </div>
+          <Accordion
+            type="single"
+            collapsible
+            className="rounded-3xl border border-line bg-card px-5 sm:px-7"
+          >
+            {FAQ_GROUPS[0].items.slice(0, 4).map((item, i) => (
+              <AccordionItem
+                key={item.q}
+                value={`q-${i}`}
+                className="border-line"
+              >
+                <AccordionTrigger className="text-start text-sm leading-relaxed text-ink hover:no-underline">
+                  {item.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm leading-relaxed text-ink-soft">
+                  {item.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+      </section>
+
+      <section className="home-section container">
+        <Reveal>
+          <div className="rounded-[28px] border border-iris/20 bg-iris-soft p-7 sm:p-11">
+            <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+              <div>
+                <span className="mb-3 flex items-center gap-2 text-xs text-iris">
+                  <Sparkles className="size-4" /> خطوتك الجاية أبسط مما تتخيّل
+                </span>
+                <h2 className="text-3xl leading-snug text-ink">
+                  أول جملة واثقة.
+                  <br />
+                  <span className="hl-word">تبدأ النهارده.</span>
+                </h2>
+              </div>
+              <Button
+                asChild
+                className="h-12 rounded-full bg-iris px-7 text-white hover:bg-iris-deep"
+              >
+                <Link href="/signup">
+                  اعمل حسابك <ArrowLeft className="size-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </Reveal>
+      </section>
+    </PageShell>
+  );
+}

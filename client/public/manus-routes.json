@@ -1,0 +1,116 @@
+{
+  "routes": [
+    {
+      "path": "/",
+      "title": "الرئيسية"
+    },
+    {
+      "path": "/courses",
+      "title": "الكورسات"
+    },
+    {
+      "path": "/method",
+      "title": "منهجيتنا"
+    },
+    {
+      "path": "/level-test",
+      "title": "اختبار تحديد المستوى"
+    },
+    {
+      "path": "/chat",
+      "title": "الشات المباشر"
+    },
+    {
+      "path": "/courses/:slug",
+      "title": "تفاصيل الكورس"
+    },
+    {
+      "path": "/path",
+      "title": "مسار الاستقلال اللغوي"
+    },
+    {
+      "path": "/kids",
+      "title": "إنجليزي الأطفال"
+    },
+    {
+      "path": "/instructors",
+      "title": "المدرّسون"
+    },
+    {
+      "path": "/instructors/:slug",
+      "title": "بروفايل المدرّس"
+    },
+    {
+      "path": "/pricing",
+      "title": "الخطط والأسعار"
+    },
+    {
+      "path": "/faq",
+      "title": "الأسئلة الشائعة"
+    },
+    {
+      "path": "/contact",
+      "title": "تواصل معنا"
+    },
+    {
+      "path": "/login",
+      "title": "تسجيل الدخول"
+    },
+    {
+      "path": "/signup",
+      "title": "إنشاء حساب"
+    },
+    {
+      "path": "/forgot-password",
+      "title": "استعادة كلمة المرور"
+    },
+    {
+      "path": "/reset-password",
+      "title": "كلمة مرور جديدة"
+    },
+    {
+      "path": "/dashboard",
+      "title": "لوحة التعلّم"
+    },
+    {
+      "path": "/learn/:slug",
+      "title": "مشاهدة الدرس"
+    },
+    {
+      "path": "/profile",
+      "title": "الملف الشخصي"
+    },
+    {
+      "path": "/orders",
+      "title": "سجل المشتريات"
+    },
+    {
+      "path": "/admin",
+      "title": "لوحة التحكم"
+    },
+    {
+      "path": "/students/:id",
+      "title": "ملف الطالب"
+    },
+    {
+      "path": "/about",
+      "title": "عن Link Me"
+    },
+    {
+      "path": "/owner",
+      "title": "دخول المالك"
+    },
+    {
+      "path": "/homework",
+      "title": "واجباتي وتسليماتي"
+    },
+    {
+      "path": "/premium",
+      "title": "خطة الإتقان الفردية"
+    },
+    {
+      "path": "/coaching",
+      "title": "متابعة الطلاب المعيّنين"
+    }
+  ]
+}

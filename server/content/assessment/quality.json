@@ -1,0 +1,23 @@
+{
+  "total": 1000,
+  "uniquePromptsAndContexts": 1000,
+  "levels": {
+    "A1": 180,
+    "A2": 180,
+    "B1": 180,
+    "B2": 180,
+    "C1": 160,
+    "C2": 120
+  },
+  "skills": {
+    "grammar": 250,
+    "vocabulary": 250,
+    "usage": 250,
+    "reading": 250
+  },
+  "generator": "gpt-6-luna",
+  "reviewer": "gpt-6.1-sol",
+  "reviewedBatches": 50,
+  "correctionsThisRun": 382,
+  "limitation": "Text-only educational approximation; not empirically calibrated or CEFR-certified; no speaking/listening test."
+}

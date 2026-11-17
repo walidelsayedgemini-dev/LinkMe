@@ -1,0 +1,341 @@
+import { useEffect, useMemo, useState } from "react";
+import { useSearch } from "wouter";
+import { ChevronLeft, ChevronRight, Filter, Search, X } from "lucide-react";
+import { PageShell } from "@/components/layout/site-footer";
+import { AnimatedAurora, StudyDoodles } from "@/components/decor";
+import { CourseCard } from "@/components/course-card";
+import { Reveal } from "@/components/reveal";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { LEVELS } from "@/lib/format";
+import { trpc } from "@/lib/trpc";
+import { useLocation } from "wouter";
+
+const SORTS = [
+  { value: "popular", label: "الأكثر شعبية" },
+  { value: "rating", label: "الأعلى تقييمًا" },
+  { value: "newest", label: "الأحدث" },
+  { value: "price_asc", label: "الأقل سعرًا" },
+  { value: "price_desc", label: "الأعلى سعرًا" },
+] as const;
+
+const PRICES = [
+  { value: "all", label: "الكل" },
+  { value: "paid", label: "مدفوع" },
+] as const;
+
+type SortValue = (typeof SORTS)[number]["value"];
+type PriceValue = (typeof PRICES)[number]["value"];
+
+export default function Courses() {
+  const search = useSearch();
+  const [, navigate] = useLocation();
+  const params = useMemo(() => new URLSearchParams(search), [search]);
+
+  const q = params.get("q") ?? "";
+  const category = params.get("category") ?? "";
+  const instructor = params.get("instructor") ?? "";
+  const level = (params.get("level") ?? "") as "" | "beginner" | "intermediate" | "advanced" | "all";
+  const price = (params.get("price") ?? "all") as PriceValue;
+  const minRating = Number(params.get("rating") ?? 0);
+  const sort = (params.get("sort") ?? "popular") as SortValue;
+  const page = Math.max(1, Number(params.get("page") ?? 1));
+
+  const [searchInput, setSearchInput] = useState(q);
+  const [showFilters, setShowFilters] = useState(false);
+
+  useEffect(() => setSearchInput(q), [q]);
+
+  const update = (patch: Record<string, string | number | undefined>) => {
+    const next = new URLSearchParams(params.toString());
+    Object.entries(patch).forEach(([key, value]) => {
+      if (value === undefined || value === "" || value === 0 || value === "all") next.delete(key);
+      else next.set(key, String(value));
+    });
+    if (!("page" in patch)) next.delete("page");
+    navigate(`/courses${next.toString() ? `?${next.toString()}` : ""}`);
+  };
+
+  const { data: categories } = trpc.catalog.categories.useQuery();
+  const { data: instructors } = trpc.catalog.instructors.useQuery({});
+  const { data, isLoading } = trpc.catalog.courses.useQuery({
+    q: q || undefined,
+    category: category || undefined,
+    instructor: instructor || undefined,
+    level: level || undefined,
+    price,
+    minRating,
+    sort,
+    page,
+    pageSize: 9,
+  });
+
+  const totalPages = Math.max(1, Math.ceil((data?.total ?? 0) / 9));
+  const activeFilters = [
+    category && { key: "category", label: categories?.find(item => item.slug === category)?.nameAr ?? category },
+    instructor && { key: "instructor", label: instructors?.find(item => item.slug === instructor)?.name ?? instructor },
+    level && { key: "level", label: LEVELS.find(item => item.value === level)?.label ?? level },
+    price !== "all" && { key: "price", label: PRICES.find(item => item.value === price)?.label ?? price },
+    minRating > 0 && { key: "rating", label: `تقييم ${minRating}+` },
+    q && { key: "q", label: `«${q}»` },
+  ].filter(Boolean) as { key: string; label: string }[];
+
+  const FilterGroup = ({
+    title,
+    children,
+  }: {
+    title: string;
+    children: React.ReactNode;
+  }) => (
+    <div className="space-y-3 border-b border-line pb-5 last:border-0 last:pb-0">
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-soft">{title}</h3>
+      {children}
+    </div>
+  );
+
+  const Option = ({
+    active,
+    onClick,
+    children,
+    count,
+  }: {
+    active: boolean;
+    onClick: () => void;
+    children: React.ReactNode;
+    count?: number;
+  }) => (
+    <button
+      onClick={onClick}
+      className={cn(
+        "flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors",
+        active ? "bg-iris text-white" : "text-ink-soft hover:bg-ink/5 hover:text-ink",
+      )}
+    >
+      <span>{children}</span>
+      {count !== undefined && <span className="latin text-xs opacity-70">{count}</span>}
+    </button>
+  );
+
+  const filtersPanel = (
+    <div className="space-y-6">
+      <FilterGroup title="المسار">
+        <Option active={!category} onClick={() => update({ category: undefined })}>
+          كل المسارات
+        </Option>
+        {(categories ?? []).map(item => (
+          <Option
+            key={item.slug}
+            active={category === item.slug}
+            onClick={() => update({ category: item.slug })}
+            count={item.courseCount}
+          >
+            {item.nameAr}
+          </Option>
+        ))}
+      </FilterGroup>
+      <FilterGroup title="المستوى">
+        <Option active={!level} onClick={() => update({ level: undefined })}>
+          كل المستويات
+        </Option>
+        {LEVELS.filter(item => item.value !== "all").map(item => (
+          <Option key={item.value} active={level === item.value} onClick={() => update({ level: item.value })}>
+            {item.label}
+          </Option>
+        ))}
+      </FilterGroup>
+      <FilterGroup title="السعر">
+        <div className="flex gap-2">
+          {PRICES.map(item => (
+            <button
+              key={item.value}
+              onClick={() => update({ price: item.value })}
+              className={cn(
+                "flex-1 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                price === item.value ? "border-ink bg-iris text-white" : "border-line text-ink-soft hover:border-ink",
+              )}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      </FilterGroup>
+      <FilterGroup title="التقييم">
+        {[4.5, 4, 3].map(value => (
+          <Option key={value} active={minRating === value} onClick={() => update({ rating: minRating === value ? undefined : value })}>
+            {value}+ نجوم
+          </Option>
+        ))}
+      </FilterGroup>
+      <FilterGroup title="المدرّس">
+        <Option active={!instructor} onClick={() => update({ instructor: undefined })}>
+          كل المدرّسين
+        </Option>
+        {(instructors ?? []).map(item => (
+          <Option key={item.slug} active={instructor === item.slug} onClick={() => update({ instructor: item.slug })}>
+            {item.name}
+          </Option>
+        ))}
+      </FilterGroup>
+    </div>
+  );
+
+  return (
+    <PageShell>
+      <section className="border-b border-line bg-paper-deep/60">        <AnimatedAurora className="opacity-60" />
+        <StudyDoodles variant="soft" />
+        <div className="container py-12 md:py-16">
+          <p className="latin text-xs font-medium uppercase tracking-[0.2em] text-ink-soft">Course catalogue</p>
+          <h1 className="mt-3 text-4xl leading-tight text-ink sm:text-5xl">
+            كل الكورسات في <span className="hl-word">مكان واحد</span>
+          </h1>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
+            {data?.total ?? 0} كورسًا مصنّفة حسب المسار والمستوى والسعر. استخدم البحث والفلاتر للوصول لكورسك في ثوانٍ.
+          </p>
+
+          <form
+            className="mt-8 flex max-w-xl items-center gap-2"
+            onSubmit={event => {
+              event.preventDefault();
+              update({ q: searchInput.trim() || undefined });
+            }}
+          >
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-ink-soft" />
+              <input
+                value={searchInput}
+                onChange={event => setSearchInput(event.target.value)}
+                placeholder="ابحث بالعنوان، المدرّس، أو الموضوع…"
+                className="h-12 w-full rounded-full border border-line bg-card pe-11 ps-4 text-sm text-ink placeholder:text-ink-soft/70 focus:border-ink focus:outline-none"
+              />
+            </div>
+            <Button type="submit" className="h-12 rounded-full bg-iris px-6 text-white hover:bg-iris-deep">
+              بحث
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-12 rounded-full border-ink/20 lg:hidden"
+              onClick={() => setShowFilters(value => !value)}
+            >
+              <Filter className="size-4" />
+            </Button>
+          </form>
+        </div>
+      </section>
+
+      <section className="container py-10">
+        <div className="grid gap-10 lg:grid-cols-[260px_1fr]">
+          <aside className={cn("lg:block", showFilters ? "block" : "hidden")}>
+            <div className="sticky top-24 rounded-3xl border border-line bg-card p-5">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-sm font-bold text-ink">الفلاتر</h2>
+                {activeFilters.length > 0 && (
+                  <button
+                    onClick={() => navigate("/courses")}
+                    className="text-xs text-ink-soft underline-offset-2 hover:text-ink hover:underline"
+                  >
+                    مسح الكل
+                  </button>
+                )}
+              </div>
+              {filtersPanel}
+            </div>
+          </aside>
+
+          <div>
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                {activeFilters.map(filter => (
+                  <button
+                    key={filter.key}
+                    onClick={() => update({ [filter.key]: undefined })}
+                    className="flex items-center gap-1.5 rounded-full bg-iris px-3 py-1.5 text-xs text-white"
+                  >
+                    {filter.label} <X className="size-3" />
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-ink-soft">ترتيب</span>
+                <select
+                  value={sort}
+                  onChange={event => update({ sort: event.target.value })}
+                  className="h-9 rounded-full border border-line bg-card px-3 text-xs text-ink focus:border-ink focus:outline-none"
+                >
+                  {SORTS.map(item => (
+                    <option key={item.value} value={item.value}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {isLoading ? (
+              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div key={index} className="h-80 animate-pulse rounded-3xl bg-ink/[0.06]" />
+                ))}
+              </div>
+            ) : (data?.items.length ?? 0) === 0 ? (
+              <div className="rounded-3xl border border-dashed border-ink/20 bg-card/60 p-16 text-center">
+                <p className="text-lg font-semibold text-ink">لا توجد كورسات مطابقة</p>
+                <p className="mt-2 text-sm text-ink-soft">جرّب مسح بعض الفلاتر أو البحث بكلمة أخرى.</p>
+                <Button variant="outline" className="mt-6 rounded-full border-ink/20" onClick={() => navigate("/courses")}>
+                  عرض كل الكورسات
+                </Button>
+              </div>
+            ) : (
+              <>
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                  {data!.items.map((course, index) => (
+                    <Reveal key={course.id} delay={index * 0.04}>
+                      <CourseCard course={course} />
+                    </Reveal>
+                  ))}
+                </div>
+
+                {totalPages > 1 && (
+                  <div className="mt-10 flex items-center justify-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="rounded-full border-ink/20"
+                      disabled={page <= 1}
+                      onClick={() => update({ page: page - 1 })}
+                      aria-label="السابق"
+                    >
+                      <ChevronRight className="size-4" />
+                    </Button>
+                    {Array.from({ length: totalPages }).map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => update({ page: index + 1 })}
+                        className={cn(
+                          "latin size-9 rounded-full text-sm font-medium transition-colors",
+                          page === index + 1 ? "bg-iris text-white" : "text-ink-soft hover:bg-ink/5",
+                        )}
+                      >
+                        {index + 1}
+                      </button>
+                    ))}
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="rounded-full border-ink/20"
+                      disabled={page >= totalPages}
+                      onClick={() => update({ page: page + 1 })}
+                      aria-label="التالي"
+                    >
+                      <ChevronLeft className="size-4" />
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </section>
+    </PageShell>
+  );
+}

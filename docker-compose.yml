@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: linkme_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: linkme_db
+      MYSQL_USER: linkme_user
+      MYSQL_PASSWORD: linkme_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+
+  app:
+    build: .
+    container_name: linkme_app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=mysql://linkme_user:linkme_password@mysql:3306/linkme_db
+      - JWT_SECRET=linkme-super-secret-jwt-key-2026-production
+      - VODAFONE_CASH_NUMBER=01022412243
+      - VODAFONE_CASH_NAME=Link Me Academy
+      - INSTAPAY_USERNAME=linkme@instapay
+    depends_on:
+      - mysql
+    volumes:
+      - uploads_data:/app/uploads
+
+volumes:
+  mysql_data:
+  uploads_data:
