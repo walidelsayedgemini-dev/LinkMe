@@ -1,14 +1,154 @@
-# Fluently — منصة كورسات الإنجليزي
+<div align="center">
 
-React / Express / tRPC / Drizzle starter, adapted from the Sandbox web-db-user template.
+# 🚀 Link Me — إنجليزي من غير ما تترجم
+### منصة تعلّم الإنجليزية الاحترافية باللهجة المصرية، مع مرشديك ياسين وخديجة وتقييم النطق بالذكاء الاصطناعي
 
-- `pnpm dev`: development server; honors `PORT` (default 3000).
-- `pnpm build` / `pnpm start`: build and serve `dist/index.js` and `dist/public/`.
-- `pnpm db:migrate`: apply checked-in migrations. `pnpm db:push`: generate and apply new schema changes.
-- `pnpm check` / `pnpm test`: types and application tests.
+[![Link Me CI](https://github.com/walidelsayedgemini-dev/LinkMe/actions/workflows/ci.yml/badge.svg)](https://github.com/walidelsayedgemini-dev/LinkMe/actions/workflows/ci.yml)
+[![Node.js Version](https://img.shields.io/badge/node-v22+-green.svg)](https://nodejs.org)
+[![React Version](https://img.shields.io/badge/react-v19-blue.svg)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Start with the Webdev skill's default-template guide. Platform login, storage, payments and service contracts live in its shared references; read the relevant capability before extending its helper.
+[**ابدأ الآن في دقيقة**](#-طرق-التشغيل-السريع) • [**المزايا التفاعلية**](#-المزايا-الفريدة-للمنصة) • [**شخصيات المنصة**](#-مرشدو-التعلّم-الكرتونيين) • [**بيانات الدخول التجريبية**](#-بيانات-الدخول-التجريبية)
 
-`server/_core/publicConfig.ts` exposes only named public runtime values. Private keys stay server-side. The platform serves managed `/manus-storage/` assets; the application does not register a second proxy.
+---
+</div>
 
-Platform configuration is readable and editable through `webdev.config`. Default settings are initial values, not enforced constraints. The agent may modify the files, commands and configuration or follow the flexible guide for another stack.
+## 📖 نظرة عامة (Overview)
+
+منصة **Link Me** صُممت خصيصاً لتعلّم اللغة الإنجليزية للمصريين والعرب بطريقة تفاعلية وممتعة قائمة على التحدث المباشر وفهم الثقافة وسياقات الكلام الواقعية، بدلاً من أسلوب الحفظ والترجمة الحرفية المرهقة.
+
+تتضمن المنصة مناهج معتمدة تتدرج من الصفر حتى الطلاقة، مروراً بمحادثات الحياة اليومية، واختبار الآيلتس (IELTS Band 7)، وإنجليزي المقابلات والأعمال (Business English).
+
+---
+
+## ✨ المزايا الفريدة للمنصة
+
+1. **المرشدون الكرتونيون التفاعليون (3D Pixar Companions):**
+   - **ياسين (Yassin):** المرشد الرياضي الأسمر الوسيم، مليء بالحماس والطاقة الإيجابية.
+   - **خديجة (Khadija):** المرشدة الكيوت الودودة، بفيونكة وردية ولمسات تشجيعية لطيفة.
+   - بنك تحفيزي ذكي يحتوي على أكثر من **1000 تركيبة وعبارة تشجيعية** تظهر في كافة أقسام المنصة.
+
+2. **معمل نطق الإنجليزية بالذكاء الاصطناعي (AI Voice Practice):**
+   - يتيح للطلاب التحدث بالمايكروفون ونطق جمل حقيقية.
+   - تحليل فوري لدقة النطق بالنسبة المئوية (0% - 100%) وتقديم ملاحظات صوتية فورية.
+   - الاستماع للنطق الأصلي من متحدث أصلي (Native Accent).
+
+3. **نظام التلعيب وشعلة الالتزام اليومي (Gamification & Daily Streak):**
+   - متابعة أيام الدراسة المتتالية بشعلة حماس 🔥 في الشريط العلوي.
+   - كسب نقاط خبرة (XP) وفتح أوسمة تفوق (وسام أول خطوة، بطل الصوت، قاهر المستويات).
+
+4. **المؤثرات الصوتية الفورية (Web Audio Synthesizer):**
+   - نغمات مبهجة للإجابات الصحيحة، الأوسمة، وكؤوس التخرج بدون أي تأخير زمني وتعمل 100% بدون إنترنت، مع زر كتم فوري.
+
+5. **تطبيق موبايل وتثبيت سريع (PWA):**
+   - إمكانية تثبيت المنصة على شاشة الموبايل أو الكمبيوتر بزر واحد، وتصفح المحتوى والتدريب حتى في حالة ضعف أو انقطاع الإنترنت.
+
+6. **الشهادات الرقمية المعتمدة (Digital Certificates):**
+   - إصدار شهادات إتمام شرفية فاخرة بختم ذهبي بارز وكود تحقق رسمي للمنصة.
+   - إمكانية تنزيل الشهادة فوراً كصورة عاليّة الجودة (PNG) أو طباعتها كـ PDF أو مشاركتها على واتساب ولينكد إن.
+
+7. **الدفع المحلي وكوبونات الخصم (Vodafone Cash, InstaPay & Promo Codes):**
+   - دعم الدفع المباشر عبر فودافون كاش (`01022412243`) وعنوان إنستاباي (`linkme@instapay`).
+   - أكواد خصم حية: `LINKME20` (خصم 20%)، `YASSIN` (خصم 25%)، `KHADIJA` (خصم 25%)، `EGYPT100` (خصم 100 ج.م).
+
+---
+
+## 🚀 طرق التشغيل السريع (Quickstart)
+
+### الطريقة الأولى: بنقرة واحدة عبر Docker (تعمل عند أي شخص فوراً 🐳)
+
+إذا كان لديك Docker مثبت على جهازك، فكل ما تحتاجه هو أمر واحد فقط:
+
+```bash
+docker compose up
+```
+
+سيقوم Docker تلقائياً بـ:
+1. تشغيل قاعدة بيانات MySQL وتجهيزها.
+2. تطبيق جداول وقواعد البيانات (Schema Migrations).
+3. إدراج جميع الكورسات والمناهج وحسابات الاختبار (Seeding).
+4. تشغيل الموقع على الرابط: `http://localhost:3000`.
+
+---
+
+### الطريقة الثانية: بنقرة واحدة على Windows (ملف `start.bat` 🪟)
+
+إذا كنت على نظام Windows وتريد تشغيل الموقع محلياً بدون Docker:
+- ببساطة اضغط مرتين على ملف **`start.bat`**.
+- سيقوم الملف بالتحقق من بيئة التشغيل وفتح الموقع في متصفحك تلقائياً على `http://localhost:3000`.
+
+---
+
+### الطريقة الثالثة: التشغيل اليدوي (Manual / Developers 💻)
+
+1. **استنساخ المستودع (Clone Repository):**
+   ```bash
+   git clone https://github.com/walidelsayedgemini-dev/LinkMe.git
+   cd LinkMe
+   ```
+
+2. **تثبيت الحزم (Install Dependencies):**
+   ```bash
+   pnpm install
+   # أو
+   npm install
+   ```
+
+3. **إعداد ملف البيئة (.env):**
+   ```bash
+   cp .env.example .env
+   ```
+
+4. **تجهيز قاعدة البيانات (Push Schema & Seed):**
+   ```bash
+   pnpm db:push
+   pnpm seed
+   ```
+
+5. **بدء السيرفر (Start Dev Server):**
+   ```bash
+   pnpm dev
+   ```
+   افتح متصفحك على: `http://localhost:3000`.
+
+---
+
+## 🔑 بيانات الدخول التجريبية (Demo Accounts)
+
+| الحساب | البريد الإلكتروني | كلمة المرور | الصلاحيات |
+|---|---|---|---|
+| **الطالب التجريبي** | `student@linkme.app` | `linkme123` | لوحة التعلّم، التدريب الصوتي، الكورسات والواجبات |
+| **المدير والمالك** | `admin@linkme.app` | `linkme123` | لوحة التحكم الكاملة، مراجعة إيصالات الدفع، إدارة الطلاب |
+
+---
+
+## 🛠️ البنية التقنية (Tech Stack)
+
+- **الواجهة الأمامية:** React 19, Vite, Tailwind CSS v4, Radix UI, Lucide Icons, Wouter.
+- **الواجهة الخلفية:** Node.js, Express, tRPC v11, Drizzle ORM.
+- **قواعد البيانات:** MariaDB / MySQL 8.0+.
+- **الصوتيات والذكاء الاصطناعي:** Web Audio API Synth, Web Speech Recognition API, SpeechSynthesis.
+- **البيئة والحاويات:** Docker, Docker Compose, PWA Service Worker.
+- **الاختبارات وضمان الجودة:** Vitest (19 ملف اختبار، 91 اختبار بنجاح 100%).
+
+---
+
+## 🧪 الاختبارات وضمان الجودة
+
+```bash
+# فحص الأنواع (TypeScript Check)
+pnpm check
+
+# تشغيل جميع الاختبارات (Vitest)
+pnpm test
+
+# بناء نسخة الإنتاج (Production Build)
+pnpm build
+```
+
+---
+
+<div align="center">
+صُنع بكل حب لدعم كل من يسعى لطلاقة الإنجليزية بدون تعقيد ❤️🎓
+</div>

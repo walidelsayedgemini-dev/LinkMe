@@ -29,6 +29,8 @@ import { cn } from "@/lib/utils";
 import NotFound from "./NotFound";
 import { CourseRecording } from "@/components/course-recording";
 import { VoicePractice } from "@/components/voice-practice";
+import { soundEffects } from "@/lib/sound-effects";
+import { recordDailyActivity } from "@/lib/gamification";
 
 export default function Learn() {
   const [, params] = useRoute("/learn/:slug");
@@ -70,8 +72,14 @@ export default function Learn() {
     onSuccess: async result => {
       await utils.learning.access.invalidate({ slug });
       await utils.learning.dashboard.invalidate();
-      if (result.progress === 100)
-        toast.success("مبروك! أكملت كل دروس الكورس 🎉");
+      recordDailyActivity();
+      if (result.progress === 100) {
+        soundEffects.playTrophy();
+        toast.success("مبروك! أكملت كل دروس الكورس بنجاح 🎉🎓");
+      } else {
+        soundEffects.playCorrect();
+        toast.success("تم إكمال الدرس! أضيف +10 XP لرصيدك ✨");
+      }
     },
     onError: error => toast.error(error.message),
   });

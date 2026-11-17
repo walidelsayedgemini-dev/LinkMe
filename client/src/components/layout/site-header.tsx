@@ -15,12 +15,16 @@ import {
   ShoppingBag,
   Sun,
   User,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useCompanion, CompanionAvatar } from "@/components/companion";
 import { HeaderStreakIndicator } from "@/components/gamification-badges";
+import { isSoundEnabled, setSoundEnabled, soundEffects } from "@/lib/sound-effects";
 import { Logo } from "@/components/brand";
 import { UserAvatar } from "@/components/bits";
 import { Button } from "@/components/ui/button";
@@ -61,6 +65,7 @@ export function SiteHeader() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { companion, toggleCompanion, setIsModalOpen } = useCompanion();
+  const [soundOn, setSoundOn] = useState(() => isSoundEnabled());
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -200,6 +205,28 @@ export function SiteHeader() {
             <Search className="size-[18px]" />
           </button>
           <HeaderStreakIndicator />
+          <button
+            type="button"
+            onClick={() => {
+              const next = !soundOn;
+              setSoundOn(next);
+              setSoundEnabled(next);
+              if (next) {
+                soundEffects.playClick();
+                toast.success("تم تفعيل المؤثرات الصوتية 🔊");
+              } else {
+                toast.info("تم كتم المؤثرات الصوتية 🔇");
+              }
+            }}
+            aria-label={soundOn ? "كتم المؤثرات الصوتية" : "تشغيل المؤثرات الصوتية"}
+            title={soundOn ? "المؤثرات الصوتية مفعّلة — اضغط للكتم" : "المؤثرات الصوتية مكتومة — اضغط للتشغيل"}
+            className={cn(
+              "grid size-10 place-items-center rounded-full border border-line bg-card transition hover:border-iris",
+              soundOn ? "text-iris" : "text-ink-soft opacity-60"
+            )}
+          >
+            {soundOn ? <Volume2 className="size-[18px]" /> : <VolumeX className="size-[18px]" />}
+          </button>
           {themeButton}
           <button
             type="button"

@@ -56,6 +56,149 @@ export function CertificateModal({
     window.print();
   };
 
+  const handleDownloadImage = () => {
+    soundEffects.playClick();
+    const canvas = document.createElement("canvas");
+    canvas.width = 1200;
+    canvas.height = 840;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      toast.error("حدث خطأ أثناء إنشاء الصورة");
+      return;
+    }
+
+    // Background gradient
+    const bgGrad = ctx.createLinearGradient(0, 0, 1200, 840);
+    bgGrad.addColorStop(0, "#fcfbf7");
+    bgGrad.addColorStop(0.5, "#ffffff");
+    bgGrad.addColorStop(1, "#f9f6ee");
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, 1200, 840);
+
+    // Double borders
+    ctx.strokeStyle = "#d97706";
+    ctx.lineWidth = 14;
+    ctx.strokeRect(20, 20, 1160, 800);
+
+    ctx.strokeStyle = "#b45309";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(36, 36, 1128, 768);
+
+    // Filigree corners
+    ctx.fillStyle = "#d97706";
+    const cornerSize = 24;
+    ctx.fillRect(36, 36, cornerSize, cornerSize);
+    ctx.fillRect(1164 - cornerSize, 36, cornerSize, cornerSize);
+    ctx.fillRect(36, 804 - cornerSize, cornerSize, cornerSize);
+    ctx.fillRect(1164 - cornerSize, 804 - cornerSize, cornerSize);
+
+    // Academy header
+    ctx.fillStyle = "#92400e";
+    ctx.font = "bold 20px sans-serif";
+    ctx.textAlign = "center";
+    ctx.letterSpacing = "6px";
+    ctx.fillText("LINK ME ENGLISH ACADEMY", 600, 110);
+
+    // Title
+    ctx.fillStyle = "#0f172a";
+    ctx.font = "bold 44px serif";
+    ctx.letterSpacing = "2px";
+    ctx.fillText("CERTIFICATE OF ACHIEVEMENT", 600, 180);
+
+    // Arabic title
+    ctx.fillStyle = "#475569";
+    ctx.font = "bold 22px 'IBM Plex Sans Arabic', sans-serif";
+    ctx.letterSpacing = "0px";
+    ctx.fillText("شهادة إتمام وتفوق معتمدة", 600, 225);
+
+    // Subtitle
+    ctx.fillStyle = "#64748b";
+    ctx.font = "16px sans-serif";
+    ctx.fillText("THIS IS PROUDLY PRESENTED TO", 600, 290);
+
+    // Student Name
+    ctx.fillStyle = "#4338ca";
+    ctx.font = "bold 46px serif";
+    ctx.fillText(studentName, 600, 365);
+
+    // Underline
+    ctx.strokeStyle = "#d97706";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(350, 385);
+    ctx.lineTo(850, 385);
+    ctx.stroke();
+
+    // Body text
+    ctx.fillStyle = "#334155";
+    ctx.font = "20px 'IBM Plex Sans Arabic', sans-serif";
+    ctx.fillText(`تقديراً لإتمامه بنجاح متطلبات «${courseTitle}»`, 600, 445);
+    ctx.fillText(`واجتياز تقييم الكفاءة اللغوية بنسبة تفوق ${scorePercentage}% وفق المعايير الأوروبية`, 600, 485);
+
+    // Level Badge
+    ctx.fillStyle = "#fef3c7";
+    ctx.beginPath();
+    ctx.roundRect(400, 525, 400, 45, [22]);
+    ctx.fill();
+    ctx.strokeStyle = "#d97706";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.fillStyle = "#78350f";
+    ctx.font = "bold 18px sans-serif";
+    ctx.fillText(`★  ${levelTitle}  ★`, 600, 554);
+
+    // Signatures
+    ctx.fillStyle = "#0f172a";
+    ctx.font = "italic bold 22px serif";
+    ctx.fillText("Omar Elsayed", 300, 680);
+    ctx.strokeStyle = "#94a3b8";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(200, 695);
+    ctx.lineTo(400, 695);
+    ctx.stroke();
+    ctx.fillStyle = "#64748b";
+    ctx.font = "16px 'IBM Plex Sans Arabic', sans-serif";
+    ctx.fillText("المشرف الأكاديمي", 300, 725);
+
+    // Golden Seal in center
+    ctx.fillStyle = "#f59e0b";
+    ctx.beginPath();
+    ctx.arc(600, 690, 48, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#78350f";
+    ctx.font = "bold 13px sans-serif";
+    ctx.fillText("OFFICIAL", 600, 685);
+    ctx.fillText("VERIFIED", 600, 702);
+
+    ctx.fillStyle = "#64748b";
+    ctx.font = "12px monospace";
+    ctx.fillText(certId, 600, 755);
+
+    // Date
+    ctx.fillStyle = "#0f172a";
+    ctx.font = "bold 18px sans-serif";
+    ctx.fillText(currentDate, 900, 680);
+    ctx.strokeStyle = "#94a3b8";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(800, 695);
+    ctx.lineTo(1000, 695);
+    ctx.stroke();
+    ctx.fillStyle = "#64748b";
+    ctx.font = "16px 'IBM Plex Sans Arabic', sans-serif";
+    ctx.fillText("تاريخ الاعتماد", 900, 725);
+
+    // Download image
+    const link = document.createElement("a");
+    link.download = `LinkMe-Certificate-${certId}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+    soundEffects.playTrophy();
+    toast.success("تم تنزيل الشهادة كصورة عالية الجودة بنجاح! 🎓📸");
+  };
+
   const handleShare = async () => {
     soundEffects.playClick();
     const shareText = `🎓 حصلت على شهادة إتمام ${courseTitle} من منصة Link Me! كود التحقق: ${certId}`;
@@ -232,6 +375,13 @@ export function CertificateModal({
         {/* Action Buttons */}
         <div className="print:hidden flex flex-wrap items-center justify-end gap-2 pt-2">
           <Button
+            onClick={handleDownloadImage}
+            className="h-9 gap-1.5 rounded-full bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-700 shadow-md"
+          >
+            <Download className="size-3.5" />
+            تحميل كصورة (PNG)
+          </Button>
+          <Button
             onClick={handleShare}
             variant="outline"
             className="h-9 gap-1.5 rounded-full text-xs font-semibold"
@@ -241,7 +391,8 @@ export function CertificateModal({
           </Button>
           <Button
             onClick={handlePrint}
-            className="h-9 gap-1.5 rounded-full bg-iris text-xs font-bold text-white hover:bg-iris-deep shadow-md"
+            variant="outline"
+            className="h-9 gap-1.5 rounded-full border-iris text-iris text-xs font-bold hover:bg-iris/10"
           >
             <Printer className="size-3.5" />
             طباعة أو حفظ كـ PDF
