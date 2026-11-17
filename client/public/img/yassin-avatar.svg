@@ -14,11 +14,11 @@
       <stop offset="100%" stop-color="#0F172A"/>
     </linearGradient>
 
-    <!-- Face Skin Gradient -->
+    <!-- Face Skin Gradient (Warm Egyptian Tan / القمحي الوسيم) -->
     <linearGradient id="skinGradYassin" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#FFF3E8"/>
-      <stop offset="60%" stop-color="#FCDDC7"/>
-      <stop offset="100%" stop-color="#F4C7A5"/>
+      <stop offset="0%" stop-color="#F2CCA6"/>
+      <stop offset="55%" stop-color="#DE9F72"/>
+      <stop offset="100%" stop-color="#C28254"/>
     </linearGradient>
 
     <!-- Jacket Gradient -->
@@ -70,15 +70,15 @@
   </g>
 
   <!-- Neck -->
-  <path d="M 175 250 L 175 295 C 175 305, 225 305, 225 295 L 225 250 Z" fill="#F4C7A5"/>
+  <path d="M 175 250 L 175 295 C 175 305, 225 305, 225 295 L 225 250 Z" fill="#C28254"/>
 
   <!-- Face Shape -->
   <path d="M 135 155 C 130 215, 145 272, 200 272 C 255 272, 270 215, 265 155 C 265 140, 135 140, 135 155 Z" 
         fill="url(#skinGradYassin)" filter="url(#dropShadowYassin)"/>
 
   <!-- Ears -->
-  <path d="M 133 185 C 115 185, 115 215, 135 215 Z" fill="#F4C7A5"/>
-  <path d="M 267 185 C 285 185, 285 215, 265 215 Z" fill="#F4C7A5"/>
+  <path d="M 133 185 C 115 185, 115 215, 135 215 Z" fill="#DE9F72"/>
+  <path d="M 267 185 C 285 185, 285 215, 265 215 Z" fill="#DE9F72"/>
 
   <!-- Cheerful Rosy Warm Cheeks -->
   <ellipse cx="158" cy="225" rx="14" ry="8" fill="#F87171" opacity="0.3"/>
