@@ -33,3 +33,6 @@ Thumbs.db
 
 # Vitest
 .vitest/
+
+# Binaries
+cloudflared.exe

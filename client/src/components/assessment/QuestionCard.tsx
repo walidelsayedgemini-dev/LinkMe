@@ -147,7 +147,7 @@ export function QuestionCard({
                 type="button"
                 role="radio"
                 aria-checked={selected}
-                disabled={hasAnswer || answerPending || actionPending}
+                disabled={answerPending || actionPending}
                 key={`${question.id}-${optionIndex}`}
                 onClick={() => onChoose(optionIndex)}
                 className={cn(
@@ -180,6 +180,12 @@ export function QuestionCard({
             );
           })}
         </div>
+
+        {hasAnswer && !answerPending && (
+          <p className="text-[11px] text-ink-soft py-1 text-center font-medium">
+            💡 لو اخترت بالغلط تقدر تضغط على أي اختيار تاني وتعدّل إجابتك بحرية
+          </p>
+        )}
 
         {currentFeedback && mode === "practice" ? (
           <div

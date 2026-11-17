@@ -258,7 +258,7 @@ function AssessmentExperience() {
       safeView.phase !== "answering" ||
       !currentQuestion ||
       answer.isPending ||
-      safeView.answers[currentQuestion.id] !== undefined
+      safeView.answers[currentQuestion.id] === optionIndex
     )
       return;
     answer.reset();
@@ -320,7 +320,7 @@ function AssessmentExperience() {
         if (
           currentQuestion?.options[optionIndex] !== undefined &&
           currentQuestion &&
-          safeView.answers[currentQuestion.id] === undefined &&
+          safeView.answers[currentQuestion.id] !== optionIndex &&
           !answer.isPending
         ) {
           event.preventDefault();
