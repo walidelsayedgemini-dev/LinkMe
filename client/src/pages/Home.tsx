@@ -161,20 +161,20 @@ export default function Home() {
       <section className="container pt-6">
         <CompanionMotivationalBanner className="mb-6" />
 
-        {/* Interactive Free Playground Showcase — Rich Branded Visual Cards */}
+        {/* Interactive Free Playground Showcase — Rich Branded Visual Cards (60 FPS, zero blur-3xl/backdrop-blur) */}
         <div className="relative mb-6 overflow-hidden rounded-[28px] border border-iris/20 bg-gradient-to-br from-[#0e2248] via-[#173673] to-[#1e40af] p-5 sm:p-8 text-white shadow-[0_24px_60px_-25px_rgba(37,99,255,0.45)]">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -top-24 -end-24 size-72 rounded-full bg-sky-400/20 blur-3xl"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -bottom-24 -start-24 size-72 rounded-full bg-amber-400/15 blur-3xl"
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(520px circle at 90% 10%, rgba(56, 189, 248, 0.22), transparent 60%), radial-gradient(460px circle at 10% 90%, rgba(251, 191, 36, 0.16), transparent 60%)",
+            }}
           />
 
           <div className="relative flex flex-wrap items-end justify-between gap-3">
             <div>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold text-amber-300 backdrop-blur-sm">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold text-amber-300">
                 <Sparkles className="size-3.5" /> جرّب مجاناً من غير تسجيل
               </span>
               <h2 className="mt-2.5 text-xl font-extrabold text-white sm:text-3xl">
@@ -183,7 +183,7 @@ export default function Home() {
             </div>
             <Link
               href="/competitions"
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs font-bold text-white backdrop-blur-sm transition hover:bg-white hover:text-iris"
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-white hover:text-iris"
             >
               ادخل ساحة التحديات <ArrowLeft className="size-3.5" />
             </Link>
@@ -200,7 +200,7 @@ export default function Home() {
                 title: "محاكي المواقف الحقيقية",
                 desc: "إنترفيو، آيلتس، تفاوض على المرتب، سفر، فندق واجتماعات Zoom بصوتك.",
                 icon: MessageCircle,
-                iconBg: "bg-sky-400/20 text-sky-200 border-sky-300/30",
+                iconBg: "bg-sky-950/75 text-sky-200 border-sky-300/35",
               },
               {
                 href: "/flashcards",
@@ -211,7 +211,7 @@ export default function Home() {
                 title: "فلاش كاردز الكلمات",
                 desc: "A1–C1 + IELTS + بزنس + تعبيرات Native بالنطق الأمريكي وملخصات PDF.",
                 icon: BookOpen,
-                iconBg: "bg-emerald-400/20 text-emerald-200 border-emerald-300/30",
+                iconBg: "bg-emerald-950/75 text-emerald-200 border-emerald-300/35",
               },
               {
                 href: "/speed-quiz",
@@ -222,7 +222,7 @@ export default function Home() {
                 title: "تحدي الـ 60 ثانية اليومي",
                 desc: "أسئلة سريعة بتايمر وكومبو وكارت نتيجة جاهز للمشاركة على واتساب.",
                 icon: Zap,
-                iconBg: "bg-amber-400/25 text-amber-200 border-amber-300/35",
+                iconBg: "bg-amber-950/75 text-amber-200 border-amber-300/40",
               },
               {
                 href: "/competitions",
@@ -233,7 +233,7 @@ export default function Home() {
                 title: "دوري المسابقات والحماسة",
                 desc: "نافس أبطال اليوم والأسبوع والشهر والسنة واختار من 100 أفتار فخم!",
                 icon: Trophy,
-                iconBg: "bg-purple-400/25 text-purple-200 border-purple-300/35",
+                iconBg: "bg-purple-950/75 text-purple-200 border-purple-300/40",
               },
             ].map(tool => {
               const Icon = tool.icon;
@@ -241,14 +241,15 @@ export default function Home() {
                 <Link
                   key={tool.href}
                   href={tool.href}
-                  className={`group relative flex min-h-[225px] flex-col justify-between overflow-hidden rounded-2xl border border-white/15 p-5 shadow-md transition duration-300 hover:-translate-y-1 ${tool.accentBorder}`}
+                  className={`group relative flex min-h-[225px] flex-col justify-between overflow-hidden rounded-2xl border border-white/15 p-5 shadow-md transition-transform duration-200 hover:-translate-y-1 ${tool.accentBorder}`}
                 >
                   <img
                     src={tool.bgImage}
                     alt=""
                     aria-hidden="true"
                     loading="lazy"
-                    className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    decoding="async"
+                    className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   <div
                     aria-hidden="true"
@@ -257,11 +258,11 @@ export default function Home() {
 
                   <div className="relative flex items-center justify-between gap-2">
                     <span
-                      className={`grid size-10 place-items-center rounded-xl border backdrop-blur-md ${tool.iconBg}`}
+                      className={`grid size-10 place-items-center rounded-xl border ${tool.iconBg}`}
                     >
                       <Icon className="size-5" />
                     </span>
-                    <span className="rounded-full border border-white/20 bg-black/30 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur-md">
+                    <span className="rounded-full border border-white/20 bg-black/55 px-2.5 py-1 text-[10px] font-bold text-white">
                       {tool.badge}
                     </span>
                   </div>
@@ -273,7 +274,7 @@ export default function Home() {
                     <p className="mt-1.5 text-xs leading-relaxed text-white/85">
                       {tool.desc}
                     </p>
-                    <span className="mt-3.5 inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold text-white backdrop-blur-sm transition group-hover:bg-white group-hover:text-iris">
+                    <span className="mt-3.5 inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold text-white transition-colors group-hover:bg-white group-hover:text-iris">
                       جرّبها الآن <ArrowLeft className="size-3" />
                     </span>
                   </div>
@@ -283,16 +284,16 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-line bg-card p-5">
-          <p className="text-sm leading-relaxed text-ink-soft">
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-iris/25 bg-gradient-to-l from-iris-soft/80 via-card to-sky-50/70 p-5 dark:from-iris-soft/40 dark:via-card dark:to-card">
+          <p className="text-sm font-medium leading-relaxed text-ink">
             ليه Link Me؟ فهم وممارسة ومتابعة —{" "}
-            <span className="text-iris">رحلة ليها معنى.</span>
+            <span className="font-bold text-iris">رحلة ليها معنى.</span>
           </p>
           <Link
             href="/about"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-iris"
+            className="inline-flex items-center gap-2 rounded-full bg-iris px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-iris-deep"
           >
-            اعرف المنصة وقيمها <ArrowLeft className="size-4" />
+            اعرف المنصة وقيمها <ArrowLeft className="size-3.5" />
           </Link>
         </div>
       </section>
@@ -533,28 +534,44 @@ export default function Home() {
               </Link>
             </Button>
           </div>
-          <div className="rounded-[28px] border border-line bg-card p-7 sm:p-9">
-            <div className="flex items-center gap-4">
-              <span className="grid size-14 place-items-center rounded-2xl bg-iris-soft text-iris">
-                <MessageCircle className="size-7" />
-              </span>
-              <div>
-                <h3 className="text-lg text-ink">مساحة تتكلم، مش تتفرّج.</h3>
-                <p className="mt-1 text-xs text-ink-soft">
-                  جلسات أونلاين مباشرة
-                </p>
+          <div className="overflow-hidden rounded-[28px] border border-iris/25 bg-gradient-to-br from-iris-soft/50 via-card to-sky-50/40 shadow-sm dark:from-iris-soft/30 dark:via-card dark:to-card">
+            <div className="relative h-36 overflow-hidden">
+              <img
+                src="/img/oneonone.webp"
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                decoding="async"
+                className="size-full object-cover"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 bg-gradient-to-t from-[#0e2248]/95 via-[#173673]/65 to-transparent"
+              />
+              <div className="absolute inset-x-6 bottom-4 flex items-center gap-3 text-white">
+                <span className="grid size-11 place-items-center rounded-xl border border-white/25 bg-white/15 text-sky-200">
+                  <MessageCircle className="size-5" />
+                </span>
+                <div>
+                  <h3 className="text-base font-extrabold text-white">
+                    مساحة تتكلم، مش تتفرّج.
+                  </h3>
+                  <p className="text-xs text-sky-200">جلسات أونلاين مباشرة</p>
+                </div>
               </div>
             </div>
-            <p className="mt-5 text-sm leading-[1.9] text-ink-soft">
-              تسأل، تجاوب، تغلط وتجرّب تاني. في حسابك هتلاقي الجلسات، التكليفات
-              وملاحظات المدرّس؛ عشان تعرف إيه اللي اتحسن وإيه خطوتك الجاية.
-            </p>
-            <Link
-              href="/instructors"
-              className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-iris"
-            >
-              قسم المدربين <ArrowLeft className="size-4" />
-            </Link>
+            <div className="p-6 sm:p-7">
+              <p className="text-sm leading-[1.9] text-ink-soft">
+                تسأل، تجاوب، تغلط وتجرّب تاني. في حسابك هتلاقي الجلسات، التكليفات
+                وملاحظات المدرّس؛ عشان تعرف إيه اللي اتحسن وإيه خطوتك الجاية.
+              </p>
+              <Link
+                href="/instructors"
+                className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-iris"
+              >
+                قسم المدربين <ArrowLeft className="size-4" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -577,7 +594,7 @@ export default function Home() {
       <section className="home-section container">
         <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
           {/* Student Testimonials */}
-          <div className="rounded-3xl border border-line bg-card p-6 sm:p-7">
+          <div className="rounded-3xl border border-iris/25 bg-gradient-to-br from-iris-soft/55 via-card to-amber-50/45 p-6 sm:p-7 dark:from-iris-soft/30 dark:via-card dark:to-amber-950/15">
             <div className="flex items-center justify-between gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-700 dark:text-amber-300">
                 <Star className="size-3.5 fill-amber-500 text-amber-500" /> آراء

@@ -46,6 +46,7 @@ export default function Competitions() {
   const [avatarCategory, setAvatarCategory] = useState<
     "all" | AvatarCategory
   >("all");
+  const [avatarVisibleCount, setAvatarVisibleCount] = useState(24);
   const [claimedQuests, setClaimedQuests] = useState<Record<string, boolean>>(() => {
     if (typeof window === "undefined") return {};
     try {
@@ -114,25 +115,33 @@ export default function Competitions() {
 
   return (
     <PageShell>
-      {/* Hero Banner */}
-      <section className="relative overflow-hidden border-b border-line bg-paper-deep/60">
-        <div className="container py-10 sm:py-14">
+      {/* Hero Banner — Rich Link Me Royal Editorial Backdrop */}
+      <section className="relative overflow-hidden border-b border-iris/25 bg-gradient-to-br from-[#0e2248] via-[#173673] to-[#1e40af] text-white">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(640px circle at 85% 15%, rgba(56, 189, 248, 0.22), transparent 60%), radial-gradient(520px circle at 10% 85%, rgba(251, 191, 36, 0.18), transparent 60%)",
+          }}
+        />
+        <div className="container relative py-10 sm:py-14">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-700 dark:text-amber-300">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-bold text-amber-300">
                 <Trophy className="size-3.5" /> دوري Link Me الرسمي للتحديات والحماسة
               </span>
-              <h1 className="mt-3 text-3xl font-extrabold text-ink sm:text-4xl">
-                نافس، اجمع نقاط <span className="hl-word">الحماسة</span>، وافتح سكنات أسطورية! 🔥
+              <h1 className="mt-3 text-3xl font-extrabold text-white sm:text-4xl">
+                نافس، اجمع نقاط <span className="text-amber-300">الحماسة</span>، وافتح سكنات أسطورية! 🔥
               </h1>
-              <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+              <p className="mt-3 text-sm leading-relaxed text-white/80">
                 تحديات يومية، أسبوعية، شهرية، وسنوية! كل يوم التزام بيقرّبك من المركز
                 الأول وبيفتحلك إطارات وسكنات نادرة — وبخصوصية كاملة يظهر الاسم الأول فقط لكل طالب.
               </p>
             </div>
 
             {user && myProfile.data ? (
-              <div className="flex items-center gap-4 rounded-3xl border border-line bg-card p-4 shadow-sm">
+              <div className="flex items-center gap-4 rounded-3xl border border-white/20 bg-black/25 p-4 text-white shadow-sm">
                 <StudentAvatarBadge
                   avatarPreset={currentAvatar}
                   equippedSkin={currentSkin}
@@ -140,7 +149,7 @@ export default function Competitions() {
                 />
                 <div>
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <p className="text-base font-extrabold text-ink">
+                    <p className="text-base font-extrabold text-white">
                       {myProfile.data.firstName}
                     </p>
                     {isVip && (
@@ -149,11 +158,11 @@ export default function Competitions() {
                       </span>
                     )}
                   </div>
-                  <p className="text-xs font-semibold text-amber-600 dark:text-amber-400">
+                  <p className="text-xs font-semibold text-amber-300">
                     🔥 {currentStreak} أيام حماسة متتالية
                     {isVip && " · 🛡️ درع الحماسة مفعّل"}
                   </p>
-                  <p className="mt-0.5 text-xs text-ink-soft">
+                  <p className="mt-0.5 text-xs text-white/75">
                     {isVip
                       ? "⚡ مضاعفة النقاط 2x مفعّلة تلقائياً!"
                       : `${getStreakSkin(currentSkin).badgeEmoji} ${getStreakSkin(currentSkin).name}`}
@@ -161,7 +170,7 @@ export default function Competitions() {
                 </div>
               </div>
             ) : (
-              <Button asChild className="rounded-full bg-iris px-6 text-white">
+              <Button asChild className="rounded-full bg-amber-400 px-6 font-bold text-[#0e2248] hover:bg-amber-300">
                 <Link href="/login">سجّل دخولك وادخل المنافسة 🚀</Link>
               </Button>
             )}
@@ -252,7 +261,8 @@ export default function Competitions() {
                           alt=""
                           aria-hidden="true"
                           loading="lazy"
-                          className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          decoding="async"
+                          className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                         <div
                           aria-hidden="true"
@@ -266,7 +276,7 @@ export default function Competitions() {
                             {action.sub}
                           </p>
                         </div>
-                        <span className="latin relative shrink-0 rounded-full border border-white/25 bg-black/30 px-2.5 py-1 text-[11px] font-black text-amber-300 backdrop-blur-sm">
+                        <span className="latin relative shrink-0 rounded-full border border-white/25 bg-black/55 px-2.5 py-1 text-[11px] font-black text-amber-300">
                           {action.xp}
                         </span>
                       </Link>
@@ -319,8 +329,8 @@ export default function Competitions() {
                       className={cn(
                         "flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-4 shadow-xs",
                         quest.isPro
-                          ? "border-amber-400/50 bg-gradient-to-r from-amber-500/[0.07] to-card"
-                          : "border-line bg-card"
+                          ? "border-amber-400/50 bg-gradient-to-r from-amber-500/[0.1] via-card to-amber-500/[0.04]"
+                          : "border-iris/25 bg-gradient-to-l from-iris-soft/60 via-card to-card"
                       )}
                     >
                       <div className="flex items-start gap-3">
@@ -543,6 +553,7 @@ export default function Competitions() {
                       onClick={() => {
                         soundEffects.playClick();
                         setAvatarCategory(cat.id);
+                        setAvatarVisibleCount(24);
                       }}
                       className={cn(
                         "rounded-full border px-3.5 py-1.5 text-xs font-bold transition",
@@ -560,71 +571,95 @@ export default function Competitions() {
                 })}
               </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-                {AVATAR_PRESETS.filter(avatar =>
+              {(() => {
+                const filteredAvatars = AVATAR_PRESETS.filter(avatar =>
                   avatarCategory === "all"
                     ? true
                     : avatarCategory === "pro_vip"
                       ? Boolean(avatar.isPro)
                       : avatar.category === avatarCategory
-                ).map(avatar => {
-                  const selected = currentAvatar === avatar.id;
-                  const lockedByPro = Boolean(avatar.isPro) && !isVip;
-                  return (
-                    <button
-                      key={avatar.id}
-                      type="button"
-                      disabled={!user || customize.isPending}
-                      onClick={() => {
-                        if (lockedByPro) {
-                          toast.info(
-                            "هذا الأفتار الملكي حصري لمشتركي PRO 👑 — رقّي حسابك من صفحة الأسعار!"
-                          );
-                          return;
-                        }
-                        customize.mutate({ avatarPreset: avatar.id });
-                      }}
-                      className={cn(
-                        "group relative flex flex-col items-center gap-2 overflow-hidden rounded-2xl border p-3.5 transition duration-200 hover:-translate-y-1",
-                        selected
-                          ? "border-iris bg-gradient-to-b from-iris/15 to-card ring-2 ring-iris/40 shadow-md"
-                          : avatar.isPro
-                            ? "border-amber-400/50 bg-gradient-to-b from-amber-500/10 via-card to-card hover:border-amber-400 hover:shadow-md"
-                            : "border-line bg-gradient-to-b from-paper-deep/60 to-card hover:border-iris/50 hover:shadow-sm"
-                      )}
-                    >
-                      {avatar.isPro && (
-                        <span className="absolute top-2 end-2 z-10 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-1.5 py-0.5 text-[9px] font-black text-white shadow-xs">
-                          PRO 👑
-                        </span>
-                      )}
-                      <StudentAvatarBadge
-                        avatarPreset={avatar.id}
-                        equippedSkin={currentSkin}
-                        size="lg"
-                        showSkinBadge={false}
-                        className="transition-transform duration-300 group-hover:scale-105"
-                      />
-                      <span className="line-clamp-1 text-xs font-bold text-ink">
-                        {avatar.label}
-                      </span>
-                      {selected ? (
-                        <span className="inline-flex items-center gap-0.5 rounded-full bg-iris-soft px-2 py-0.5 text-[10px] font-bold text-iris">
-                          <Check className="size-3" /> مختار
-                        </span>
-                      ) : lockedByPro ? (
-                        <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-amber-600 dark:text-amber-400">
-                          <Lock className="size-2.5" /> لمشتركي PRO
-                        </span>
-                      ) : (
-                        <span className="text-[10px] text-ink-soft opacity-0 transition group-hover:opacity-100">
-                          اضغط للاختيار ✨
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
+                );
+                const shownAvatars = filteredAvatars.slice(0, avatarVisibleCount);
+                const remainingAvatars = filteredAvatars.length - shownAvatars.length;
+                return (
+                  <>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                      {shownAvatars.map(avatar => {
+                        const selected = currentAvatar === avatar.id;
+                        const lockedByPro = Boolean(avatar.isPro) && !isVip;
+                        return (
+                          <button
+                            key={avatar.id}
+                            type="button"
+                            disabled={!user || customize.isPending}
+                            onClick={() => {
+                              if (lockedByPro) {
+                                toast.info(
+                                  "هذا الأفتار الملكي حصري لمشتركي PRO 👑 — رقّي حسابك من صفحة الأسعار!"
+                                );
+                                return;
+                              }
+                              customize.mutate({ avatarPreset: avatar.id });
+                            }}
+                            className={cn(
+                              "group relative flex flex-col items-center gap-2 overflow-hidden rounded-2xl border p-3.5 transition-transform duration-200 hover:-translate-y-0.5 [content-visibility:auto]",
+                              selected
+                                ? "border-iris bg-gradient-to-b from-iris/15 to-card ring-2 ring-iris/40 shadow-md"
+                                : avatar.isPro
+                                  ? "border-amber-400/50 bg-gradient-to-b from-amber-500/12 via-card to-card hover:border-amber-400"
+                                  : "border-iris/20 bg-gradient-to-b from-iris-soft/55 to-card hover:border-iris/50"
+                            )}
+                          >
+                            {avatar.isPro && (
+                              <span className="absolute top-2 end-2 z-10 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-1.5 py-0.5 text-[9px] font-black text-white shadow-xs">
+                                PRO 👑
+                              </span>
+                            )}
+                            <StudentAvatarBadge
+                              avatarPreset={avatar.id}
+                              equippedSkin={currentSkin}
+                              size="lg"
+                              showSkinBadge={false}
+                              className="transition-transform duration-200 group-hover:scale-105"
+                            />
+                            <span className="line-clamp-1 text-xs font-bold text-ink">
+                              {avatar.label}
+                            </span>
+                            {selected ? (
+                              <span className="inline-flex items-center gap-0.5 rounded-full bg-iris-soft px-2 py-0.5 text-[10px] font-bold text-iris">
+                                <Check className="size-3" /> مختار
+                              </span>
+                            ) : lockedByPro ? (
+                              <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-amber-600 dark:text-amber-400">
+                                <Lock className="size-2.5" /> لمشتركي PRO
+                              </span>
+                            ) : (
+                              <span className="text-[10px] text-ink-soft opacity-0 transition group-hover:opacity-100">
+                                اضغط للاختيار ✨
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {remainingAvatars > 0 && (
+                      <div className="flex justify-center pt-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() =>
+                            setAvatarVisibleCount(prev => prev + 36)
+                          }
+                          className="rounded-full border-iris/40 bg-iris-soft/60 px-6 font-bold text-iris hover:bg-iris hover:text-white"
+                        >
+                          عرض المزيد من الأفتارات (+{Math.min(36, remainingAvatars)} من أصل {remainingAvatars} متبقي) 🎨
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
 
             {/* Streak Skins Grid */}

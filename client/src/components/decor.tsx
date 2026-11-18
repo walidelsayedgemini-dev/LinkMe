@@ -61,14 +61,14 @@ export function StudyDoodles({
   className?: string;
 }) {
   return (
-    <div aria-hidden className={cn("pointer-events-none absolute inset-0 overflow-hidden", className)}>
+    <div aria-hidden className={cn("pointer-events-none absolute inset-0 hidden overflow-hidden lg:block", className)}>
       {SETS[variant].map((doodle, index) => {
         const Icon = ICONS[doodle.icon];
         return (
           <span
             key={`${doodle.icon}-${index}`}
-            className={cn("study-doodle", doodle.className, doodle.motion === "drift" ? "animate-drift" : "animate-float-sm")}
-            style={{ animationDelay: `${doodle.delay ?? 0}s`, opacity: doodle.opacity ?? 0.14 }}
+            className={cn("study-doodle", doodle.className)}
+            style={{ opacity: doodle.opacity ?? 0.14 }}
           >
             <Icon size={doodle.size} strokeWidth={1.5} />
           </span>
@@ -78,29 +78,18 @@ export function StudyDoodles({
   );
 }
 
-/** Soft, slowly morphing colour field used behind hero and auth panels. */
+/** Lightweight static radial colour field (zero blur-3xl / GPU compositing overhead). */
 export function AnimatedAurora({ className, dark = false }: { className?: string; dark?: boolean }) {
   return (
-    <div aria-hidden className={cn("pointer-events-none absolute inset-0 overflow-hidden", className)}>
-      <div
-        className={cn(
-          "aurora absolute -start-24 -top-32 size-[26rem] rounded-full blur-3xl",
-          dark ? "bg-iris/35" : "bg-iris/20",
-        )}
-      />
-      <div
-        className={cn(
-          "aurora absolute -end-20 top-1/3 size-80 rounded-full blur-3xl [animation-delay:-6s]",
-          dark ? "bg-[#7aa2ff]/25" : "bg-[#9fc0ff]/30",
-        )}
-      />
-      <div
-        className={cn(
-          "animate-blob absolute bottom-0 start-1/3 size-72 rounded-full blur-3xl",
-          dark ? "bg-[#5b8cff]/20" : "bg-acid/25",
-        )}
-      />
-    </div>
+    <div
+      aria-hidden
+      className={cn("pointer-events-none absolute inset-0 overflow-hidden", className)}
+      style={{
+        background: dark
+          ? "radial-gradient(600px circle at 15% 10%, rgba(37, 99, 255, 0.28), transparent 60%), radial-gradient(500px circle at 88% 45%, rgba(122, 162, 255, 0.18), transparent 60%)"
+          : "radial-gradient(600px circle at 15% 10%, rgba(37, 99, 255, 0.14), transparent 60%), radial-gradient(500px circle at 88% 45%, rgba(159, 192, 255, 0.18), transparent 60%)",
+      }}
+    />
   );
 }
 
@@ -231,24 +220,23 @@ export function AbcStack({ className }: { className?: string }) {
 
 /** Cluster of 3D-ish supply tiles, used as a decorative corner piece. */
 export function SuppliesCluster({ className }: { className?: string }) {
-  const items: { icon: keyof typeof ICONS; rotate: string; delay: number }[] = [
-    { icon: "pencil", rotate: "-rotate-12", delay: 0 },
-    { icon: "book", rotate: "rotate-6", delay: 0.5 },
-    { icon: "cap", rotate: "-rotate-3", delay: 1 },
+  const items: { icon: keyof typeof ICONS; rotate: string }[] = [
+    { icon: "pencil", rotate: "-rotate-12" },
+    { icon: "book", rotate: "rotate-6" },
+    { icon: "cap", rotate: "-rotate-3" },
   ];
   return (
     <div aria-hidden className={cn("flex items-end gap-2", className)}>
-      {items.map(({ icon, rotate, delay }) => {
+      {items.map(({ icon, rotate }) => {
         const Icon = ICONS[icon];
         return (
           <span
             key={icon}
             className={cn(
-              "animate-float-sm grid place-items-center rounded-2xl border border-white/25 bg-white/10 text-white/80 backdrop-blur",
+              "grid place-items-center rounded-2xl border border-white/25 bg-white/15 text-white/90",
               rotate,
               icon === "cap" ? "size-12" : "size-10",
             )}
-            style={{ animationDelay: `${delay}s` }}
           >
             <Icon size={icon === "cap" ? 22 : 18} strokeWidth={1.6} />
           </span>
@@ -259,43 +247,43 @@ export function SuppliesCluster({ className }: { className?: string }) {
 }
 
 /**
- * Playful school props tucked into the page corners — backpack, English books
- * and a ruler — to keep the study mood light and cheerful.
+ * Playful school props tucked into the page corners on wide desktop monitors only
+ * (zero fixed compositing layers on phones and laptops).
  */
 export function CornerProps({ className }: { className?: string }) {
   return (
-    <div aria-hidden className={cn("pointer-events-none fixed inset-0 z-0 select-none", className)}>
+    <div aria-hidden className={cn("pointer-events-none fixed inset-0 z-0 hidden select-none 2xl:block", className)}>
       {/* English book stack — bottom start corner */}
-      <div className="corner-books animate-float-sm absolute -bottom-2 -start-3 origin-bottom rotate-[-8deg] opacity-90 scale-[0.62] sm:scale-75 lg:scale-100">
+      <div className="corner-books absolute -bottom-2 -start-3 origin-bottom rotate-[-8deg] opacity-85">
         <div className="relative">
-          <div className="h-4 w-40 rounded-md bg-[#1a3fc4] shadow-lg" />
-          <div className="absolute -top-4 start-3 h-4 w-36 rounded-md bg-[#4d80ff] shadow-lg" />
-          <div className="absolute -top-8 start-1 h-4 w-40 rounded-md bg-[#ffd166] shadow-lg" />
-          <div className="absolute -top-12 start-6 h-4 w-32 rounded-md bg-card ring-1 ring-line shadow-lg" />
+          <div className="h-4 w-40 rounded-md bg-[#1a3fc4] shadow-md" />
+          <div className="absolute -top-4 start-3 h-4 w-36 rounded-md bg-[#4d80ff] shadow-md" />
+          <div className="absolute -top-8 start-1 h-4 w-40 rounded-md bg-[#ffd166] shadow-md" />
+          <div className="absolute -top-12 start-6 h-4 w-32 rounded-md bg-card ring-1 ring-line shadow-md" />
           <span className="latin absolute -top-12 start-8 text-[9px] font-bold leading-[16px] text-iris">English</span>
         </div>
       </div>
 
       {/* Ruler — top start corner, just under the navbar */}
-      <div className="corner-ruler animate-sway absolute start-2 top-[84px] rotate-[24deg] opacity-80 scale-[0.7] lg:top-24 lg:start-3 lg:scale-100">
-        <div className="flex h-6 w-28 items-end gap-1 rounded-md bg-[#ffd166] px-1.5 pb-1 shadow-md ring-1 ring-[#e7b53a]/40">
+      <div className="corner-ruler absolute start-3 top-24 rotate-[24deg] opacity-75">
+        <div className="flex h-6 w-28 items-end gap-1 rounded-md bg-[#ffd166] px-1.5 pb-1 shadow-sm ring-1 ring-[#e7b53a]/40">
           {Array.from({ length: 9 }).map((_, index) => (
             <span key={index} className="w-px flex-1 bg-[#a67c00]/50" style={{ height: index % 2 ? 5 : 9 }} />
           ))}
         </div>
       </div>
 
-      {/* Backpack — bottom end corner, lifted above the WhatsApp button */}
-      <div className="animate-drift absolute -end-2 bottom-44 rotate-[10deg] scale-[0.75] sm:scale-90 lg:scale-100">
-        <div className="grid size-20 place-items-center rounded-[1.6rem] bg-gradient-to-br from-[#4d80ff] to-[#1a3fc4] shadow-[0_18px_40px_-18px_rgba(26,63,196,0.9)]">
-          <Backpack className="size-10 text-white" strokeWidth={1.7} />
+      {/* Backpack — bottom end corner */}
+      <div className="absolute -end-2 bottom-44 rotate-[10deg]">
+        <div className="grid size-16 place-items-center rounded-[1.4rem] bg-gradient-to-br from-[#4d80ff] to-[#1a3fc4] shadow-md">
+          <Backpack className="size-8 text-white" strokeWidth={1.7} />
         </div>
       </div>
 
       {/* Pencil — top end corner */}
-      <div className="animate-float-sm absolute end-2 top-[92px] -rotate-[18deg] opacity-80 scale-[0.8] lg:top-28 lg:end-4 lg:scale-100">
-        <div className="grid size-12 place-items-center rounded-2xl bg-card shadow-md ring-1 ring-line">
-          <Pencil className="size-6 text-iris" strokeWidth={1.8} />
+      <div className="absolute end-4 top-28 -rotate-[18deg] opacity-75">
+        <div className="grid size-11 place-items-center rounded-2xl bg-card shadow-sm ring-1 ring-line">
+          <Pencil className="size-5 text-iris" strokeWidth={1.8} />
         </div>
       </div>
     </div>

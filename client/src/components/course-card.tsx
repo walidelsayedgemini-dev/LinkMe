@@ -45,8 +45,9 @@ export function CourseCover({
           onError={(e) => {
             e.currentTarget.src = "/img/hero.webp";
           }}
-          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+          className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.05]"
           loading="lazy"
+          decoding="async"
         />
       </div>
     );
@@ -71,10 +72,10 @@ export function CourseCover({
 
 export function CourseCard({ course, className }: { course: CourseCardData; className?: string }) {
   return (
-    <Link href={`/courses/${course.slug}`} className={cn("card-soft group flex flex-col overflow-hidden", className)}>
+    <Link href={`/courses/${course.slug}`} className={cn("card-soft group flex flex-col overflow-hidden [content-visibility:auto]", className)}>
       <div className="relative">
         <CourseCover title={course.title} coverImage={course.coverImage} accent={course.accent} className="h-44 w-full" />
-        <span className="absolute right-3 top-3 rounded-full bg-paper/95 px-2.5 py-1 text-[11px] font-semibold text-ink backdrop-blur">
+        <span className="absolute right-3 top-3 rounded-full bg-paper/95 px-2.5 py-1 text-[11px] font-semibold text-ink shadow-xs">
           {course.categoryNameAr}
         </span>
         <span className="absolute left-3 top-3 rounded-full bg-iris-deep px-2.5 py-1 text-[11px] font-medium text-white">

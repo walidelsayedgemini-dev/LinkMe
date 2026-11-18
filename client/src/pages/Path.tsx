@@ -166,7 +166,14 @@ export default function Path() {
 
       <section className="container pb-16">
         <div className="relative overflow-hidden rounded-[2rem] bg-navy px-6 py-10 text-white sm:px-10">
-          <div aria-hidden className="absolute -end-16 -top-16 size-56 rounded-full bg-iris/40 blur-3xl" />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(360px circle at 92% 10%, rgba(37, 99, 255, 0.35), transparent 65%)",
+            }}
+          />
           <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="flex items-center gap-2 text-xs text-white/70">

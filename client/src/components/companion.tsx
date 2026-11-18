@@ -157,8 +157,11 @@ export function CompanionHero({
         />
         <span
           aria-hidden
-          className="absolute inset-4 rounded-full blur-xl transition-all"
-          style={{ background: companion.accentColor, opacity: 0.15 }}
+          className="absolute inset-4 rounded-full"
+          style={{
+            background: `radial-gradient(circle, ${companion.accentColor} 0%, transparent 70%)`,
+            opacity: 0.16,
+          }}
         />
         <CompanionAvatar size={150} className="companion-bob relative" />
         <span
@@ -392,7 +395,7 @@ export function CompanionFloatingWidget() {
       <button
         type="button"
         onClick={() => setExpanded((prev) => !prev)}
-        className="group relative flex items-center gap-2 rounded-full border border-line bg-card/95 p-1 sm:p-1.5 sm:pe-4 shadow-xl backdrop-blur-md transition-all hover:scale-105 active:scale-95"
+        className="group relative flex items-center gap-2 rounded-full border border-line bg-card p-1 sm:p-1.5 sm:pe-4 shadow-lg transition-transform duration-200 hover:scale-105 active:scale-95"
         title={`اضغط للتحدث مع ${companion.name}`}
         aria-label={`التحدث مع ${companion.name}`}
       >

@@ -40,6 +40,60 @@ const LEVELS: FlashcardLevel[] = [
   "IDIOMS",
 ];
 
+const DECK_VISUALS: Record<
+  FlashcardLevel,
+  { bg: string; overlay: string; activeRing: string; barColor: string }
+> = {
+  A1: {
+    bg: "/img/cafe.webp",
+    overlay: "from-[#0a1b33]/92 via-[#122e5c]/78 to-[#1e40af]/55",
+    activeRing: "ring-2 ring-sky-300 border-sky-300",
+    barColor: "bg-sky-300",
+  },
+  A2: {
+    bg: "/img/travel.webp",
+    overlay: "from-[#08263b]/92 via-[#0f4466]/78 to-[#0284c7]/55",
+    activeRing: "ring-2 ring-cyan-300 border-cyan-300",
+    barColor: "bg-cyan-300",
+  },
+  B1: {
+    bg: "/img/pronunciation.webp",
+    overlay: "from-[#062b26]/92 via-[#0c4d42]/78 to-[#0d9488]/55",
+    activeRing: "ring-2 ring-emerald-300 border-emerald-300",
+    barColor: "bg-emerald-300",
+  },
+  B2: {
+    bg: "/img/business.webp",
+    overlay: "from-[#181342]/92 via-[#2b206e]/78 to-[#4f46e5]/55",
+    activeRing: "ring-2 ring-indigo-300 border-indigo-300",
+    barColor: "bg-indigo-300",
+  },
+  C1: {
+    bg: "/img/writing.webp",
+    overlay: "from-[#2b1404]/92 via-[#5c2b09]/80 to-[#b45309]/55",
+    activeRing: "ring-2 ring-amber-300 border-amber-300",
+    barColor: "bg-amber-300",
+  },
+  IELTS: {
+    bg: "/img/ielts.webp",
+    overlay: "from-[#330d12]/92 via-[#6b1925]/80 to-[#b91c1c]/55",
+    activeRing: "ring-2 ring-rose-300 border-rose-300",
+    barColor: "bg-amber-300",
+  },
+  BUSINESS: {
+    bg: "/img/online.webp",
+    overlay: "from-[#0d1d3a]/92 via-[#22355c]/80 to-[#b45309]/60",
+    activeRing: "ring-2 ring-amber-300 border-amber-300",
+    barColor: "bg-amber-300",
+  },
+  IDIOMS: {
+    bg: "/img/mall.webp",
+    overlay: "from-[#220e42]/92 via-[#451a7a]/80 to-[#9333ea]/55",
+    activeRing: "ring-2 ring-fuchsia-300 border-fuchsia-300",
+    barColor: "bg-fuchsia-300",
+  },
+};
+
 function todayKey() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -226,16 +280,26 @@ export default function Flashcards() {
 
   return (
     <PageShell>
-      {/* Hero */}
-      <section className="border-b border-line bg-paper-deep/60">
-        <div className="container py-8 sm:py-10">
+      {/* Hero — Rich Link Me Royal Editorial Banner */}
+      <section className="relative overflow-hidden border-b border-iris/25 bg-gradient-to-br from-[#0e2248] via-[#173673] to-[#1e40af] text-white">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(640px circle at 85% 15%, rgba(56, 189, 248, 0.22), transparent 60%), radial-gradient(520px circle at 10% 90%, rgba(251, 191, 36, 0.16), transparent 60%)",
+          }}
+        />
+        <div className="container relative py-8 sm:py-10">
           <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
             <div>
-              <Eyebrow>مراجعة ذكية بالصوت</Eyebrow>
-              <h1 className="mt-2 text-2xl font-bold text-ink sm:text-4xl">
-                فلاش كاردز <span className="hl-word">الكلمات اليومية.</span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold text-amber-300">
+                <Sparkles className="size-3.5" /> مراجعة ذكية بالصوت · 180 بطاقة
+              </span>
+              <h1 className="mt-2.5 text-2xl font-extrabold text-white sm:text-4xl">
+                فلاش كاردز <span className="text-sky-300">الكلمات اليومية.</span>
               </h1>
-              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/80">
                 راجع 5 كلمات يومياً بالنطق الأمريكي الصحيح والمثال المصري — وكل
                 كلمة تحفظها بتزوّد نقاطك في ساحة المسابقات وتحافظ على شعلة
                 حماستك 🔥
@@ -243,24 +307,24 @@ export default function Flashcards() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2.5">
-              <div className="flex items-center gap-2 rounded-2xl border border-amber-300/60 bg-amber-50/80 px-4 py-2.5 dark:border-amber-800/60 dark:bg-amber-950/30">
-                <Flame className="size-5 fill-amber-500 text-amber-500" />
+              <div className="flex items-center gap-2.5 rounded-2xl border border-amber-300/35 bg-black/25 px-4 py-2.5">
+                <Flame className="size-5 fill-amber-400 text-amber-400" />
                 <div>
-                  <p className="text-[11px] font-semibold text-amber-700 dark:text-amber-300">
+                  <p className="text-[11px] font-semibold text-amber-200">
                     هدف النهارده
                   </p>
-                  <p className="latin text-sm font-black text-ink">
+                  <p className="latin text-sm font-black text-white">
                     {Math.min(dailyCount, dailyGoal)} / {dailyGoal} كلمات (
                     {dailyPercent}%)
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 rounded-2xl border border-line bg-card px-4 py-2.5">
-                <CheckCircle2 className="size-5 text-emerald-500" />
+              <div className="flex items-center gap-2.5 rounded-2xl border border-white/20 bg-white/10 px-4 py-2.5">
+                <CheckCircle2 className="size-5 text-emerald-300" />
                 <div>
-                  <p className="text-[11px] text-ink-soft">إجمالي المحفوظ</p>
-                  <p className="latin text-sm font-black text-ink">
+                  <p className="text-[11px] text-white/75">إجمالي المحفوظ</p>
+                  <p className="latin text-sm font-black text-white">
                     {totalMastered} / {FLASHCARDS_DECK.length}
                   </p>
                 </div>
@@ -268,14 +332,16 @@ export default function Flashcards() {
             </div>
           </div>
 
-          {/* Level selector */}
-          <div className="mt-6 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+          {/* Level selector — Branded Photographic Visual Cards (Zero Flat White!) */}
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {LEVELS.map(lvl => {
               const meta = FLASHCARD_LEVEL_META[lvl];
+              const visual = DECK_VISUALS[lvl];
               const count = FLASHCARDS_DECK.filter(c => c.level === lvl).length;
               const done = FLASHCARDS_DECK.filter(
                 c => c.level === lvl && mastered.includes(c.id)
               ).length;
+              const pct = Math.round((done / Math.max(1, count)) * 100);
               const active = level === lvl;
               const locked = Boolean(meta.isPro) && !isVip;
               return (
@@ -284,29 +350,56 @@ export default function Flashcards() {
                   type="button"
                   onClick={() => setLevel(lvl)}
                   className={cn(
-                    "rounded-2xl border p-3 text-start transition",
+                    "group relative flex min-h-[104px] flex-col justify-between overflow-hidden rounded-2xl border p-3.5 text-start text-white shadow-sm transition-transform duration-200 hover:-translate-y-0.5",
                     active
-                      ? "border-iris bg-iris-soft/70 shadow-sm"
+                      ? `${visual.activeRing} shadow-lg`
                       : meta.isPro
-                        ? "border-amber-400/50 bg-amber-500/[0.06] hover:border-amber-400"
-                        : "border-line bg-card hover:border-iris/40"
+                        ? "border-amber-300/45 hover:border-amber-300"
+                        : "border-white/20 hover:border-white/50"
                   )}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-bold text-ink">
+                  <img
+                    src={visual.bg}
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div
+                    aria-hidden="true"
+                    className={cn(
+                      "absolute inset-0 bg-gradient-to-t",
+                      visual.overlay
+                    )}
+                  />
+
+                  <div className="relative flex items-center justify-between gap-2">
+                    <span className="text-sm font-extrabold text-white drop-shadow-xs">
                       {meta.label}
                     </span>
                     {locked ? (
-                      <Lock className="size-3.5 text-amber-600" />
+                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/90 px-2 py-0.5 text-[10px] font-black text-white shadow-xs">
+                        <Lock className="size-2.5" /> PRO
+                      </span>
                     ) : (
-                      <span className="latin text-xs font-semibold text-iris">
+                      <span className="latin rounded-full bg-black/40 px-2 py-0.5 text-[11px] font-bold text-sky-200">
                         {done}/{count}
                       </span>
                     )}
                   </div>
-                  <p className="mt-1 line-clamp-1 text-[11px] text-ink-soft">
-                    {meta.subtitle}
-                  </p>
+
+                  <div className="relative mt-2">
+                    <p className="line-clamp-1 text-[11px] font-medium text-white/85">
+                      {meta.subtitle}
+                    </p>
+                    <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-white/20">
+                      <div
+                        className={cn("h-full rounded-full", visual.barColor)}
+                        style={{ width: `${Math.max(active ? 12 : 0, pct)}%` }}
+                      />
+                    </div>
+                  </div>
                 </button>
               );
             })}
@@ -390,12 +483,21 @@ export default function Flashcards() {
                   }
                 }}
                 className={cn(
-                  "relative min-h-[340px] cursor-pointer select-none rounded-3xl border-2 p-6 sm:p-8 shadow-md transition-all",
+                  "relative min-h-[340px] cursor-pointer select-none overflow-hidden rounded-3xl border-2 p-6 sm:p-8 shadow-md transition-colors",
                   flipped
-                    ? "border-emerald-500/50 bg-gradient-to-br from-emerald-500/[0.06] via-card to-iris/[0.05]"
-                    : "border-iris/30 bg-card hover:border-iris/60"
+                    ? "border-emerald-500/50 bg-gradient-to-br from-emerald-500/[0.09] via-card to-iris/[0.08]"
+                    : "border-iris/35 bg-gradient-to-br from-iris-soft/60 via-card to-sky-50/40 hover:border-iris/60 dark:from-iris-soft/35 dark:via-card dark:to-card"
                 )}
               >
+                <div
+                  aria-hidden="true"
+                  className={cn(
+                    "absolute inset-x-0 top-0 h-1.5",
+                    flipped
+                      ? "bg-gradient-to-r from-emerald-500 to-teal-400"
+                      : "bg-gradient-to-r from-[#0e2248] via-iris to-sky-400"
+                  )}
+                />
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span
                     className={cn(

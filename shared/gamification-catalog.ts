@@ -123,7 +123,7 @@ export const STREAK_SKINS: StreakSkin[] = [
     badgeEmoji: "💎",
     minStreak: 30,
     description: "يفتح عند الوصول إلى 30 يوم حماسة متتالية (شهر كامل!)",
-    ringClass: "ring-[3px] ring-cyan-400 shadow-[0_0_22px_rgba(34,211,238,0.75)] animate-pulse",
+    ringClass: "ring-[3px] ring-cyan-400 shadow-[0_0_16px_rgba(34,211,238,0.65)]",
     cardGlowClass: "border-cyan-400/60 bg-gradient-to-br from-cyan-50/60 via-blue-50/30 to-card dark:from-cyan-950/30",
     pillClass: "bg-cyan-500/20 text-cyan-800 dark:text-cyan-300",
   },

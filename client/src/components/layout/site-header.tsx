@@ -82,14 +82,15 @@ export function SiteHeader() {
     let frame = 0;
     const update = () => {
       frame = 0;
-      setScrolled(window.scrollY > 12);
+      const nextScrolled = window.scrollY > 12;
+      setScrolled(prev => (prev === nextScrolled ? prev : nextScrolled));
       if (location !== "/") return;
       let active = "top";
       NAV.forEach(item => {
         const el = document.getElementById(item.section);
         if (el && el.getBoundingClientRect().top <= 170) active = item.section;
       });
-      setActiveSection(active);
+      setActiveSection(prev => (prev === active ? prev : active));
     };
     const queue = () => {
       if (!frame) frame = requestAnimationFrame(update);

@@ -163,15 +163,25 @@ export default function SpeedQuiz() {
 
   return (
     <PageShell>
-      <section className="border-b border-line bg-paper-deep/60">
-        <div className="container py-8 sm:py-10">
-          <Eyebrow>تحدي يومي سريع</Eyebrow>
-          <h1 className="mt-2 text-2xl font-bold text-ink sm:text-4xl">
-            تحدي الـ <span className="hl-word">60 ثانية</span> اليومي ⚡
+      <section className="relative overflow-hidden border-b border-iris/25 bg-gradient-to-br from-[#0e2248] via-[#173673] to-[#1e40af] text-white">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(600px circle at 15% 20%, rgba(251, 191, 36, 0.2), transparent 60%), radial-gradient(500px circle at 85% 80%, rgba(56, 189, 248, 0.2), transparent 60%)",
+          }}
+        />
+        <div className="container relative py-8 sm:py-10">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold text-amber-300">
+            <Zap className="size-3.5 fill-amber-300 text-amber-300" /> تحدي يومي سريع · {SPEED_QUIZ_BANK.length} سؤال
+          </span>
+          <h1 className="mt-2.5 text-2xl font-extrabold text-white sm:text-4xl">
+            تحدي الـ <span className="text-amber-300">60 ثانية</span> اليومي ⚡
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/80">
             5 أسئلة ذكية في دقيقة واحدة بس! اختبر سرعة بديهتك في الإنجليزي،
-            اكسب حتى +30 XP في المسابقات، وشارك نتيجتك مع صحابك على واتساب.
+            اكسب حتى +300 XP في ماراثون PRO، وشارك نتيجتك مع صحابك على واتساب.
           </p>
         </div>
       </section>
@@ -179,19 +189,37 @@ export default function SpeedQuiz() {
       <section className="container py-8 sm:py-12">
         <div className="mx-auto max-w-2xl">
           {phase === "ready" && (
-            <div className="rounded-3xl border border-line bg-card p-8 text-center shadow-sm">
-              <div className="mx-auto grid size-16 place-items-center rounded-2xl bg-amber-500/15 text-3xl">
-                ⚡
+            <div className="overflow-hidden rounded-3xl border border-iris/25 bg-gradient-to-b from-iris-soft/45 via-card to-card text-center shadow-md">
+              <div className="relative h-44 overflow-hidden">
+                <img
+                  src="/img/ielts.webp"
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                  decoding="async"
+                  className="size-full object-cover"
+                />
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-gradient-to-t from-[#0e2248]/95 via-[#173673]/75 to-[#b45309]/40"
+                />
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-5 text-white">
+                  <div className="grid size-14 place-items-center rounded-2xl border border-amber-300/40 bg-amber-500/25 text-3xl shadow-sm">
+                    ⚡
+                  </div>
+                  <h2 className="mt-3 text-2xl font-black text-white sm:text-3xl">
+                    جاهز تتحدى الوقت؟
+                  </h2>
+                </div>
               </div>
-              <h2 className="mt-4 text-2xl font-black text-ink">
-                جاهز تتحدى الوقت؟
-              </h2>
-              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-ink-soft">
-                بنك ضخم من <b className="latin text-iris">{SPEED_QUIZ_BANK.length} سؤال عملي</b>{" "}
-                بين القواعد والمحادثة والبزنس والآيلتس! اختار التحدي اللي يناسبك:
-              </p>
 
-              <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <div className="p-6 sm:p-8">
+                <p className="mx-auto max-w-md text-sm leading-relaxed text-ink-soft">
+                  بنك ضخم من <b className="latin text-iris">{SPEED_QUIZ_BANK.length} سؤال عملي</b>{" "}
+                  بين القواعد والمحادثة والبزنس والآيلتس! اختار التحدي اللي يناسبك:
+                </p>
+
+                <div className="mt-6 flex flex-wrap justify-center gap-3">
                 <Button
                   type="button"
                   onClick={() => startQuiz("daily")}
@@ -229,6 +257,7 @@ export default function SpeedQuiz() {
                     </Link>
                   </Button>
                 )}
+                </div>
               </div>
             </div>
           )}

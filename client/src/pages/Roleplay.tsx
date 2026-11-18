@@ -181,16 +181,26 @@ export default function Roleplay() {
 
   return (
     <PageShell>
-      {/* Hero */}
-      <section className="border-b border-line bg-paper-deep/60">
-        <div className="container py-8 sm:py-10">
+      {/* Hero — Deep Link Me Royal Editorial Banner */}
+      <section className="relative overflow-hidden border-b border-iris/25 bg-gradient-to-br from-[#0e2248] via-[#173673] to-[#1e40af] text-white">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(620px circle at 85% 20%, rgba(56, 189, 248, 0.22), transparent 60%), radial-gradient(500px circle at 12% 85%, rgba(251, 191, 36, 0.16), transparent 60%)",
+          }}
+        />
+        <div className="container relative py-8 sm:py-10">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
-              <Eyebrow>محادثة عملية بالصوت</Eyebrow>
-              <h1 className="mt-2 text-2xl font-bold text-ink sm:text-4xl">
-                محاكي <span className="hl-word">المواقف الحقيقية.</span> 🎭
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold text-amber-300">
+                🎭 محادثة عملية بالصوت · {ROLEPLAY_SCENARIOS.length} موقف
+              </span>
+              <h1 className="mt-2.5 text-2xl font-extrabold text-white sm:text-4xl">
+                محاكي <span className="text-sky-300">المواقف الحقيقية.</span> 🎭
               </h1>
-              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/80">
                 اتدرّب على مواقف الحياة والشغل الحقيقية (إنترفيو، كافيه، فندق،
                 اجتماع Zoom) — اسمع الجملة بالصوت، اختار أذكى رد، وجرّب تنطقه
                 بصوتك مع تقييم فوري من {companion.name}!
@@ -201,7 +211,7 @@ export default function Roleplay() {
                 type="button"
                 variant="outline"
                 onClick={() => setActiveScenario(null)}
-                className="rounded-full self-start sm:self-auto"
+                className="rounded-full border-white/30 bg-white/10 text-white hover:bg-white hover:text-iris self-start sm:self-auto"
               >
                 <ArrowRight className="me-1.5 size-4" /> كل المواقف
               </Button>
@@ -267,7 +277,7 @@ export default function Roleplay() {
                 <div
                   key={scenario.id}
                   className={cn(
-                    "group relative flex flex-col justify-between overflow-hidden rounded-3xl border bg-card shadow-sm transition hover:-translate-y-0.5 hover:shadow-md",
+                    "group relative flex flex-col justify-between overflow-hidden rounded-3xl border bg-card shadow-sm transition-transform duration-200 hover:-translate-y-0.5 [content-visibility:auto]",
                     scenario.isPro
                       ? "border-amber-400/60"
                       : "border-line hover:border-iris/50"
@@ -281,6 +291,7 @@ export default function Roleplay() {
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
+                        decoding="async"
                         className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                       <div
@@ -307,10 +318,10 @@ export default function Roleplay() {
                               <Crown className="size-3" /> PRO
                             </span>
                           )}
-                          <span className="latin rounded-full border border-white/20 bg-black/40 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm">
+                          <span className="latin rounded-full border border-white/20 bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
                             {scenario.level}
                           </span>
-                          <span className="latin inline-flex items-center gap-0.5 rounded-full border border-amber-300/30 bg-black/45 px-2 py-0.5 text-[10px] font-bold text-amber-300 backdrop-blur-sm">
+                          <span className="latin inline-flex items-center gap-0.5 rounded-full border border-amber-300/30 bg-black/65 px-2 py-0.5 text-[10px] font-bold text-amber-300">
                             <Zap className="size-2.5 fill-amber-400 text-amber-400" />
                             +{isVip ? scenario.rewardXp * 2 : scenario.rewardXp}
                           </span>

@@ -10,38 +10,21 @@
   overflow: hidden;
   pointer-events: none;
   user-select: none;
-  isolation: isolate;
+  contain: strict;
+}
+
+@media (max-width: 1279px) {
+  .study-atmosphere {
+    display: none;
+  }
 }
 
 .study-atmosphere__pattern {
   position: absolute;
   inset: 0;
-  opacity: 0.42;
-  background-image:
-    linear-gradient(
-      90deg,
-      transparent 0 24px,
-      var(--color-line) 24px 25px,
-      transparent 25px 100%
-    ),
-    linear-gradient(var(--color-line) 1px, transparent 1px);
-  background-size:
-    100% 100%,
-    100% 34px;
-  mask-image: linear-gradient(
-    90deg,
-    black,
-    transparent 30%,
-    transparent 70%,
-    black
-  );
-  -webkit-mask-image: linear-gradient(
-    90deg,
-    black,
-    transparent 30%,
-    transparent 70%,
-    black
-  );
+  opacity: 0.24;
+  background-image: linear-gradient(var(--color-line) 1px, transparent 1px);
+  background-size: 100% 34px;
 }
 
 .study-atmosphere__margin {
@@ -219,8 +202,8 @@
 }
 
 .study-atmosphere__motion {
-  animation: study-atmosphere-drift 10s ease-in-out infinite;
-  will-change: transform;
+  animation: none;
+  will-change: auto;
 }
 
 .study-atmosphere--paused .study-atmosphere__motion {

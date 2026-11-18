@@ -139,9 +139,7 @@ export function WhatsAppFab({ className }: { className?: string }) {
       <WhatsAppIcon className="size-6 sm:size-5" />
       <span className="hidden sm:inline">واتساب</span>
       {!dragging && (
-        <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-[#25D366] ring-2 ring-white">
-          <span className="absolute inset-0 animate-ping rounded-full bg-[#25D366]" />
-        </span>
+        <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-[#25D366] ring-2 ring-white" />
       )}
     </button>
   );

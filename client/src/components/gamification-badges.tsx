@@ -61,7 +61,7 @@ export function HeaderStreakIndicator({ className }: { className?: string }) {
         )}
         title={`استمرارك: ${streak} أيام متتالية | ${xp} نقطة خبرة XP`}
       >
-        <Flame className="size-3.5 fill-amber-500 text-amber-500 animate-pulse" />
+        <Flame className="size-3.5 fill-amber-500 text-amber-500" />
         <span className="latin font-extrabold">{streak}</span>
         <span className="hidden md:inline text-[11px] font-normal text-amber-600 dark:text-amber-400">
           أيام 🔥

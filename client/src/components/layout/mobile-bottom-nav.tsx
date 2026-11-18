@@ -47,7 +47,7 @@ export function MobileBottomNav() {
     <nav
       aria-label="التنقل السريع"
       dir="rtl"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 backdrop-blur-md md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper shadow-[0_-4px_18px_rgba(10,27,51,0.06)] md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="mx-auto grid max-w-md grid-cols-5">

@@ -229,7 +229,7 @@ export default function Dashboard() {
       {gameProfile && (
         <section className="container pt-6">
           <div className="grid gap-4 lg:grid-cols-[1fr_1.4fr]">
-            <div className="flex items-center justify-between gap-4 rounded-2xl border border-line bg-card p-5">
+            <div className="flex items-center justify-between gap-4 rounded-2xl border border-iris/30 bg-gradient-to-br from-[#0e2248] via-[#173673] to-[#1e40af] p-5 text-white shadow-md">
               <div className="flex items-center gap-3.5 min-w-0">
                 <StudentAvatarBadge
                   avatarPreset={gameProfile.avatarPreset}
@@ -238,7 +238,7 @@ export default function Dashboard() {
                 />
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <p className="text-xs font-semibold text-ink-soft">
+                    <p className="text-xs font-semibold text-sky-200">
                       هويتك في ساحة التحدي
                     </p>
                     {gameProfile.isVip && (
@@ -247,10 +247,10 @@ export default function Dashboard() {
                       </span>
                     )}
                   </div>
-                  <p className="truncate text-base font-bold text-ink">
+                  <p className="truncate text-base font-extrabold text-white">
                     {gameProfile.firstName}
                   </p>
-                  <p className="mt-0.5 text-xs text-amber-600 dark:text-amber-400 font-semibold">
+                  <p className="mt-0.5 text-xs text-amber-300 font-semibold">
                     🔥 {gameProfile.streakDays} أيام حماسة ·{" "}
                     {gameProfile.isVip
                       ? "🛡️ درع الحماسة مفعّل"
@@ -262,13 +262,13 @@ export default function Dashboard() {
                 asChild
                 size="sm"
                 variant="outline"
-                className="shrink-0 rounded-full border-iris/30 text-iris hover:bg-iris hover:text-white"
+                className="shrink-0 rounded-full border-white/30 bg-white/10 text-white hover:bg-white hover:text-iris"
               >
                 <Link href="/competitions">تغيير الأفتار</Link>
               </Button>
             </div>
 
-            <div className="rounded-2xl border border-line bg-card p-5">
+            <div className="rounded-2xl border border-iris/25 bg-gradient-to-br from-iris-soft/60 via-card to-emerald-50/45 p-5 dark:from-iris-soft/30 dark:via-card dark:to-emerald-950/15">
               <div className="flex items-center justify-between gap-2">
                 <h2 className="flex items-center gap-2 text-sm font-bold text-ink">
                   <Users className="size-4 text-iris" />
