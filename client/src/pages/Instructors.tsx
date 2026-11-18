@@ -14,7 +14,7 @@ export default function Instructors() {
 
   return (
     <PageShell>
-      <section className="border-b border-line bg-paper-deep/60">        <AnimatedAurora className="opacity-50" />
+      <section className="relative overflow-hidden border-b border-line bg-paper-deep/60">        <AnimatedAurora className="opacity-50" />
         <StudyDoodles variant="soft" />
         <div className="container py-12 md:py-16">
           <p className="latin text-xs font-medium uppercase tracking-[0.2em] text-ink-soft">Our teachers</p>

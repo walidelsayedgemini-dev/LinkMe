@@ -88,7 +88,7 @@ export function CompanionSays({
           companion.borderClass
         )}
       >
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <p className={cn("text-[12px] font-bold", companion.accentText)}>
             {companion.name}{" "}
             <span className="font-normal text-ink-soft">· {companion.role}</span>
@@ -315,9 +315,9 @@ export function CompanionFloatingWidget() {
   const other = COMPANIONS[otherId];
 
   return (
-    <div className="fixed bottom-6 start-6 z-40 flex flex-col items-start gap-2 select-none" dir="rtl">
+    <div className="fixed bottom-4 start-4 sm:bottom-6 sm:start-6 z-40 flex flex-col items-start gap-2 select-none" dir="rtl">
       {expanded && (
-        <div className="w-72 rounded-3xl border border-line bg-card/95 p-4 shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-bottom-3 duration-300">
+        <div className="w-[min(calc(100vw-2rem),18rem)] rounded-3xl border border-line bg-card/95 p-4 shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-bottom-3 duration-300">
           <div className="flex items-center justify-between pb-2 border-b border-line">
             <div className="flex items-center gap-2">
               <CompanionAvatar size={34} />
@@ -392,11 +392,12 @@ export function CompanionFloatingWidget() {
       <button
         type="button"
         onClick={() => setExpanded((prev) => !prev)}
-        className="group relative flex items-center gap-2 rounded-full border border-line bg-card/90 p-1.5 pe-4 shadow-xl backdrop-blur-md transition-all hover:scale-105 active:scale-95"
+        className="group relative flex items-center gap-2 rounded-full border border-line bg-card/95 p-1 sm:p-1.5 sm:pe-4 shadow-xl backdrop-blur-md transition-all hover:scale-105 active:scale-95"
         title={`اضغط للتحدث مع ${companion.name}`}
+        aria-label={`التحدث مع ${companion.name}`}
       >
-        <CompanionAvatar size={44} className="group-hover:rotate-6 transition-transform" />
-        <div className="text-start">
+        <CompanionAvatar size={42} className="group-hover:rotate-6 transition-transform" />
+        <div className="hidden sm:block text-start">
           <p className={cn("text-xs font-bold leading-tight", companion.accentText)}>
             {companion.name}
           </p>
@@ -404,7 +405,7 @@ export function CompanionFloatingWidget() {
             {companion.id === "khadija" ? "معاك يا سكر 🌸" : "معاك يا بطل 🚀"}
           </p>
         </div>
-        <span className="ms-1 rounded-full bg-iris/10 px-1.5 py-0.5 text-[9px] font-bold text-iris">
+        <span className="hidden sm:inline-block ms-1 rounded-full bg-iris/10 px-1.5 py-0.5 text-[9px] font-bold text-iris">
           اضغطني ✨
         </span>
       </button>

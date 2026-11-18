@@ -131,7 +131,7 @@ export function WhatsAppFab({ className }: { className?: string }) {
       title="اسحبني لأي مكان · اضغط للتواصل"
       aria-label="تواصل معنا على واتساب — تقدر تسحبه لأي مكان"
       className={cn(
-        "group fixed bottom-24 left-4 z-40 grid size-12 touch-none place-items-center rounded-full bg-[#25D366] text-sm font-semibold text-white shadow-[0_12px_26px_-10px_rgba(37,211,102,0.9)] transition-[transform,box-shadow] duration-200 select-none hover:-translate-y-0.5 hover:shadow-[0_16px_32px_-10px_rgba(37,211,102,0.95)] sm:bottom-6 sm:left-6 sm:flex sm:h-12 sm:w-auto sm:gap-2 sm:ps-3.5 sm:pe-4",
+        "group fixed bottom-4 left-4 z-40 grid size-11 touch-none place-items-center rounded-full bg-[#25D366] text-sm font-semibold text-white shadow-[0_12px_26px_-10px_rgba(37,211,102,0.9)] transition-[transform,box-shadow] duration-200 select-none hover:-translate-y-0.5 hover:shadow-[0_16px_32px_-10px_rgba(37,211,102,0.95)] sm:bottom-6 sm:left-6 sm:flex sm:h-12 sm:w-auto sm:gap-2 sm:ps-3.5 sm:pe-4",
         dragging ? "cursor-grabbing scale-105 shadow-[0_18px_36px_-8px_rgba(37,211,102,0.95)]" : "cursor-grab",
         className,
       )}

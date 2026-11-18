@@ -901,6 +901,7 @@
   }
   .assessment-question-panel {
     border-radius: 1.15rem;
+    padding: 1.1rem;
   }
   .assessment-question-actions {
     align-items: stretch;
@@ -908,10 +909,13 @@
   }
   .assessment-question-actions > div {
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     justify-content: space-between;
+    gap: 0.65rem;
   }
   .assessment-question-actions > div > .bg-iris {
-    flex: 1;
+    flex: 1 1 160px;
   }
   .assessment-result-hero,
   .assessment-summary-hero {

@@ -142,6 +142,17 @@ export function SiteHeader() {
         : "/courses"
     );
   };
+  const handleToggleSound = () => {
+    const next = !soundOn;
+    setSoundOn(next);
+    setSoundEnabled(next);
+    if (next) {
+      soundEffects.playClick();
+      toast.success("تم تفعيل المؤثرات الصوتية 🔊");
+    } else {
+      toast.info("تم كتم المؤثرات الصوتية 🔇");
+    }
+  };
   const themeButton = (
     <button
       type="button"
@@ -149,7 +160,7 @@ export function SiteHeader() {
       aria-label={
         theme === "dark" ? "تفعيل الوضع النهاري" : "تفعيل الوضع الليلي"
       }
-      className="grid size-10 shrink-0 place-items-center rounded-full border border-line bg-card text-ink-soft hover:border-iris hover:text-iris"
+      className="grid size-9 sm:size-10 shrink-0 place-items-center rounded-full border border-line bg-card text-ink-soft hover:border-iris hover:text-iris"
     >
       {theme === "dark" ? (
         <Sun className="size-[18px]" />
@@ -195,54 +206,44 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
             aria-label="افتح بحث الكورسات"
-            className="grid size-10 place-items-center rounded-full border border-line bg-card text-ink-soft hover:border-iris hover:text-iris"
+            className="grid size-9 sm:size-10 place-items-center rounded-full border border-line bg-card text-ink-soft hover:border-iris hover:text-iris"
           >
-            <Search className="size-[18px]" />
+            <Search className="size-[17px] sm:size-[18px]" />
           </button>
-          <HeaderStreakIndicator />
+          <HeaderStreakIndicator className="hidden md:inline-flex" />
           <button
             type="button"
-            onClick={() => {
-              const next = !soundOn;
-              setSoundOn(next);
-              setSoundEnabled(next);
-              if (next) {
-                soundEffects.playClick();
-                toast.success("تم تفعيل المؤثرات الصوتية 🔊");
-              } else {
-                toast.info("تم كتم المؤثرات الصوتية 🔇");
-              }
-            }}
+            onClick={handleToggleSound}
             aria-label={soundOn ? "كتم المؤثرات الصوتية" : "تشغيل المؤثرات الصوتية"}
             title={soundOn ? "المؤثرات الصوتية مفعّلة — اضغط للكتم" : "المؤثرات الصوتية مكتومة — اضغط للتشغيل"}
             className={cn(
-              "grid size-10 place-items-center rounded-full border border-line bg-card transition hover:border-iris",
+              "hidden md:grid size-10 place-items-center rounded-full border border-line bg-card transition hover:border-iris",
               soundOn ? "text-iris" : "text-ink-soft opacity-60"
             )}
           >
             {soundOn ? <Volume2 className="size-[18px]" /> : <VolumeX className="size-[18px]" />}
           </button>
-          {themeButton}
+          <div className="hidden md:block">{themeButton}</div>
           <button
             type="button"
             onClick={toggleCompanion}
             aria-label={`تبديل المرشد (الحالي: ${companion.name})`}
             className={cn(
-              "flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-bold transition hover:scale-105 active:scale-95 shadow-sm",
+              "flex items-center gap-1 sm:gap-1.5 rounded-full border p-1 sm:px-2.5 sm:py-1 text-xs font-bold transition hover:scale-105 active:scale-95 shadow-sm",
               companion.id === "khadija"
                 ? "border-pink-300 bg-pink-50/90 text-pink-700 hover:bg-pink-100 dark:bg-pink-950/50 dark:text-pink-300"
                 : "border-blue-300 bg-blue-50/90 text-blue-700 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-300"
             )}
             title={`المرشد الحالي: ${companion.name} (${companion.badge}) — اضغط للتبديل`}
           >
-            <CompanionAvatar size={24} />
+            <CompanionAvatar size={26} />
             <span className="hidden sm:inline font-semibold">{companion.name}</span>
-            <span className="text-[10px] opacity-75">{companion.favoriteEmoji}</span>
+            <span className="hidden sm:inline text-[10px] opacity-75">{companion.favoriteEmoji}</span>
           </button>
           {user ? (
             <DropdownMenu dir="rtl">
@@ -319,12 +320,29 @@ export function SiteHeader() {
             </SheetTrigger>
             <SheetContent
               side="right"
-              className="w-[88vw] max-w-sm overflow-y-auto bg-paper p-0"
+              className="w-[85vw] max-w-[320px] overflow-y-auto bg-paper p-0"
               dir="rtl"
             >
               <SheetTitle className="sr-only">قائمة التنقل</SheetTitle>
-              <div className="flex min-h-full flex-col gap-6 p-6">
-                <Logo />
+              <div className="flex min-h-full flex-col gap-5 p-5 pt-6">
+                <div className="pe-10">
+                  <Logo />
+                </div>
+                <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-card p-3">
+                  <HeaderStreakIndicator />
+                  <button
+                    type="button"
+                    onClick={handleToggleSound}
+                    aria-label={soundOn ? "كتم المؤثرات الصوتية" : "تشغيل المؤثرات الصوتية"}
+                    className={cn(
+                      "grid size-9 place-items-center rounded-full border border-line bg-paper transition hover:border-iris",
+                      soundOn ? "text-iris" : "text-ink-soft opacity-60"
+                    )}
+                  >
+                    {soundOn ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
+                  </button>
+                  {themeButton}
+                </div>
                 <nav aria-label="القائمة الجوالة" className="flex flex-col">
                   {NAV.map((item, i) => (
                     <Link

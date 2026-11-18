@@ -202,14 +202,14 @@ const AUTH_PATHS = ["/login", "/signup", "/forgot-password", "/reset-password"];
 
 function FloatingCompanion() {
   const [location] = useLocation();
-  if (AUTH_PATHS.some(path => location.startsWith(path))) return null;
+  if (AUTH_PATHS.some(path => location.startsWith(path)) || location.startsWith("/level-test")) return null;
   return <CompanionFloatingWidget />;
 }
 
-/** The floating WhatsApp shortcut is hidden on the auth screens, which are full-height. */
+/** The floating WhatsApp shortcut is hidden on the auth and active test screens. */
 function FloatingWhatsApp() {
   const [location] = useLocation();
-  if (AUTH_PATHS.some(path => location.startsWith(path))) return null;
+  if (AUTH_PATHS.some(path => location.startsWith(path)) || location.startsWith("/level-test")) return null;
   return <WhatsAppFab />;
 }
 

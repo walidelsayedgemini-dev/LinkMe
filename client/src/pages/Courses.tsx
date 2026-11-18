@@ -181,40 +181,42 @@ export default function Courses() {
 
   return (
     <PageShell>
-      <section className="border-b border-line bg-paper-deep/60">        <AnimatedAurora className="opacity-60" />
+      <section className="relative overflow-hidden border-b border-line bg-paper-deep/60">
+        <AnimatedAurora className="opacity-60" />
         <StudyDoodles variant="soft" />
-        <div className="container py-12 md:py-16">
+        <div className="container relative z-10 py-10 md:py-16">
           <p className="latin text-xs font-medium uppercase tracking-[0.2em] text-ink-soft">Course catalogue</p>
-          <h1 className="mt-3 text-4xl leading-tight text-ink sm:text-5xl">
+          <h1 className="mt-3 text-3xl leading-tight text-ink sm:text-5xl">
             كل الكورسات في <span className="hl-word">مكان واحد</span>
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
+          <p className="mt-4 max-w-2xl text-sm sm:text-base leading-relaxed text-ink-soft">
             {data?.total ?? 0} كورسًا مصنّفة حسب المسار والمستوى والسعر. استخدم البحث والفلاتر للوصول لكورسك في ثوانٍ.
           </p>
 
           <form
-            className="mt-8 flex max-w-xl items-center gap-2"
+            className="mt-6 sm:mt-8 flex w-full max-w-xl items-center gap-2"
             onSubmit={event => {
               event.preventDefault();
               update({ q: searchInput.trim() || undefined });
             }}
           >
-            <div className="relative flex-1">
-              <Search className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-ink-soft" />
+            <div className="relative min-w-0 flex-1">
+              <Search className="pointer-events-none absolute start-4 top-1/2 size-4 -translate-y-1/2 text-ink-soft" />
               <input
                 value={searchInput}
                 onChange={event => setSearchInput(event.target.value)}
                 placeholder="ابحث بالعنوان، المدرّس، أو الموضوع…"
-                className="h-12 w-full rounded-full border border-line bg-card pe-11 ps-4 text-sm text-ink placeholder:text-ink-soft/70 focus:border-ink focus:outline-none"
+                className="h-11 sm:h-12 w-full rounded-full border border-line bg-card ps-11 pe-4 text-sm text-ink placeholder:text-ink-soft/70 focus:border-ink focus:outline-none"
               />
             </div>
-            <Button type="submit" className="h-12 rounded-full bg-iris px-6 text-white hover:bg-iris-deep">
+            <Button type="submit" className="h-11 sm:h-12 shrink-0 rounded-full bg-iris px-4 sm:px-6 text-white hover:bg-iris-deep">
               بحث
             </Button>
             <Button
               type="button"
               variant="outline"
-              className="h-12 rounded-full border-ink/20 lg:hidden"
+              aria-label="الفلاتر"
+              className="h-11 sm:h-12 shrink-0 rounded-full border-ink/20 lg:hidden"
               onClick={() => setShowFilters(value => !value)}
             >
               <Filter className="size-4" />

@@ -84,11 +84,17 @@ export function PronounceButton({
 
   if (!isSupported || !cleanText) return null;
 
-  const sizeClasses = {
-    sm: "size-7 text-xs",
-    md: "size-8 text-sm",
-    lg: "h-9 px-3 text-xs gap-1.5",
-  };
+  const sizeClasses = label
+    ? {
+        sm: "h-8 px-3 text-xs gap-1.5",
+        md: "h-9 px-3.5 text-xs gap-1.5",
+        lg: "h-10 px-4 text-xs gap-2",
+      }
+    : {
+        sm: "size-7 text-xs",
+        md: "size-8 text-sm",
+        lg: "size-9 text-xs",
+      };
 
   const iconSizes = {
     sm: "size-3.5",
