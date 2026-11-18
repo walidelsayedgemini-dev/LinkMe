@@ -84,20 +84,37 @@ export function PaymentReceiptDialog({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const utils = trpc.useUtils();
+  const validatePromo = trpc.community.validatePromoCode.useMutation();
 
-  const handleApplyPromo = () => {
-    if (!promoCodeInput.trim()) return;
-    const res = applyPromoCode(promoCodeInput, amountCents);
-    if (res.valid && res.promo) {
-      soundEffects.playCorrect();
-      setAppliedPromo(res.promo);
-      setDiscountCents(res.discountCents);
-      toast.success(
-        `تم تطبيق كود الخصم! وفّرت ${formatPrice(res.discountCents, currency, false)} 🎉`
-      );
-    } else {
-      soundEffects.playIncorrect();
-      toast.error(res.messageAr);
+  const handleApplyPromo = async () => {
+    const code = promoCodeInput.trim();
+    if (!code) return;
+    try {
+      const res = await validatePromo.mutateAsync({ code, amountCents });
+      if (res.valid && res.promo) {
+        soundEffects.playCorrect();
+        setAppliedPromo(res.promo);
+        setDiscountCents(res.discountCents);
+        toast.success(
+          `تم تطبيق كود الخصم! وفّرت ${formatPrice(res.discountCents, currency, false)} 🎉`
+        );
+      } else {
+        soundEffects.playIncorrect();
+        toast.error(res.messageAr);
+      }
+    } catch {
+      const res = applyPromoCode(code, amountCents);
+      if (res.valid && res.promo) {
+        soundEffects.playCorrect();
+        setAppliedPromo(res.promo);
+        setDiscountCents(res.discountCents);
+        toast.success(
+          `تم تطبيق كود الخصم! وفّرت ${formatPrice(res.discountCents, currency, false)} 🎉`
+        );
+      } else {
+        soundEffects.playIncorrect();
+        toast.error(res.messageAr);
+      }
     }
   };
 

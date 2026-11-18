@@ -3,11 +3,14 @@ import { TRPCError } from "@trpc/server";
 import { desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import {
+  announcementReads,
+  announcements,
   courses,
   enrollments,
   lessonProgress,
   orders,
   paymentReceipts,
+  promoCodes,
   sessionAttendance,
   sessions,
   studentGameProfiles,
@@ -19,6 +22,7 @@ import {
   subscriptions,
   users,
 } from "../../drizzle/schema";
+import { applyPromoCode as applyStaticPromoCode } from "../../shared/promo-codes";
 import {
   AVATAR_PRESETS,
   CHALLENGE_QUESTS,
@@ -877,6 +881,273 @@ export const communityRouter = router({
         weeklyXp: gameProfile?.weeklyXp ?? 25,
         latestRatingStars: latestRating?.stars ?? null,
         latestRatingNote: latestRating?.note ?? null,
+      };
+    }),
+
+  /* =========================================================
+   * 9. ANNOUNCEMENTS & STUDENT NOTIFICATION BELL
+   * ========================================================= */
+  adminListAnnouncements: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return { items: [], groups: [] };
+    const [items, groups] = await Promise.all([
+      db.select().from(announcements).orderBy(desc(announcements.createdAt)),
+      db.select({ id: studyGroups.id, name: studyGroups.name, level: studyGroups.level }).from(studyGroups),
+    ]);
+    const groupMap = new Map(groups.map(g => [g.id, g.name]));
+    return {
+      items: items.map(item => ({
+        ...item,
+        targetGroupName: item.targetGroupId
+          ? groupMap.get(item.targetGroupId) ?? "فصل محذوف"
+          : "كل الطلبة",
+      })),
+      groups,
+    };
+  }),
+
+  adminCreateAnnouncement: adminProcedure
+    .input(
+      z.object({
+        title: z.string().trim().min(2, "اكتب عنوان الإعلان").max(180),
+        body: z.string().trim().min(3, "اكتب نص الإعلان").max(2000),
+        targetGroupId: z.number().int().positive().nullable().optional(),
+        priority: z.enum(["info", "urgent", "celebration"]).default("info"),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "قاعدة البيانات غير متاحة" });
+
+      const [res] = await db.insert(announcements).values({
+        title: input.title,
+        body: input.body,
+        targetGroupId: input.targetGroupId ?? null,
+        priority: input.priority,
+        createdBy: ctx.user.id,
+      });
+      return { id: Number(res.insertId), ok: true as const };
+    }),
+
+  adminDeleteAnnouncement: adminProcedure
+    .input(z.object({ id: z.number().int().positive() }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "قاعدة البيانات غير متاحة" });
+
+      await db
+        .delete(announcementReads)
+        .where(eq(announcementReads.announcementId, input.id));
+      await db.delete(announcements).where(eq(announcements.id, input.id));
+      return { ok: true as const };
+    }),
+
+  myAnnouncements: protectedProcedure.query(async ({ ctx }) => {
+    const db = await getDb();
+    if (!db) return { items: [], unreadCount: 0 };
+
+    const [myGroupRows, allAnnouncements, myReads, groups] = await Promise.all([
+      db
+        .select({ groupId: studyGroupMembers.groupId })
+        .from(studyGroupMembers)
+        .where(eq(studyGroupMembers.userId, ctx.user.id)),
+      db.select().from(announcements).orderBy(desc(announcements.createdAt)).limit(30),
+      db
+        .select({ announcementId: announcementReads.announcementId })
+        .from(announcementReads)
+        .where(eq(announcementReads.userId, ctx.user.id)),
+      db.select({ id: studyGroups.id, name: studyGroups.name }).from(studyGroups),
+    ]);
+
+    const myGroupSet = new Set(myGroupRows.map(g => g.groupId));
+    const readSet = new Set(myReads.map(r => r.announcementId));
+    const groupMap = new Map(groups.map(g => [g.id, g.name]));
+
+    const visible = allAnnouncements
+      .filter(a => a.targetGroupId === null || myGroupSet.has(a.targetGroupId))
+      .map(a => ({
+        ...a,
+        targetGroupName: a.targetGroupId ? groupMap.get(a.targetGroupId) ?? null : null,
+        isRead: readSet.has(a.id),
+      }));
+
+    return {
+      items: visible,
+      unreadCount: visible.filter(i => !i.isRead).length,
+    };
+  }),
+
+  markAnnouncementsRead: protectedProcedure
+    .input(z.object({ ids: z.array(z.number().int().positive()).max(50) }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db || input.ids.length === 0) return { ok: true as const };
+
+      for (const announcementId of input.ids) {
+        try {
+          await db.insert(announcementReads).values({
+            announcementId,
+            userId: ctx.user.id,
+          });
+        } catch {
+          // ignore duplicate unique key if already read
+        }
+      }
+      return { ok: true as const };
+    }),
+
+  /* =========================================================
+   * 10. DYNAMIC PROMO CODES MANAGER & CHECKOUT VALIDATOR
+   * ========================================================= */
+  adminListPromos: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return [];
+    return db.select().from(promoCodes).orderBy(desc(promoCodes.createdAt));
+  }),
+
+  adminCreatePromo: adminProcedure
+    .input(
+      z.object({
+        code: z
+          .string()
+          .trim()
+          .min(3, "الكود لا يقل عن 3 أحرف")
+          .max(40)
+          .transform(s => s.toUpperCase().replace(/\s+/g, "")),
+        discountPercent: z.number().int().min(5).max(95),
+        label: z.string().trim().min(2, "اكتب وصف الكود").max(160),
+        maxUses: z.number().int().positive().nullable().optional(),
+        expiresAt: z.string().nullable().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "قاعدة البيانات غير متاحة" });
+
+      const [existing] = await db
+        .select({ id: promoCodes.id })
+        .from(promoCodes)
+        .where(eq(promoCodes.code, input.code))
+        .limit(1);
+      if (existing) {
+        throw new TRPCError({ code: "CONFLICT", message: "كود الخصم ده موجود بالفعل" });
+      }
+
+      const [res] = await db.insert(promoCodes).values({
+        code: input.code,
+        discountPercent: input.discountPercent,
+        label: input.label,
+        maxUses: input.maxUses ?? null,
+        expiresAt: input.expiresAt ? new Date(input.expiresAt) : null,
+        isActive: true,
+        createdBy: ctx.user.id,
+      });
+
+      return { id: Number(res.insertId), ok: true as const };
+    }),
+
+  adminTogglePromo: adminProcedure
+    .input(z.object({ id: z.number().int().positive(), isActive: z.boolean() }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "قاعدة البيانات غير متاحة" });
+
+      await db
+        .update(promoCodes)
+        .set({ isActive: input.isActive })
+        .where(eq(promoCodes.id, input.id));
+      return { ok: true as const };
+    }),
+
+  adminDeletePromo: adminProcedure
+    .input(z.object({ id: z.number().int().positive() }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "قاعدة البيانات غير متاحة" });
+
+      await db.delete(promoCodes).where(eq(promoCodes.id, input.id));
+      return { ok: true as const };
+    }),
+
+  validatePromoCode: publicProcedure
+    .input(
+      z.object({
+        code: z.string().trim().min(1).max(40),
+        amountCents: z.number().int().nonnegative(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const normalized = input.code.trim().toUpperCase();
+      const db = await getDb();
+
+      if (db) {
+        const [dbPromo] = await db
+          .select()
+          .from(promoCodes)
+          .where(eq(promoCodes.code, normalized))
+          .limit(1);
+
+        if (dbPromo) {
+          if (!dbPromo.isActive) {
+            return {
+              valid: false as const,
+              messageAr: "عذراً، كود الخصم ده موقوف حالياً.",
+              discountCents: 0,
+              finalCents: input.amountCents,
+              promo: null,
+            };
+          }
+          if (dbPromo.expiresAt && new Date(dbPromo.expiresAt).getTime() < Date.now()) {
+            return {
+              valid: false as const,
+              messageAr: "عذراً، انتهت صلاحية كود الخصم ده.",
+              discountCents: 0,
+              finalCents: input.amountCents,
+              promo: null,
+            };
+          }
+          if (dbPromo.maxUses !== null && dbPromo.usedCount >= dbPromo.maxUses) {
+            return {
+              valid: false as const,
+              messageAr: "عذراً، تم استنفاد الحد الأقصى لاستخدام هذا الكود.",
+              discountCents: 0,
+              finalCents: input.amountCents,
+              promo: null,
+            };
+          }
+
+          const discountCents = Math.round(
+            (input.amountCents * dbPromo.discountPercent) / 100
+          );
+          await db
+            .update(promoCodes)
+            .set({ usedCount: dbPromo.usedCount + 1 })
+            .where(eq(promoCodes.id, dbPromo.id));
+
+          return {
+            valid: true as const,
+            messageAr: `تم تفعيل ${dbPromo.label} بنجاح!`,
+            discountCents,
+            finalAmountCents: Math.max(0, input.amountCents - discountCents),
+            promo: {
+              code: dbPromo.code,
+              type: "percent" as const,
+              value: dbPromo.discountPercent,
+              descriptionAr: dbPromo.label,
+              active: true,
+            },
+          };
+        }
+      }
+
+      // Fallback to built-in static promo codes (LINKME10, YASSIN20, etc.)
+      const fallback = applyStaticPromoCode(normalized, input.amountCents);
+      return {
+        valid: fallback.valid,
+        messageAr: fallback.messageAr,
+        discountCents: fallback.discountCents,
+        finalAmountCents: fallback.finalAmountCents,
+        promo: fallback.promo ?? null,
       };
     }),
 });

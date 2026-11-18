@@ -9,6 +9,8 @@ import {
   getStreakSkin,
 } from "../shared/gamification-catalog";
 import { FLASHCARDS_DECK, type FlashcardLevel } from "../shared/flashcards-deck";
+import { ROLEPLAY_SCENARIOS } from "../shared/roleplay-scenarios";
+import { SPEED_QUIZ_BANK, getDailySpeedQuiz } from "../shared/speed-quiz-bank";
 import { buildReferralCode, parseReferralCode } from "./routers/community";
 
 describe("gamification catalog & student privacy", () => {
@@ -85,5 +87,22 @@ describe("gamification catalog & student privacy", () => {
         expect(card.exampleEn.length).toBeGreaterThan(5);
       }
     }
+  });
+
+  it("provides multi-turn roleplay scenarios and deterministic daily speed quizzes", () => {
+    expect(ROLEPLAY_SCENARIOS.length).toBeGreaterThanOrEqual(4);
+    for (const s of ROLEPLAY_SCENARIOS) {
+      expect(s.turns.length).toBeGreaterThanOrEqual(4);
+      for (const turn of s.turns) {
+        expect(turn.options.some(o => o.quality === "best")).toBe(true);
+      }
+    }
+
+    expect(SPEED_QUIZ_BANK.length).toBeGreaterThanOrEqual(20);
+    const fixedDate = new Date("2026-11-18T10:00:00Z");
+    const q1 = getDailySpeedQuiz(fixedDate);
+    const q2 = getDailySpeedQuiz(fixedDate);
+    expect(q1.length).toBe(5);
+    expect(q1.map(q => q.id)).toEqual(q2.map(q => q.id));
   });
 });

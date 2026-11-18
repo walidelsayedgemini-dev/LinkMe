@@ -25,6 +25,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useCompanion, CompanionAvatar } from "@/components/companion";
 import { HeaderStreakIndicator } from "@/components/gamification-badges";
+import { NotificationBell } from "@/components/notification-bell";
 import { isSoundEnabled, setSoundEnabled, soundEffects } from "@/lib/sound-effects";
 import { Logo } from "@/components/brand";
 import { UserAvatar } from "@/components/bits";
@@ -54,9 +55,10 @@ import {
 const NAV = [
   { href: "/", label: "الرئيسية", section: "top" },
   { href: "/courses", label: "الكورسات", section: "courses" },
+  { href: "/roleplay", label: "محاكي المواقف 🎭", section: "roleplay" },
   { href: "/flashcards", label: "فلاش كاردز 🃏", section: "flashcards" },
+  { href: "/speed-quiz", label: "تحدي 60 ثانية ⚡", section: "speed-quiz" },
   { href: "/competitions", label: "المسابقات 🏆", section: "competitions" },
-  { href: "/level-test", label: "اختبار المستوى", section: "level-test" },
   { href: "/pricing", label: "الأسعار", section: "pricing" },
 ];
 
@@ -216,6 +218,7 @@ export function SiteHeader() {
             <Search className="size-[17px] sm:size-[18px]" />
           </button>
           <HeaderStreakIndicator className="hidden md:inline-flex" />
+          <NotificationBell />
           <button
             type="button"
             onClick={handleToggleSound}
@@ -273,13 +276,17 @@ export function SiteHeader() {
                   <DropdownMenuItem onClick={() => navigate("/admin")}><ShieldCheck className="size-4 text-iris" /> لوحة المالك والطلاب</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/admin?tab=analytics")}><LayoutDashboard className="size-4 text-emerald-600" /> الإحصائيات والتنبيهات 📊</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/admin?tab=classrooms")}><GraduationCap className="size-4" /> الفصول الدراسية 🏫</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/admin?tab=announcements")}><MessageCircle className="size-4 text-iris" /> الإعلانات والإشعارات 🔔</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/admin?tab=promos")}><ShoppingBag className="size-4 text-amber-500" /> أكواد الخصم 🎟️</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/admin?tab=tasks")}><ClipboardList className="size-4" /> واجبات الطلاب ومتابعتهم</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/admin?tab=messages")}><MessageCircle className="size-4" /> محادثات الطلاب</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/admin?tab=premium")}><GraduationCap className="size-4" /> التفعيل المدفوع وخطط الإتقان</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/admin?tab=curriculum")}><LayoutDashboard className="size-4" /> تعديل محتوى الكورسات</DropdownMenuItem>
                 </> : user.role === "instructor" ? <DropdownMenuItem onClick={() => navigate("/coaching")}><GraduationCap className="size-4" /> متابعة الطلاب المعيّنين لي</DropdownMenuItem> : <>
                   <DropdownMenuItem onClick={() => navigate("/dashboard")}><LayoutDashboard className="size-4" /> لوحة تعلّمي</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/roleplay")}><GraduationCap className="size-4 text-indigo-500" /> محاكي المواقف الحقيقية 🎭</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/flashcards")}><GraduationCap className="size-4 text-emerald-600" /> فلاش كاردز الكلمات 🃏</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/speed-quiz")}><Trophy className="size-4 text-orange-500" /> تحدي الـ 60 ثانية ⚡</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/competitions")}><Trophy className="size-4 text-amber-500" /> المسابقات وفصلي والأفتارات 🏆</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/homework")}><ClipboardList className="size-4" /> واجباتي وتسليماتي</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/chat")}><MessageCircle className="size-4" /> كلّم المدرّس</DropdownMenuItem>

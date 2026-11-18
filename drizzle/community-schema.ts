@@ -1,4 +1,5 @@
 import {
+  boolean,
   index,
   int,
   mysqlTable,
@@ -87,7 +88,64 @@ export const studentReferrals = mysqlTable(
   ]
 );
 
+/**
+ * Admin broadcast announcements — can target all students (targetGroupId = null)
+ * or a specific classroom (targetGroupId = studyGroups.id).
+ */
+export const announcements = mysqlTable(
+  "announcements",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    title: varchar("title", { length: 180 }).notNull(),
+    body: text("body").notNull(),
+    targetGroupId: int("targetGroupId"),
+    priority: varchar("priority", { length: 24 }).default("info").notNull(),
+    createdBy: int("createdBy"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  table => [index("announcements_group_idx").on(table.targetGroupId)]
+);
+
+export const announcementReads = mysqlTable(
+  "announcementReads",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    announcementId: int("announcementId").notNull(),
+    userId: int("userId").notNull(),
+    readAt: timestamp("readAt").defaultNow().notNull(),
+  },
+  table => [
+    uniqueIndex("announcement_reads_unique").on(
+      table.announcementId,
+      table.userId
+    ),
+    index("announcement_reads_user_idx").on(table.userId),
+  ]
+);
+
+/**
+ * Dynamic admin-managed promo codes with discount %, optional max uses, and expiry.
+ */
+export const promoCodes = mysqlTable(
+  "promoCodes",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    code: varchar("code", { length: 40 }).notNull(),
+    discountPercent: int("discountPercent").notNull(),
+    label: varchar("label", { length: 160 }).notNull(),
+    maxUses: int("maxUses"),
+    usedCount: int("usedCount").default(0).notNull(),
+    isActive: boolean("isActive").default(true).notNull(),
+    expiresAt: timestamp("expiresAt"),
+    createdBy: int("createdBy"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  table => [uniqueIndex("promo_codes_code_unique").on(table.code)]
+);
+
 export type StudyGroup = typeof studyGroups.$inferSelect;
 export type StudyGroupMember = typeof studyGroupMembers.$inferSelect;
 export type StudentGameProfile = typeof studentGameProfiles.$inferSelect;
 export type StudentReferral = typeof studentReferrals.$inferSelect;
+export type Announcement = typeof announcements.$inferSelect;
+export type PromoCodeRow = typeof promoCodes.$inferSelect;

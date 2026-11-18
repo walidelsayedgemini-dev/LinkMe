@@ -22,6 +22,8 @@ import { BookingRequests } from "@/components/booking-requests";
 import { ReceiptsManager } from "@/components/admin/receipts-manager";
 import { ClassroomsManager } from "@/components/admin/classrooms-manager";
 import { AdminAnalyticsPanel } from "@/components/admin/analytics-panel";
+import { AnnouncementsManager } from "@/components/admin/announcements-manager";
+import { PromosManager } from "@/components/admin/promos-manager";
 import { AdminHomeworkPanel } from "@/components/homework";
 import { OwnerInbox } from "@/components/chat";
 import { PremiumAdminPanel } from "@/components/premium/PremiumAdminPanel";
@@ -69,6 +71,8 @@ export default function AdminConsole() {
     "students",
     "analytics",
     "classrooms",
+    "announcements",
+    "promos",
     "sessions",
     "tasks",
     "messages",
@@ -264,6 +268,18 @@ export default function AdminConsole() {
               الفصول الدراسية 🏫
             </TabsTrigger>
             <TabsTrigger
+              value="announcements"
+              className="rounded-xl px-4 py-2 data-[state=active]:bg-iris data-[state=active]:text-white"
+            >
+              الإعلانات 🔔
+            </TabsTrigger>
+            <TabsTrigger
+              value="promos"
+              className="rounded-xl px-4 py-2 data-[state=active]:bg-iris data-[state=active]:text-white"
+            >
+              أكواد الخصم 🎟️
+            </TabsTrigger>
+            <TabsTrigger
               value="sessions"
               className="rounded-xl px-4 py-2 data-[state=active]:bg-iris data-[state=active]:text-white"
             >
@@ -318,6 +334,12 @@ export default function AdminConsole() {
           </TabsContent>
           <TabsContent value="classrooms">
             <ClassroomsManager />
+          </TabsContent>
+          <TabsContent value="announcements">
+            <AnnouncementsManager />
+          </TabsContent>
+          <TabsContent value="promos">
+            <PromosManager />
           </TabsContent>
           <TabsContent value="receipts">
             <ReceiptsManager />

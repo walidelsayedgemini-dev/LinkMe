@@ -146,6 +146,20 @@ export default function Dashboard() {
               <Button
                 asChild
                 variant="outline"
+                className="rounded-full border-indigo-500/40 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-bold gap-1.5"
+              >
+                <Link href="/roleplay">🎭 محاكي المواقف</Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="rounded-full border-orange-500/40 bg-orange-500/10 hover:bg-orange-500/20 text-orange-700 dark:text-orange-300 font-bold gap-1.5"
+              >
+                <Link href="/speed-quiz">⚡ تحدي 60 ثانية</Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
                 className="rounded-full border-sky-500/40 bg-sky-500/10 hover:bg-sky-500/20 text-sky-700 dark:text-sky-300 font-bold gap-1.5"
               >
                 <Link href="/flashcards">
