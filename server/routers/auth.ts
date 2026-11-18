@@ -2,7 +2,13 @@ import { randomBytes } from "node:crypto";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { contactMessages, sessions, users } from "../../drizzle/schema";
+import {
+  contactMessages,
+  sessions,
+  studentGameProfiles,
+  studentReferrals,
+  users,
+} from "../../drizzle/schema";
 import { getDb } from "../db";
 import {
   consumeResetToken,
@@ -16,6 +22,9 @@ import {
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import { publicUser } from "./_shared";
 import { enforceRateLimit } from "../rate-limit";
+import { sendWelcomeEmail } from "../email";
+import { isGoogleAuthConfigured } from "../google-auth";
+import { parseReferralCode } from "./community";
 
 const emailSchema = z.string().trim().email("اكتب بريدًا إلكترونيًا صحيحًا");
 const passwordSchema = z
@@ -28,6 +37,10 @@ export const authRouter = router({
     ctx.user ? publicUser(ctx.user) : null
   ),
 
+  providers: publicProcedure.query(() => ({
+    google: isGoogleAuthConfigured(),
+  })),
+
   signup: publicProcedure
     .input(
       z.object({
@@ -36,6 +49,7 @@ export const authRouter = router({
         password: passwordSchema,
         role: z.literal("user").default("user"),
         headline: z.string().trim().max(160).optional(),
+        referralCode: z.string().trim().max(32).optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -68,6 +82,80 @@ export const authRouter = router({
         headline: input.headline ?? "متعلّم لغة إنجليزية",
       });
       const userId = Number(result[0].insertId);
+
+      // Process optional referral invite code (+150 XP referrer, +100 XP welcome bonus)
+      let welcomeBonusXp = 0;
+      if (input.referralCode) {
+        const referrerId = parseReferralCode(input.referralCode);
+        if (referrerId && referrerId !== userId) {
+          try {
+            const [referrer] = await db
+              .select({ id: users.id })
+              .from(users)
+              .where(eq(users.id, referrerId))
+              .limit(1);
+            if (referrer) {
+              await db.insert(studentReferrals).values({
+                referrerUserId: referrer.id,
+                referredUserId: userId,
+                referralCode: input.referralCode.toUpperCase(),
+                rewardXp: 150,
+              });
+              welcomeBonusXp = 100;
+              const today = new Date().toISOString().slice(0, 10);
+              // Give welcome XP bonus to new user
+              await db.insert(studentGameProfiles).values({
+                userId,
+                avatarPreset: "lion",
+                equippedSkin: "classic",
+                streakDays: 1,
+                dailyXp: 125,
+                weeklyXp: 125,
+                monthlyXp: 125,
+                yearlyXp: 125,
+                lastActivityDate: today,
+              });
+              // Give +150 XP to referrer
+              const [refProfile] = await db
+                .select()
+                .from(studentGameProfiles)
+                .where(eq(studentGameProfiles.userId, referrer.id))
+                .limit(1);
+              if (refProfile) {
+                await db
+                  .update(studentGameProfiles)
+                  .set({
+                    dailyXp: refProfile.dailyXp + 150,
+                    weeklyXp: refProfile.weeklyXp + 150,
+                    monthlyXp: refProfile.monthlyXp + 150,
+                    yearlyXp: refProfile.yearlyXp + 150,
+                  })
+                  .where(eq(studentGameProfiles.id, refProfile.id));
+              } else {
+                await db.insert(studentGameProfiles).values({
+                  userId: referrer.id,
+                  avatarPreset: "lion",
+                  equippedSkin: "classic",
+                  streakDays: 1,
+                  dailyXp: 175,
+                  weeklyXp: 175,
+                  monthlyXp: 175,
+                  yearlyXp: 175,
+                  lastActivityDate: today,
+                });
+              }
+            }
+          } catch {
+            // Non-fatal: signup should succeed even if referral fails
+          }
+        }
+      }
+
+      void sendWelcomeEmail({
+        to: email,
+        name: input.name,
+        bonusXp: welcomeBonusXp || undefined,
+      });
 
       await createSession(userId, ctx.res);
       const [created] = await db

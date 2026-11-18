@@ -67,6 +67,27 @@ export const studentGameProfiles = mysqlTable(
   table => [uniqueIndex("student_game_profiles_user_unique").on(table.userId)]
 );
 
+/**
+ * Referral rewards tracking: students share their invite link and both
+ * inviter (+150 XP) and friend (+100 XP) earn instant rewards on signup.
+ */
+export const studentReferrals = mysqlTable(
+  "studentReferrals",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    referrerUserId: int("referrerUserId").notNull(),
+    referredUserId: int("referredUserId").notNull(),
+    referralCode: varchar("referralCode", { length: 32 }).notNull(),
+    rewardXp: int("rewardXp").default(150).notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  table => [
+    uniqueIndex("student_referrals_referred_unique").on(table.referredUserId),
+    index("student_referrals_referrer_idx").on(table.referrerUserId),
+  ]
+);
+
 export type StudyGroup = typeof studyGroups.$inferSelect;
 export type StudyGroupMember = typeof studyGroupMembers.$inferSelect;
 export type StudentGameProfile = typeof studentGameProfiles.$inferSelect;
+export type StudentReferral = typeof studentReferrals.$inferSelect;

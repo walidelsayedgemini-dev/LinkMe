@@ -16,6 +16,7 @@ import {
 import { endDateForDuration } from "../premium/dates";
 import { enforceRateLimit } from "../rate-limit";
 import { storagePut } from "../storage";
+import { sendReceiptApprovedEmail } from "../email";
 import { adminProcedure, protectedProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
 
@@ -413,7 +414,33 @@ export const receiptsRouter = router({
           createdAt: now,
         });
 
-        return { ok: true as const, targetTitle: receipt.targetTitle };
+        return {
+          ok: true as const,
+          targetTitle: receipt.targetTitle,
+          studentUserId: receipt.userId,
+          method: receipt.method,
+        };
+      }).then(async result => {
+        if ("studentUserId" in result && result.studentUserId) {
+          try {
+            const [student] = await db
+              .select({ email: users.email, name: users.name })
+              .from(users)
+              .where(eq(users.id, result.studentUserId))
+              .limit(1);
+            if (student?.email) {
+              void sendReceiptApprovedEmail({
+                to: student.email,
+                name: student.name ?? "طالب Link Me",
+                targetTitle: result.targetTitle,
+                method: result.method,
+              });
+            }
+          } catch {
+            // Non-blocking email notification
+          }
+        }
+        return { ok: true as const, targetTitle: "targetTitle" in result ? result.targetTitle : undefined };
       });
     }),
 

@@ -1,12 +1,22 @@
-import { randomInt } from "node:crypto";
+import { createHash, randomInt } from "node:crypto";
 import { TRPCError } from "@trpc/server";
 import { desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import {
+  courses,
+  enrollments,
+  lessonProgress,
+  orders,
+  paymentReceipts,
+  sessionAttendance,
   sessions,
   studentGameProfiles,
+  studentRatings,
+  studentReferrals,
+  studentTasks,
   studyGroupMembers,
   studyGroups,
+  subscriptions,
   users,
 } from "../../drizzle/schema";
 import {
@@ -46,6 +56,23 @@ function generateReadablePassword(): string {
   const tail =
     letters[randomInt(letters.length)] + letters[randomInt(letters.length)];
   return `LM-${digits}${tail}`;
+}
+
+export function buildReferralCode(userId: number): string {
+  const checksum = createHash("sha256")
+    .update(`linkme-ref-${userId}`)
+    .digest("hex")
+    .slice(0, 4)
+    .toUpperCase();
+  return `LM${userId}-${checksum}`;
+}
+
+export function parseReferralCode(code: string): number | null {
+  const match = code.trim().toUpperCase().match(/^LM(\d+)-([A-F0-9]{4})$/);
+  if (!match) return null;
+  const userId = Number(match[1]);
+  if (!Number.isInteger(userId) || userId <= 0) return null;
+  return buildReferralCode(userId) === match[0] ? userId : null;
 }
 
 async function ensureGameProfile(userId: number) {
@@ -543,6 +570,313 @@ export const communityRouter = router({
         entries: combined.slice(0, 25),
         myEntry,
         quests: CHALLENGE_QUESTS.filter(q => q.period === period),
+      };
+    }),
+
+  /* =========================================================
+   * 6. REFERRAL REWARDS ("ادعُ صاحبك واكسب")
+   * ========================================================= */
+  myReferral: protectedProcedure.query(async ({ ctx }) => {
+    const code = buildReferralCode(ctx.user.id);
+    const shareUrl = `https://www.link-me.tech/signup?ref=${encodeURIComponent(code)}`;
+    const db = await getDb();
+    if (!db) {
+      return {
+        code,
+        shareUrl,
+        invitedCount: 0,
+        totalBonusXp: 0,
+        invitedFriends: [] as { id: number; firstName: string; rewardXp: number; joinedAt: Date }[],
+      };
+    }
+
+    const rows = await db
+      .select()
+      .from(studentReferrals)
+      .where(eq(studentReferrals.referrerUserId, ctx.user.id))
+      .orderBy(desc(studentReferrals.createdAt));
+
+    const referredIds = rows.map(r => r.referredUserId);
+    const friendUsers =
+      referredIds.length > 0
+        ? await db
+            .select({ id: users.id, name: users.name })
+            .from(users)
+            .where(inArray(users.id, referredIds))
+        : [];
+
+    const friendMap = new Map(friendUsers.map(u => [u.id, u.name]));
+    const invitedFriends = rows.map(r => ({
+      id: r.id,
+      firstName: firstNameOnly(friendMap.get(r.referredUserId)),
+      rewardXp: r.rewardXp,
+      joinedAt: r.createdAt,
+    }));
+
+    return {
+      code,
+      shareUrl,
+      invitedCount: rows.length,
+      totalBonusXp: rows.reduce((sum, r) => sum + r.rewardXp, 0),
+      invitedFriends,
+    };
+  }),
+
+  /* =========================================================
+   * 7. ADMIN ANALYTICS & INACTIVE STUDENT ALERTS
+   * ========================================================= */
+  adminAnalytics: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) {
+      return {
+        summary: {
+          totalStudents: 0,
+          activeSubscribers: 0,
+          approvedRevenueEgp: 0,
+          pendingReceiptsCount: 0,
+          totalEnrollments: 0,
+          totalReferrals: 0,
+        },
+        monthlyRevenue: [] as { monthKey: string; label: string; revenueEgp: number; ordersCount: number }[],
+        topCourses: [] as { id: number; titleAr: string; level: string; enrollmentsCount: number }[],
+        levelDistribution: [] as { level: string; count: number }[],
+        inactiveStudents: [] as {
+          id: number;
+          name: string;
+          email: string;
+          phone: string;
+          englishLevel: string | null;
+          daysSinceActive: number;
+          streakDays: number;
+        }[],
+      };
+    }
+
+    const [
+      allUsers,
+      allEnrollments,
+      allCourses,
+      allReceipts,
+      allOrders,
+      allSubs,
+      allProfiles,
+      allReferrals,
+    ] = await Promise.all([
+      db.select().from(users).where(eq(users.role, "user")),
+      db.select().from(enrollments),
+      db.select({ id: courses.id, titleAr: courses.titleAr, level: courses.level }).from(courses),
+      db.select().from(paymentReceipts),
+      db.select().from(orders),
+      db.select().from(subscriptions),
+      db.select().from(studentGameProfiles),
+      db.select().from(studentReferrals),
+    ]);
+
+    const now = Date.now();
+    const activeSubscribers = allSubs.filter(
+      s => s.status === "active" && new Date(s.currentPeriodEnd).getTime() > now
+    ).length;
+
+    const paidOrders = allOrders.filter(o => o.status === "paid");
+    const approvedReceipts = allReceipts.filter(r => r.status === "approved");
+    const pendingReceiptsCount = allReceipts.filter(r => r.status === "pending").length;
+
+    const revenueCentsFromOrders = paidOrders.reduce((s, o) => s + o.amountCents, 0);
+    const revenueCentsFromReceipts = approvedReceipts.reduce((s, r) => s + r.amountCents, 0);
+    const approvedRevenueEgp = Math.round(
+      Math.max(revenueCentsFromOrders, revenueCentsFromReceipts) / 100
+    );
+
+    // Monthly revenue over the last 6 months
+    const monthNamesAr = [
+      "يناير",
+      "فبراير",
+      "مارس",
+      "أبريل",
+      "مايو",
+      "يونيو",
+      "يوليو",
+      "أغسطس",
+      "سبتمبر",
+      "أكتوبر",
+      "نوفمبر",
+      "ديسمبر",
+    ];
+    const dNow = new Date();
+    const monthsBucket = Array.from({ length: 6 }, (_, idx) => {
+      const d = new Date(dNow.getFullYear(), dNow.getMonth() - (5 - idx), 1);
+      const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      return {
+        monthKey,
+        label: monthNamesAr[d.getMonth()],
+        revenueEgp: 0,
+        ordersCount: 0,
+      };
+    });
+    const monthMap = new Map(monthsBucket.map(m => [m.monthKey, m]));
+    const revenueSource = paidOrders.length >= approvedReceipts.length ? paidOrders : approvedReceipts;
+    for (const item of revenueSource) {
+      const dt = new Date(item.createdAt);
+      const mk = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}`;
+      const bucket = monthMap.get(mk);
+      if (bucket) {
+        bucket.revenueEgp += Math.round(item.amountCents / 100);
+        bucket.ordersCount += 1;
+      }
+    }
+
+    // Top courses by enrollment count
+    const courseCounts = new Map<number, number>();
+    for (const enr of allEnrollments) {
+      courseCounts.set(enr.courseId, (courseCounts.get(enr.courseId) ?? 0) + 1);
+    }
+    const topCourses = allCourses
+      .map(c => ({
+        id: c.id,
+        titleAr: c.titleAr,
+        level: c.level,
+        enrollmentsCount: courseCounts.get(c.id) ?? 0,
+      }))
+      .sort((a, b) => b.enrollmentsCount - a.enrollmentsCount)
+      .slice(0, 6);
+
+    // Level distribution
+    const levelOrder = ["A1", "A2", "B1", "B2", "C1", "C2", "غير محدد"];
+    const levelCounts = new Map<string, number>();
+    for (const u of allUsers) {
+      const lvl = u.englishLevel ?? "غير محدد";
+      levelCounts.set(lvl, (levelCounts.get(lvl) ?? 0) + 1);
+    }
+    const levelDistribution = levelOrder
+      .map(level => ({ level, count: levelCounts.get(level) ?? 0 }))
+      .filter(row => row.count > 0);
+
+    // Inactive students (> 3 days since last sign-in or activity)
+    const profileMap = new Map(allProfiles.map(p => [p.userId, p]));
+    const inactiveStudents = allUsers
+      .map(u => {
+        const lastTs = u.lastSignedIn ? new Date(u.lastSignedIn).getTime() : 0;
+        const daysSinceActive = lastTs
+          ? Math.floor((now - lastTs) / 86_400_000)
+          : 99;
+        return {
+          id: u.id,
+          name: u.name ?? "طالب",
+          email: u.email ?? "",
+          phone: u.phone ?? "",
+          englishLevel: u.englishLevel,
+          daysSinceActive,
+          streakDays: profileMap.get(u.id)?.streakDays ?? 0,
+        };
+      })
+      .filter(s => s.daysSinceActive >= 3)
+      .sort((a, b) => b.daysSinceActive - a.daysSinceActive)
+      .slice(0, 20);
+
+    return {
+      summary: {
+        totalStudents: allUsers.length,
+        activeSubscribers,
+        approvedRevenueEgp,
+        pendingReceiptsCount,
+        totalEnrollments: allEnrollments.length,
+        totalReferrals: allReferrals.length,
+      },
+      monthlyRevenue: monthsBucket,
+      topCourses,
+      levelDistribution,
+      inactiveStudents,
+    };
+  }),
+
+  /* =========================================================
+   * 8. ADMIN: ONE-CLICK PARENT PROGRESS REPORT
+   * ========================================================= */
+  adminParentReport: adminProcedure
+    .input(z.object({ studentId: z.number().int().positive() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "قاعدة البيانات غير متاحة",
+        });
+      }
+
+      const [student] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, input.studentId))
+        .limit(1);
+
+      if (!student) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "الطالب غير موجود" });
+      }
+
+      const [enrs, progress, attendance, tasks, ratings, profiles] =
+        await Promise.all([
+          db
+            .select()
+            .from(enrollments)
+            .where(eq(enrollments.userId, student.id)),
+          db
+            .select()
+            .from(lessonProgress)
+            .where(eq(lessonProgress.userId, student.id)),
+          db
+            .select()
+            .from(sessionAttendance)
+            .where(eq(sessionAttendance.userId, student.id)),
+          db
+            .select()
+            .from(studentTasks)
+            .where(eq(studentTasks.userId, student.id)),
+          db
+            .select()
+            .from(studentRatings)
+            .where(eq(studentRatings.userId, student.id))
+            .orderBy(desc(studentRatings.createdAt)),
+          db
+            .select()
+            .from(studentGameProfiles)
+            .where(eq(studentGameProfiles.userId, student.id))
+            .limit(1),
+        ]);
+
+      const attended = attendance.filter(
+        a => a.status === "present" || a.status === "late"
+      ).length;
+      const attendanceRate =
+        attendance.length > 0
+          ? Math.round((attended / attendance.length) * 100)
+          : null;
+      const completedLessons = progress.length;
+      const reviewedTasks = tasks.filter(
+        t => t.status === "reviewed" || t.status === "submitted"
+      ).length;
+      const openTasks = tasks.filter(
+        t => t.status === "assigned" || t.status === "in_progress"
+      ).length;
+      const latestRating = ratings[0] ?? null;
+      const gameProfile = profiles[0] ?? null;
+
+      return {
+        studentId: student.id,
+        name: student.name ?? "طالب Link Me",
+        email: student.email ?? "",
+        phone: student.phone ?? "",
+        englishLevel: student.englishLevel ?? "قيد التحديد",
+        enrollmentsCount: enrs.length,
+        completedLessons,
+        attendedSessions: attended,
+        totalSessions: attendance.length,
+        attendanceRate,
+        reviewedTasks,
+        openTasks,
+        streakDays: gameProfile?.streakDays ?? 1,
+        weeklyXp: gameProfile?.weeklyXp ?? 25,
+        latestRatingStars: latestRating?.stars ?? null,
+        latestRatingNote: latestRating?.note ?? null,
       };
     }),
 });

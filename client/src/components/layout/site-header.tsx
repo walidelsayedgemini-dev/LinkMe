@@ -54,11 +54,10 @@ import {
 const NAV = [
   { href: "/", label: "الرئيسية", section: "top" },
   { href: "/courses", label: "الكورسات", section: "courses" },
+  { href: "/flashcards", label: "فلاش كاردز 🃏", section: "flashcards" },
   { href: "/competitions", label: "المسابقات 🏆", section: "competitions" },
-  { href: "/method", label: "طريقتنا", section: "method" },
   { href: "/level-test", label: "اختبار المستوى", section: "level-test" },
   { href: "/pricing", label: "الأسعار", section: "pricing" },
-  { href: "/faq", label: "الأسئلة", section: "faq" },
 ];
 
 export function SiteHeader() {
@@ -272,6 +271,7 @@ export function SiteHeader() {
                 <DropdownMenuSeparator />
                 {user.role === "admin" ? <>
                   <DropdownMenuItem onClick={() => navigate("/admin")}><ShieldCheck className="size-4 text-iris" /> لوحة المالك والطلاب</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/admin?tab=analytics")}><LayoutDashboard className="size-4 text-emerald-600" /> الإحصائيات والتنبيهات 📊</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/admin?tab=classrooms")}><GraduationCap className="size-4" /> الفصول الدراسية 🏫</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/admin?tab=tasks")}><ClipboardList className="size-4" /> واجبات الطلاب ومتابعتهم</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/admin?tab=messages")}><MessageCircle className="size-4" /> محادثات الطلاب</DropdownMenuItem>
@@ -279,6 +279,7 @@ export function SiteHeader() {
                   <DropdownMenuItem onClick={() => navigate("/admin?tab=curriculum")}><LayoutDashboard className="size-4" /> تعديل محتوى الكورسات</DropdownMenuItem>
                 </> : user.role === "instructor" ? <DropdownMenuItem onClick={() => navigate("/coaching")}><GraduationCap className="size-4" /> متابعة الطلاب المعيّنين لي</DropdownMenuItem> : <>
                   <DropdownMenuItem onClick={() => navigate("/dashboard")}><LayoutDashboard className="size-4" /> لوحة تعلّمي</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/flashcards")}><GraduationCap className="size-4 text-emerald-600" /> فلاش كاردز الكلمات 🃏</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/competitions")}><Trophy className="size-4 text-amber-500" /> المسابقات وفصلي والأفتارات 🏆</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/homework")}><ClipboardList className="size-4" /> واجباتي وتسليماتي</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/chat")}><MessageCircle className="size-4" /> كلّم المدرّس</DropdownMenuItem>

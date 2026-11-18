@@ -9,6 +9,8 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { getDb } from "../db";
 import { registerProfileRoutes } from "../profile-upload";
+import { isEmailConfigured } from "../email";
+import { isGoogleAuthConfigured, registerGoogleAuthRoutes } from "../google-auth";
 
 export function createApiApp() {
   const app = express();
@@ -57,6 +59,8 @@ export function createApiApp() {
       status: "ok",
       database,
       storage: process.env.BLOB_READ_WRITE_TOKEN ? "vercel-blob" : "local",
+      email: isEmailConfigured() ? "resend" : "console",
+      googleAuth: isGoogleAuthConfigured(),
       uptime: Math.round(process.uptime()),
     });
   });
@@ -66,6 +70,7 @@ export function createApiApp() {
   });
 
   registerOAuthRoutes(app);
+  registerGoogleAuthRoutes(app);
   registerProfileRoutes(app);
 
   // tRPC API

@@ -32,6 +32,7 @@ import { YassinSays, useCompanion } from "@/components/companion";
 import { VoicePracticeDialog } from "@/components/voice-practice-dialog";
 import { CertificateModal } from "@/components/certificate-modal";
 import { StudentAvatarBadge } from "@/components/student-avatar-badge";
+import { ReferralCard } from "@/components/referral-card";
 import { getStreakSkin } from "@shared/gamification-catalog";
 
 export default function Dashboard() {
@@ -145,6 +146,15 @@ export default function Dashboard() {
               <Button
                 asChild
                 variant="outline"
+                className="rounded-full border-sky-500/40 bg-sky-500/10 hover:bg-sky-500/20 text-sky-700 dark:text-sky-300 font-bold gap-1.5"
+              >
+                <Link href="/flashcards">
+                  <Sparkles className="size-4 text-sky-500" /> فلاش كاردز 🃏
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
                 className="rounded-full border-purple-500/40 bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold gap-1.5"
               >
                 <Link href="/competitions">
@@ -198,7 +208,10 @@ export default function Dashboard() {
         </div>
       </section>
 
-      <div className="container pt-7"><PremiumAccountSummary /></div>
+      <div className="container pt-7 space-y-5">
+        <PremiumAccountSummary />
+        <ReferralCard />
+      </div>
       {gameProfile && (
         <section className="container pt-6">
           <div className="grid gap-4 lg:grid-cols-[1fr_1.4fr]">

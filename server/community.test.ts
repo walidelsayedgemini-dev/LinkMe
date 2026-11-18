@@ -8,6 +8,8 @@ import {
   getAvatarPreset,
   getStreakSkin,
 } from "../shared/gamification-catalog";
+import { FLASHCARDS_DECK, type FlashcardLevel } from "../shared/flashcards-deck";
+import { buildReferralCode, parseReferralCode } from "./routers/community";
 
 describe("gamification catalog & student privacy", () => {
   it("enforces strict first-name-only formatting for peer visibility", () => {
@@ -57,6 +59,31 @@ describe("gamification catalog & student privacy", () => {
       expect(STREAK_SKINS[i].minStreak).toBeGreaterThan(
         STREAK_SKINS[i - 1].minStreak
       );
+    }
+  });
+
+  it("generates tamper-proof referral codes and parses valid ones", () => {
+    const code = buildReferralCode(42);
+    expect(code).toMatch(/^LM42-[A-F0-9]{4}$/);
+    expect(parseReferralCode(code)).toBe(42);
+    expect(parseReferralCode(code.toLowerCase())).toBe(42);
+    expect(parseReferralCode("LM42-0000")).toBeNull();
+    expect(parseReferralCode("INVALID")).toBeNull();
+  });
+
+  it("ships complete audio vocabulary flashcards across A1-B2", () => {
+    const levels: FlashcardLevel[] = ["A1", "A2", "B1", "B2"];
+    const ids = new Set<string>();
+    for (const lvl of levels) {
+      const cards = FLASHCARDS_DECK.filter(c => c.level === lvl);
+      expect(cards.length).toBeGreaterThanOrEqual(12);
+      for (const card of cards) {
+        expect(ids.has(card.id)).toBe(false);
+        ids.add(card.id);
+        expect(card.word.length).toBeGreaterThan(1);
+        expect(card.meaningAr.length).toBeGreaterThan(1);
+        expect(card.exampleEn.length).toBeGreaterThan(5);
+      }
     }
   });
 });

@@ -7,6 +7,7 @@ import {
   ClipboardList,
   Copy,
   ExternalLink,
+  FileText,
   KeyRound,
   MessageCircle,
   RefreshCw,
@@ -20,6 +21,7 @@ import { toast } from "sonner";
 import { BookingRequests } from "@/components/booking-requests";
 import { ReceiptsManager } from "@/components/admin/receipts-manager";
 import { ClassroomsManager } from "@/components/admin/classrooms-manager";
+import { AdminAnalyticsPanel } from "@/components/admin/analytics-panel";
 import { AdminHomeworkPanel } from "@/components/homework";
 import { OwnerInbox } from "@/components/chat";
 import { PremiumAdminPanel } from "@/components/premium/PremiumAdminPanel";
@@ -65,6 +67,7 @@ export default function AdminConsole() {
   const tabFromUrl = new URLSearchParams(search).get("tab");
   const validTabs = [
     "students",
+    "analytics",
     "classrooms",
     "sessions",
     "tasks",
@@ -115,6 +118,10 @@ export default function AdminConsole() {
     id: number;
     name: string;
     email: string;
+  } | null>(null);
+  const [reportTarget, setReportTarget] = useState<{
+    id: number;
+    name: string;
   } | null>(null);
 
   const students = useMemo(() => {
@@ -245,6 +252,12 @@ export default function AdminConsole() {
               الطلاب ({overview.data?.students.length ?? 0})
             </TabsTrigger>
             <TabsTrigger
+              value="analytics"
+              className="rounded-xl px-4 py-2 data-[state=active]:bg-iris data-[state=active]:text-white"
+            >
+              الإحصائيات والتنبيهات 📊
+            </TabsTrigger>
+            <TabsTrigger
               value="classrooms"
               className="rounded-xl px-4 py-2 data-[state=active]:bg-iris data-[state=active]:text-white"
             >
@@ -300,6 +313,9 @@ export default function AdminConsole() {
             <TabsTrigger value="premium" className="rounded-xl px-4 py-2 data-[state=active]:bg-iris data-[state=active]:text-white">الخطط المدفوعة والمتابعة اليومية</TabsTrigger>
           </TabsList>
           <TabsContent value="premium"><PremiumAdminPanel /></TabsContent>
+          <TabsContent value="analytics">
+            <AdminAnalyticsPanel />
+          </TabsContent>
           <TabsContent value="classrooms">
             <ClassroomsManager />
           </TabsContent>
@@ -445,6 +461,18 @@ export default function AdminConsole() {
                     >
                       <KeyRound className="size-3" /> كلمة السر
                     </button>
+                    <button
+                      onClick={() =>
+                        setReportTarget({
+                          id: student.id,
+                          name: student.name ?? "طالب",
+                        })
+                      }
+                      title="توليد وإرسال تقرير متابعة جاهز لولي الأمر على واتساب"
+                      className="inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 transition-colors hover:bg-emerald-600 hover:text-white dark:text-emerald-300"
+                    >
+                      <FileText className="size-3" /> تقرير ولي الأمر
+                    </button>
                     <Link
                       href={`/students/${student.id}`}
                       className="inline-flex items-center gap-1 rounded-full bg-iris-soft px-2.5 py-1 text-[11px] font-semibold text-iris transition-colors hover:bg-iris hover:text-white"
@@ -507,6 +535,13 @@ export default function AdminConsole() {
           student={passwordTarget}
           open
           onOpenChange={open => !open && setPasswordTarget(null)}
+        />
+      )}
+      {reportTarget && (
+        <ParentReportDialog
+          student={reportTarget}
+          open
+          onOpenChange={open => !open && setReportTarget(null)}
         />
       )}
     </PageShell>
@@ -978,6 +1013,159 @@ function StudentPasswordDialog({
             </div>
           )}
         </div>
+
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+          >
+            إغلاق
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ParentReportDialog({
+  student,
+  open,
+  onOpenChange,
+}: {
+  student: { id: number; name: string };
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const [copied, setCopied] = useState(false);
+  const { data, isLoading } = trpc.community.adminParentReport.useQuery(
+    { studentId: student.id },
+    { enabled: open }
+  );
+
+  const reportText = data
+    ? [
+        `📋 *تقرير متابعة طالب — أكاديمية Link Me*`,
+        `━━━━━━━━━━━━━━━━`,
+        `👤 الاسم: ${data.name}`,
+        `🎯 المستوى الحالي: ${data.englishLevel}`,
+        `📚 الكورسات الملتحق بها: ${data.enrollmentsCount} كورس`,
+        `✅ الدروس المكتملة: ${data.completedLessons} درس`,
+        `🎥 نسبة الحضور: ${data.attendanceRate === null ? "لم تبدأ الجلسات بعد" : `${data.attendanceRate}% (${data.attendedSessions} من ${data.totalSessions} جلسة)`}`,
+        `📝 الواجبات المسلّمة: ${data.reviewedTasks} (واجبات مفتوحة: ${data.openTasks})`,
+        `🔥 شعلة الحماسة اليومية: ${data.streakDays} أيام متتالية (${data.weeklyXp} XP هذا الأسبوع)`,
+        data.latestRatingStars
+          ? `⭐ آخر تقييم من المدرّس: ${data.latestRatingStars}/5${data.latestRatingNote ? ` — "${data.latestRatingNote}"` : ""}`
+          : null,
+        `━━━━━━━━━━━━━━━━`,
+        `شكراً لمتابعتكم المستمرة! معاً نحو إتقان اللغة الإنجليزية 🌟`,
+        `https://www.link-me.tech`,
+      ]
+        .filter(Boolean)
+        .join("\n")
+    : "";
+
+  const whatsappHref = data
+    ? (() => {
+        const cleanDigits = data.phone.replace(/[^\d]/g, "");
+        const intl = cleanDigits
+          ? cleanDigits.startsWith("0")
+            ? `2${cleanDigits}`
+            : cleanDigits
+          : "";
+        return `https://wa.me/${intl}?text=${encodeURIComponent(reportText)}`;
+      })()
+    : "#";
+
+  const handleCopy = async () => {
+    if (!reportText) return;
+    try {
+      await navigator.clipboard.writeText(reportText);
+      setCopied(true);
+      toast.success("تم نسخ تقرير ولي الأمر للحافظة 📋");
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      toast.error("تعذّر النسخ");
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent dir="rtl" className="max-w-lg bg-card text-ink">
+        <DialogHeader className="text-start">
+          <DialogTitle className="flex items-center gap-2">
+            <FileText className="size-5 text-emerald-600" />
+            تقرير متابعة ولي الأمر — {student.name}
+          </DialogTitle>
+          <DialogDescription>
+            تقرير جاهز ومنسّق بمستوى الطالب وحضوره وواجباته وحماسته — انسخه أو
+            ابعته لولي الأمر على واتساب في ثانية.
+          </DialogDescription>
+        </DialogHeader>
+
+        {isLoading || !data ? (
+          <div className="py-10 text-center text-sm text-ink-soft">
+            جارٍ تجهيز تقرير المتابعة…
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="rounded-xl border border-line bg-paper-deep/60 p-3">
+                <p className="latin text-lg font-black text-iris">
+                  {data.englishLevel}
+                </p>
+                <p className="text-[11px] text-ink-soft">المستوى</p>
+              </div>
+              <div className="rounded-xl border border-line bg-paper-deep/60 p-3">
+                <p className="latin text-lg font-black text-emerald-600">
+                  {data.attendanceRate === null
+                    ? "—"
+                    : `${data.attendanceRate}%`}
+                </p>
+                <p className="text-[11px] text-ink-soft">الحضور</p>
+              </div>
+              <div className="rounded-xl border border-line bg-paper-deep/60 p-3">
+                <p className="latin text-lg font-black text-amber-600">
+                  🔥 {data.streakDays}
+                </p>
+                <p className="text-[11px] text-ink-soft">أيام حماسة</p>
+              </div>
+            </div>
+
+            <pre className="max-h-60 overflow-y-auto whitespace-pre-wrap rounded-2xl border border-line bg-paper-deep/50 p-4 font-sans text-xs leading-relaxed text-ink">
+              {reportText}
+            </pre>
+
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCopy}
+                className="rounded-full"
+              >
+                {copied ? (
+                  <>
+                    <Check className="me-1.5 size-4 text-emerald-600" /> تم
+                    النسخ
+                  </>
+                ) : (
+                  <>
+                    <Copy className="me-1.5 size-4" /> نسخ التقرير
+                  </>
+                )}
+              </Button>
+              <Button
+                asChild
+                className="rounded-full bg-[#16A34A] text-white hover:bg-[#15803D]"
+              >
+                <a href={whatsappHref} target="_blank" rel="noreferrer">
+                  <MessageCircle className="me-1.5 size-4" /> إرسال لولي الأمر
+                  واتساب
+                </a>
+              </Button>
+            </div>
+          </div>
+        )}
 
         <DialogFooter>
           <Button
