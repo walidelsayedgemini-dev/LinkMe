@@ -12,6 +12,7 @@ node_modules/
 dist/
 build/
 .cache/
+api/_handler.mjs
 
 # User uploads & ephemeral files
 uploads/*
