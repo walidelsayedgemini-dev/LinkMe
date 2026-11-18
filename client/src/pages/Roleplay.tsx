@@ -434,8 +434,8 @@ export default function Roleplay() {
                   )}
                 >
                   <div>
-                    {/* Unique Realistic Cover Header (Zero Repeats Across All 1,000 Scenarios!) */}
-                    <div className="relative h-36 overflow-hidden">
+                    {/* Clean Bright Lifestyle Photo Header (matching CourseCard editorial look!) */}
+                    <div className="relative h-44 overflow-hidden bg-paper-deep">
                       <img
                         src={coverImg}
                         alt={scenario.titleEn}
@@ -448,21 +448,11 @@ export default function Roleplay() {
                       />
                       <div
                         aria-hidden="true"
-                        className={cn(
-                          "absolute inset-0 bg-gradient-to-t opacity-90",
-                          scenario.isPro
-                            ? "from-[#1c1004]/95 via-[#3b2108]/65 to-transparent"
-                            : "from-[#0a1b33]/95 via-[#132c54]/60 to-transparent"
-                        )}
+                        className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#091833]/85 via-[#091833]/35 to-transparent"
                       />
                       <div className="absolute inset-x-3 top-3 flex flex-wrap items-center justify-between gap-1.5">
-                        <span
-                          className={cn(
-                            "grid size-10 place-items-center rounded-xl bg-gradient-to-br text-lg text-white shadow-sm ring-1 ring-white/25",
-                            scenario.accent
-                          )}
-                        >
-                          {scenario.emoji}
+                        <span className="latin rounded-full bg-iris-deep px-2.5 py-1 text-[10px] font-bold text-white shadow-xs">
+                          {scenario.level}
                         </span>
                         <div className="flex flex-wrap items-center gap-1">
                           {scenario.isPro ? (
@@ -474,30 +464,27 @@ export default function Roleplay() {
                               مجاني ✨
                             </span>
                           )}
-                          <span className="latin rounded-full border border-white/20 bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
-                            {scenario.level}
-                          </span>
-                          <span className="latin inline-flex items-center gap-0.5 rounded-full border border-amber-300/30 bg-black/65 px-2 py-0.5 text-[10px] font-bold text-amber-300">
-                            <Zap className="size-2.5 fill-amber-400 text-amber-400" />
+                          <span className="latin inline-flex items-center gap-0.5 rounded-full bg-paper/95 px-2 py-0.5 text-[10px] font-bold text-amber-700 shadow-xs dark:text-amber-300">
+                            <Zap className="size-2.5 fill-amber-500 text-amber-500" />
                             +{isVip ? scenario.rewardXp * 2 : scenario.rewardXp}
                           </span>
                         </div>
                       </div>
-                      <div className="absolute inset-x-4 bottom-2.5">
-                        <h2 className="line-clamp-1 text-base font-extrabold text-white">
-                          {scenario.titleAr}
-                        </h2>
+                      <div className="absolute inset-x-4 bottom-2">
                         <p
-                          className="latin truncate text-[11px] font-medium text-sky-200"
+                          className="latin truncate text-[11px] font-semibold text-white/95 drop-shadow-xs"
                           dir="ltr"
                         >
-                          {scenario.titleEn} · {scenario.partnerName}
+                          {scenario.emoji} {scenario.titleEn} · {scenario.partnerName}
                         </p>
                       </div>
                     </div>
 
                     <div className="p-5 pb-0">
-                      <p className="text-xs leading-relaxed text-ink-soft sm:text-sm">
+                      <h2 className="line-clamp-1 text-base font-extrabold text-ink transition-colors group-hover:text-iris">
+                        {scenario.titleAr}
+                      </h2>
+                      <p className="mt-1.5 text-xs leading-relaxed text-ink-soft sm:text-sm">
                         {scenario.settingAr}
                       </p>
                     </div>

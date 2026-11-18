@@ -241,40 +241,36 @@ export default function Home() {
                 <Link
                   key={tool.href}
                   href={tool.href}
-                  className={`group relative flex min-h-[225px] flex-col justify-between overflow-hidden rounded-2xl border border-white/15 p-5 shadow-md transition-transform duration-200 hover:-translate-y-1 ${tool.accentBorder}`}
+                  className={`group flex flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#0c1d38] shadow-md transition-transform duration-200 hover:-translate-y-1 ${tool.accentBorder}`}
                 >
-                  <img
-                    src={tool.bgImage}
-                    alt=""
-                    aria-hidden="true"
-                    loading="lazy"
-                    decoding="async"
-                    className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div
-                    aria-hidden="true"
-                    className={`absolute inset-0 bg-gradient-to-t ${tool.overlay}`}
-                  />
-
-                  <div className="relative flex items-center justify-between gap-2">
+                  <div className="relative h-36 w-full overflow-hidden">
+                    <img
+                      src={tool.bgImage}
+                      alt={tool.title}
+                      loading="lazy"
+                      decoding="async"
+                      className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
                     <span
-                      className={`grid size-10 place-items-center rounded-xl border ${tool.iconBg}`}
+                      className={`absolute right-3 top-3 grid size-9 place-items-center rounded-xl border shadow-xs ${tool.iconBg}`}
                     >
-                      <Icon className="size-5" />
+                      <Icon className="size-4" />
                     </span>
-                    <span className="rounded-full border border-white/20 bg-black/55 px-2.5 py-1 text-[10px] font-bold text-white">
+                    <span className="absolute left-3 top-3 rounded-full bg-iris-deep px-2.5 py-1 text-[10px] font-bold text-white shadow-xs">
                       {tool.badge}
                     </span>
                   </div>
 
-                  <div className="relative mt-6">
-                    <h3 className="text-base font-extrabold text-white">
-                      {tool.title}
-                    </h3>
-                    <p className="mt-1.5 text-xs leading-relaxed text-white/85">
-                      {tool.desc}
-                    </p>
-                    <span className="mt-3.5 inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold text-white transition-colors group-hover:bg-white group-hover:text-iris">
+                  <div className="flex flex-1 flex-col justify-between p-4">
+                    <div>
+                      <h3 className="text-base font-extrabold text-white">
+                        {tool.title}
+                      </h3>
+                      <p className="mt-1.5 text-xs leading-relaxed text-white/80">
+                        {tool.desc}
+                      </p>
+                    </div>
+                    <span className="mt-3.5 inline-flex w-fit items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold text-white transition-colors group-hover:bg-white group-hover:text-iris">
                       جرّبها الآن <ArrowLeft className="size-3" />
                     </span>
                   </div>
@@ -422,81 +418,47 @@ export default function Home() {
           </article>
         </div>
 
-        {/* 6 Category Cards — Unique Branded Realistic Backgrounds (Zero Flat White!) */}
+        {/* 6 Category Cards — Clean Sunlit Lifestyle Editorial Cards (matching CourseCard design!) */}
         <div className="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {categories.data
             ?.filter(c => !["kids", "path"].includes(c.slug))
             .map(category => {
               const Icon = categoryIcon(category.icon);
-              const visualMap: Record<
-                string,
-                { img: string; overlay: string; iconBg: string }
-              > = {
-                grammar: {
-                  img: "/img/ui/cat-grammar.webp",
-                  overlay: "from-[#0a1b33]/94 via-[#142f61]/82 to-[#1e40af]/58",
-                  iconBg: "bg-sky-950/75 text-sky-200 border-sky-300/35",
-                },
-                speaking: {
-                  img: "/img/ui/cat-speaking.webp",
-                  overlay: "from-[#062b26]/94 via-[#0d4d42]/82 to-[#0d9488]/58",
-                  iconBg: "bg-emerald-950/75 text-emerald-200 border-emerald-300/35",
-                },
-                vocabulary: {
-                  img: "/img/ui/cat-vocabulary.webp",
-                  overlay: "from-[#1d1145]/94 via-[#371f7a]/82 to-[#6d28d9]/58",
-                  iconBg: "bg-violet-950/75 text-violet-200 border-violet-300/35",
-                },
-                ielts: {
-                  img: "/img/ui/cat-ielts.webp",
-                  overlay: "from-[#330d12]/94 via-[#661924]/82 to-[#b91c1c]/58",
-                  iconBg: "bg-rose-950/75 text-rose-200 border-rose-300/35",
-                },
-                business: {
-                  img: "/img/ui/cat-business.webp",
-                  overlay: "from-[#0d1c36]/94 via-[#1e355e]/82 to-[#b45309]/60",
-                  iconBg: "bg-amber-950/75 text-amber-200 border-amber-300/35",
-                },
-                writing: {
-                  img: "/img/ui/cat-writing.webp",
-                  overlay: "from-[#12263a]/94 via-[#1e4363]/82 to-[#0284c7]/58",
-                  iconBg: "bg-cyan-950/75 text-cyan-200 border-cyan-300/35",
-                },
+              const imgMap: Record<string, string> = {
+                grammar: "/img/ui/cat-grammar.webp",
+                speaking: "/img/ui/cat-speaking.webp",
+                vocabulary: "/img/ui/cat-vocabulary.webp",
+                ielts: "/img/ui/cat-ielts.webp",
+                business: "/img/ui/cat-business.webp",
+                writing: "/img/ui/cat-writing.webp",
               };
-              const v = visualMap[category.slug] ?? visualMap.grammar;
+              const coverSrc = imgMap[category.slug] ?? "/img/ui/cat-grammar.webp";
               return (
                 <Link
                   key={category.id}
                   href={`/courses?category=${category.slug}`}
-                  className="group relative flex min-h-[168px] flex-col justify-between overflow-hidden rounded-3xl border border-white/15 p-5 text-white shadow-md transition-transform duration-200 hover:-translate-y-1 hover:border-sky-300/70 [content-visibility:auto]"
+                  className="card-soft group flex flex-col overflow-hidden [content-visibility:auto]"
                 >
-                  <img
-                    src={v.img}
-                    alt=""
-                    aria-hidden="true"
-                    loading="lazy"
-                    decoding="async"
-                    className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div
-                    aria-hidden="true"
-                    className={`absolute inset-0 bg-gradient-to-t ${v.overlay}`}
-                  />
-                  <div className="relative flex items-start justify-between gap-3">
-                    <span
-                      className={`grid size-11 shrink-0 place-items-center rounded-2xl border ${v.iconBg}`}
-                    >
-                      <Icon className="size-5" strokeWidth={1.8} />
-                    </span>
-                    <span className="latin rounded-full border border-white/20 bg-black/45 px-2.5 py-0.5 text-[10px] font-bold text-white/90">
+                  <div className="relative h-36 w-full overflow-hidden bg-paper-deep">
+                    <img
+                      src={coverSrc}
+                      alt={category.nameAr}
+                      loading="lazy"
+                      decoding="async"
+                      className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <span className="latin absolute left-3 top-3 rounded-full bg-iris-deep px-2.5 py-1 text-[10px] font-bold text-white shadow-xs">
                       {category.nameEn}
                     </span>
+                    <span className="absolute right-3 top-3 grid size-8 place-items-center rounded-full bg-paper/95 text-iris shadow-xs">
+                      <Icon className="size-4" strokeWidth={1.9} />
+                    </span>
                   </div>
-                  <div className="relative mt-4">
-                    <h3 className="text-lg font-extrabold text-white">
+                  <div className="flex flex-1 flex-col p-4">
+                    <h3 className="text-base font-extrabold text-ink transition-colors group-hover:text-iris">
                       {category.nameAr}
                     </h3>
-                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-white/85">
+                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-ink-soft">
                       {category.description}
                     </p>
                   </div>
