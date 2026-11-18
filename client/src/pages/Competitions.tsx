@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CompanionSays, useCompanion } from "@/components/companion";
 import { StudentAvatarBadge } from "@/components/student-avatar-badge";
+import { ReferralCard } from "@/components/referral-card";
 import { useAuth } from "@/contexts/AuthContext";
 import { trpc } from "@/lib/trpc";
 import { soundEffects } from "@/lib/sound-effects";
@@ -163,6 +164,86 @@ export default function Competitions() {
 
           {/* ================= TAB 1: LEADERBOARD & CHALLENGES ================= */}
           <TabsContent value="leaderboard" className="space-y-6">
+            {/* Smart Rank Gap Motivator + Quick XP Boosters */}
+            {(() => {
+              const myEntry = board.data?.myEntry;
+              const aboveEntry =
+                myEntry && myEntry.rank > 1
+                  ? entries.find(e => e.rank === myEntry.rank - 1)
+                  : null;
+              const xpGap = aboveEntry && myEntry ? Math.max(1, aboveEntry.xp - myEntry.xp + 1) : 0;
+              return (
+                <div className="space-y-3">
+                  {myEntry && (
+                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-400/50 bg-gradient-to-r from-amber-500/10 via-card to-iris/10 px-4 py-3 text-xs sm:text-sm">
+                      {myEntry.rank === 1 ? (
+                        <p className="font-bold text-ink">
+                          👑 بطل الصدارة! أنت في <b>المركز الأول</b> دلوقتي بـ{" "}
+                          <span className="latin text-iris">{myEntry.xp} XP</span> — حافظ على القمة!
+                        </p>
+                      ) : aboveEntry ? (
+                        <p className="font-bold text-ink">
+                          🔥 باقي لك <span className="latin text-amber-600 dark:text-amber-400">{xpGap} XP</span> بس وتعدّي{" "}
+                          <span className="text-iris">{aboveEntry.firstName}</span> وتطلع للمركز{" "}
+                          <span className="latin">#{aboveEntry.rank}</span>!
+                        </p>
+                      ) : null}
+                      <span className="latin rounded-full bg-iris-soft px-3 py-1 text-xs font-black text-iris">
+                        #{myEntry.rank} · {myEntry.xp} XP ⚡
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="grid gap-2.5 sm:grid-cols-3">
+                    {[
+                      {
+                        href: "/roleplay",
+                        emoji: "🎭",
+                        title: "محاكي المواقف",
+                        xp: "+30 XP",
+                        sub: "تدرّب بالصوت الآن",
+                      },
+                      {
+                        href: "/flashcards",
+                        emoji: "🃏",
+                        title: "فلاش كاردز الكلمات",
+                        xp: "+10 XP / كلمة",
+                        sub: "5 كلمات يومياً بالصوت",
+                      },
+                      {
+                        href: "/speed-quiz",
+                        emoji: "⚡",
+                        title: "تحدي الـ 60 ثانية",
+                        xp: "+30 XP",
+                        sub: "اكسر الرقم القياسي",
+                      },
+                    ].map(action => (
+                      <Link
+                        key={action.href}
+                        href={action.href}
+                        className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-card px-4 py-3 transition hover:border-iris hover:bg-iris-soft/30"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span className="text-xl">{action.emoji}</span>
+                          <div className="min-w-0">
+                            <p className="truncate text-xs font-bold text-ink">
+                              {action.title}
+                            </p>
+                            <p className="truncate text-[11px] text-ink-soft">
+                              {action.sub}
+                            </p>
+                          </div>
+                        </div>
+                        <span className="latin shrink-0 rounded-full bg-amber-500/15 px-2.5 py-0.5 text-[11px] font-black text-amber-700 dark:text-amber-300">
+                          {action.xp}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* Period Switcher */}
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex flex-wrap gap-2">
@@ -193,6 +274,7 @@ export default function Competitions() {
             </div>
 
             {/* Active Quests for this period */}
+            {user && <ReferralCard />}
             {quests.length > 0 && (
               <div className="grid gap-3 sm:grid-cols-2">
                 {quests.map(quest => {

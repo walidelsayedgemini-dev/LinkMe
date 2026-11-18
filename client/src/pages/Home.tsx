@@ -1,14 +1,19 @@
 import {
   ArrowLeft,
   ArrowDown,
+  Award,
   BookOpen,
   Check,
   Clock3,
   Gauge,
   GraduationCap,
   MessageCircle,
+  QrCode,
   Sparkles,
+  Star,
+  Trophy,
   Video,
+  Zap,
 } from "lucide-react";
 import { useEffect } from "react";
 import { Link } from "wouter";
@@ -155,6 +160,88 @@ export default function Home() {
 
       <section className="container pt-6">
         <CompanionMotivationalBanner className="mb-6" />
+
+        {/* Interactive Free Playground Showcase */}
+        <div className="mb-6 rounded-3xl border border-iris/20 bg-gradient-to-br from-iris/[0.06] via-card to-amber-500/[0.05] p-5 sm:p-7">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-iris-soft px-3 py-1 text-[11px] font-bold text-iris">
+                <Sparkles className="size-3.5" /> جرّب مجاناً من غير تسجيل
+              </span>
+              <h2 className="mt-2 text-xl font-bold text-ink sm:text-2xl">
+                أدوات Link Me التفاعلية — اتعلّم والعب كل يوم 🔥
+              </h2>
+            </div>
+            <Link
+              href="/competitions"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-iris hover:underline"
+            >
+              ادخل ساحة التحديات <ArrowLeft className="size-3.5" />
+            </Link>
+          </div>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                href: "/roleplay",
+                emoji: "🎭",
+                badge: "بالصوت والميكروفون",
+                title: "محاكي المواقف الحقيقية",
+                desc: "اتدرّب على الإنترفيو، الكافيه، الفندق واجتماعات الشغل بصوتك.",
+                accent: "hover:border-indigo-400",
+              },
+              {
+                href: "/flashcards",
+                emoji: "🃏",
+                badge: "48 بطاقة A1–B2",
+                title: "فلاش كاردز الكلمات",
+                desc: "راجع 5 كلمات يومياً بالنطق الأمريكي البطيء والعادي والشرح المصري.",
+                accent: "hover:border-emerald-400",
+              },
+              {
+                href: "/speed-quiz",
+                emoji: "⚡",
+                badge: "60 ثانية · Combo",
+                title: "تحدي الـ 60 ثانية اليومي",
+                desc: "5 أسئلة سريعة بتايمر وكارت نتيجة جاهز للمشاركة على واتساب.",
+                accent: "hover:border-amber-400",
+              },
+              {
+                href: "/competitions",
+                emoji: "🏆",
+                badge: "أفتارات وسكنات",
+                title: "دوري المسابقات والحماسة",
+                desc: "نافس أبطال اليوم والأسبوع والشهر والسنة وافتح سكنات حصرية!",
+                accent: "hover:border-purple-400",
+              },
+            ].map(tool => (
+              <Link
+                key={tool.href}
+                href={tool.href}
+                className={`group flex flex-col justify-between rounded-2xl border border-line bg-card p-4 shadow-xs transition hover:-translate-y-0.5 ${tool.accent}`}
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-2xl">{tool.emoji}</span>
+                    <span className="rounded-full bg-paper-deep px-2.5 py-0.5 text-[10px] font-bold text-ink-soft">
+                      {tool.badge}
+                    </span>
+                  </div>
+                  <h3 className="mt-3 text-sm font-bold text-ink group-hover:text-iris">
+                    {tool.title}
+                  </h3>
+                  <p className="mt-1 text-xs leading-relaxed text-ink-soft">
+                    {tool.desc}
+                  </p>
+                </div>
+                <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold text-iris">
+                  جرّبها الآن <ArrowLeft className="size-3" />
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-line bg-card p-5">
           <p className="text-sm leading-relaxed text-ink-soft">
             ليه Link Me؟ فهم وممارسة ومتابعة —{" "}
@@ -443,6 +530,79 @@ export default function Home() {
         />
         <div className="mt-8">
           <PlanCards />
+        </div>
+      </section>
+
+      <section className="home-section container">
+        <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+          {/* Student Testimonials */}
+          <div className="rounded-3xl border border-line bg-card p-6 sm:p-7">
+            <div className="flex items-center justify-between gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-700 dark:text-amber-300">
+                <Star className="size-3.5 fill-amber-500 text-amber-500" /> آراء
+                طلبة وأولياء أمور Link Me
+              </span>
+              <span className="latin text-xs font-bold text-ink-soft">
+                4.9 / 5.0 ⭐
+              </span>
+            </div>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {[
+                {
+                  name: "سلمى — مستوى B1",
+                  quote:
+                    "أول مرة أتكلم في إنترفيو إنجليزي من غير ما أقف وأترجم في دماغي! محاكي المواقف والفلاش كاردز فرقوا معايا جداً.",
+                },
+                {
+                  name: "ولية أمر عمر — 5 ابتدائي",
+                  quote:
+                    "ابني بقى بيفتح الموقع لوحده عشان يحافظ على شعلة الحماسة والأفتار، وتقرير المتابعة اللي بيجيلي على واتساب مطمّني جداً.",
+                },
+              ].map(review => (
+                <div
+                  key={review.name}
+                  className="rounded-2xl border border-line bg-paper-deep/50 p-4"
+                >
+                  <p className="text-xs leading-relaxed text-ink">
+                    “{review.quote}”
+                  </p>
+                  <p className="mt-2.5 text-[11px] font-bold text-iris">
+                    — {review.name}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Official QR Certificate Verification Card */}
+          <div className="flex flex-col justify-between rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-card to-iris/5 p-6 sm:p-7">
+            <div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                <QrCode className="size-3.5" /> شهادات معتمدة قابلة للتحقق
+              </span>
+              <h3 className="mt-3 text-xl font-bold text-ink">
+                شهادة إتقان رسمية بـ QR Code 🎓
+              </h3>
+              <p className="mt-2 text-xs leading-relaxed text-ink-soft">
+                كل شهادة بتصدر من Link Me ليها رقم تسلسلي فريد وكود QR يقدر أي
+                مدير توظيف أو شركة يمسحه ويتأكد من صحتها فوراً على موقعنا.
+              </p>
+            </div>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <Button
+                asChild
+                size="sm"
+                className="rounded-full bg-emerald-600 text-white hover:bg-emerald-700"
+              >
+                <Link href="/verify">
+                  <Award className="me-1.5 size-4" /> تحقق من شهادة الآن
+                </Link>
+              </Button>
+              <Button asChild size="sm" variant="outline" className="rounded-full">
+                <Link href="/level-test">ابدأ اختبار المستوى</Link>
+              </Button>
+            </div>
+          </div>
         </div>
       </section>
 

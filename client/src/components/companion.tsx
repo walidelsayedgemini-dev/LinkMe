@@ -315,7 +315,7 @@ export function CompanionFloatingWidget() {
   const other = COMPANIONS[otherId];
 
   return (
-    <div className="fixed bottom-4 start-4 sm:bottom-6 sm:start-6 z-40 flex flex-col items-start gap-2 select-none" dir="rtl">
+    <div className="fixed bottom-20 start-3.5 md:bottom-6 md:start-6 z-40 flex flex-col items-start gap-2 select-none" dir="rtl">
       {expanded && (
         <div className="w-[min(calc(100vw-2rem),18rem)] rounded-3xl border border-line bg-card/95 p-4 shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-bottom-3 duration-300">
           <div className="flex items-center justify-between pb-2 border-b border-line">

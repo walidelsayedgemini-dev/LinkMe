@@ -45,7 +45,7 @@ const COLUMNS = [
 
 export function SiteFooter() {
   return (
-    <footer className="relative mt-16 sm:mt-20 border-t border-line bg-paper-deep pb-16 sm:pb-0">
+    <footer className="relative mt-16 sm:mt-20 border-t border-line bg-paper-deep pb-24 md:pb-0">
       <div className="container grid gap-9 py-12 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
         <div>
           <Logo />

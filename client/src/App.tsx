@@ -46,6 +46,7 @@ import { CompanionFloatingWidget, CompanionSelectionDialog } from "./components/
 import { WhatsAppFab } from "./components/whatsapp";
 import { CornerProps } from "@/components/decor";
 import { SiteHeader } from "@/components/layout/site-header";
+import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import { StudyAtmosphere } from "@/components/study-atmosphere";
 import { PwaInstallPrompt } from "@/components/pwa-install-prompt";
 
@@ -201,6 +202,7 @@ function App() {
               </div>
               <FloatingCompanion />
               <FloatingWhatsApp />
+              <MobileBottomNav />
               <PwaInstallPrompt />
               <CompanionSelectionDialog />
             </CompanionProvider>
