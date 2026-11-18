@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { getAvatarPreset, getStreakSkin } from "@shared/gamification-catalog";
 
@@ -16,11 +17,12 @@ export function StudentAvatarBadge({
 }) {
   const avatar = getAvatarPreset(avatarPreset);
   const skin = getStreakSkin(equippedSkin);
+  const [imgFailed, setImgFailed] = useState(false);
 
   const dims = {
     sm: "size-9 text-lg",
-    md: "size-11 text-xl",
-    lg: "size-16 text-3xl",
+    md: "size-12 text-xl",
+    lg: "size-[72px] text-3xl",
   }[size];
 
   const badgeDims = {
@@ -33,14 +35,25 @@ export function StudentAvatarBadge({
     <div className={cn("relative inline-flex shrink-0", className)}>
       <div
         className={cn(
-          "grid place-items-center rounded-full bg-gradient-to-br text-white select-none transition-transform",
+          "grid place-items-center overflow-hidden rounded-full bg-gradient-to-br text-white select-none transition-transform",
           avatar.bgClass,
           skin.ringClass,
           dims
         )}
         title={`${avatar.label} · ${skin.name}`}
       >
-        <span aria-hidden="true">{avatar.emoji}</span>
+        {!imgFailed && avatar.imageUrl ? (
+          <img
+            src={avatar.imageUrl}
+            alt={avatar.label}
+            loading="lazy"
+            decoding="async"
+            onError={() => setImgFailed(true)}
+            className="size-full object-cover"
+          />
+        ) : (
+          <span aria-hidden="true">{avatar.emoji}</span>
+        )}
       </div>
       {showSkinBadge && (skin.minStreak > 0 || skin.isPro) && (
         <span

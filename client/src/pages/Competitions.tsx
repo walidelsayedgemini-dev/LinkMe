@@ -510,7 +510,7 @@ export default function Competitions() {
                       <StudentAvatarBadge
                         avatarPreset={avatar.id}
                         equippedSkin={currentSkin}
-                        size="md"
+                        size="lg"
                         showSkinBadge={false}
                       />
                       <span className="text-xs font-bold text-ink">{avatar.label}</span>

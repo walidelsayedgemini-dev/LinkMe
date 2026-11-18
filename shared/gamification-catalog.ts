@@ -16,32 +16,39 @@ export interface AvatarPreset {
   id: string;
   label: string;
   emoji: string;
+  imageUrl: string;
   bgClass: string;
   isPro?: boolean;
 }
 
 export const AVATAR_PRESETS: AvatarPreset[] = [
-  { id: "lion", label: "شبل الطلاقة", emoji: "🦁", bgClass: "from-blue-500 to-indigo-600" },
-  { id: "flower", label: "نجمة اللطف", emoji: "🌸", bgClass: "from-pink-400 to-rose-500" },
-  { id: "rocket", label: "رائد الفضاء", emoji: "🚀", bgClass: "from-violet-500 to-purple-700" },
-  { id: "owl", label: "البومة الذكية", emoji: "🦉", bgClass: "from-slate-700 to-indigo-900" },
-  { id: "fox", label: "الثعلب السريع", emoji: "🦊", bgClass: "from-orange-400 to-amber-600" },
-  { id: "cat", label: "القطة الكيوت", emoji: "🐱", bgClass: "from-fuchsia-400 to-pink-500" },
-  { id: "panda", label: "الباندا الهادئ", emoji: "🐼", bgClass: "from-emerald-400 to-teal-600" },
-  { id: "tiger", label: "النمر المتحمس", emoji: "🐯", bgClass: "from-amber-500 to-red-500" },
-  { id: "butterfly", label: "فراشة الإنجليزي", emoji: "🦋", bgClass: "from-sky-400 to-cyan-600" },
-  { id: "crown", label: "بطل القمة", emoji: "👑", bgClass: "from-yellow-400 to-amber-600" },
-  { id: "headphones", label: "عاشق النطق", emoji: "🎧", bgClass: "from-cyan-500 to-blue-600" },
-  { id: "book", label: "عبقري الكلمات", emoji: "📚", bgClass: "from-teal-500 to-emerald-700" },
+  { id: "lion", label: "شبل الطلاقة", emoji: "🦁", imageUrl: "/avatars/lion.webp", bgClass: "from-blue-500 to-indigo-600" },
+  { id: "flower", label: "نجمة اللطف", emoji: "🌸", imageUrl: "/avatars/flower.webp", bgClass: "from-pink-400 to-rose-500" },
+  { id: "rocket", label: "رائد الفضاء", emoji: "🚀", imageUrl: "/avatars/rocket.webp", bgClass: "from-violet-500 to-purple-700" },
+  { id: "cat", label: "القطة الكيوت", emoji: "🐱", imageUrl: "/avatars/cat.webp", bgClass: "from-fuchsia-400 to-pink-500" },
+  { id: "butterfly", label: "فراشة الإنجليزي", emoji: "🦋", imageUrl: "/avatars/butterfly.webp", bgClass: "from-sky-400 to-cyan-600" },
+  { id: "headphones", label: "عاشق النطق", emoji: "🎧", imageUrl: "/avatars/headphones.webp", bgClass: "from-cyan-500 to-blue-600" },
+  { id: "book", label: "عبقري الكلمات", emoji: "📚", imageUrl: "/avatars/book.webp", bgClass: "from-teal-500 to-emerald-700" },
+  { id: "yassin_hero", label: "شخصية ياسين", emoji: "⚡", imageUrl: "/avatars/yassin_hero.webp", bgClass: "from-sky-500 to-blue-700" },
+  { id: "khadija_star", label: "شخصية خديجة", emoji: "✨", imageUrl: "/avatars/khadija_star.webp", bgClass: "from-pink-500 to-rose-600" },
   // Exclusive VIP / PRO Avatars
-  { id: "vip_king", label: "ملك الإنجليزي PRO", emoji: "🤴", bgClass: "from-amber-400 via-yellow-500 to-orange-600", isPro: true },
-  { id: "vip_queen", label: "ملكة الطلاقة PRO", emoji: "👸", bgClass: "from-rose-400 via-fuchsia-500 to-purple-700", isPro: true },
-  { id: "vip_eagle", label: "نسر القمة PRO", emoji: "🦅", bgClass: "from-sky-500 via-indigo-600 to-slate-900", isPro: true },
-  { id: "vip_astronaut", label: "رائد المجرة PRO", emoji: "👨‍🚀", bgClass: "from-purple-600 via-indigo-600 to-cyan-500", isPro: true },
+  { id: "vip_king", label: "ملك الإنجليزي PRO", emoji: "🤴", imageUrl: "/avatars/vip_king.webp", bgClass: "from-amber-400 via-yellow-500 to-orange-600", isPro: true },
+  { id: "vip_queen", label: "ملكة الطلاقة PRO", emoji: "👸", imageUrl: "/avatars/vip_queen.webp", bgClass: "from-rose-400 via-fuchsia-500 to-purple-700", isPro: true },
+  { id: "vip_eagle", label: "نسر القمة PRO", emoji: "🦅", imageUrl: "/avatars/vip_eagle.webp", bgClass: "from-sky-500 via-indigo-600 to-slate-900", isPro: true },
+  { id: "vip_astronaut", label: "رائد المجرة PRO", emoji: "👨‍🚀", imageUrl: "/avatars/vip_astronaut.webp", bgClass: "from-purple-600 via-indigo-600 to-cyan-500", isPro: true },
 ];
 
+const LEGACY_AVATAR_FALLBACK: Record<string, string> = {
+  owl: "book",
+  fox: "lion",
+  panda: "cat",
+  tiger: "yassin_hero",
+  crown: "vip_king",
+};
+
 export function getAvatarPreset(id?: string | null): AvatarPreset {
-  return AVATAR_PRESETS.find(a => a.id === id) ?? AVATAR_PRESETS[0];
+  const resolved = (id && LEGACY_AVATAR_FALLBACK[id]) || id;
+  return AVATAR_PRESETS.find(a => a.id === resolved) ?? AVATAR_PRESETS[0];
 }
 
 export interface StreakSkin {
@@ -236,18 +243,18 @@ interface VirtualCompetitorSeed {
  * energetic, motivating leaderboard across daily, weekly, monthly, and yearly challenges.
  */
 const VIRTUAL_SEEDS: VirtualCompetitorSeed[] = [
-  { id: "v1", firstName: "سلمى", avatarPreset: "flower", streakDays: 34, equippedSkin: "diamond_aura", baseDaily: 115, baseWeekly: 680, baseMonthly: 2450, baseYearly: 18400 },
+  { id: "v1", firstName: "سلمى", avatarPreset: "vip_queen", streakDays: 34, equippedSkin: "vip_cosmic_galaxy", baseDaily: 115, baseWeekly: 680, baseMonthly: 2450, baseYearly: 18400 },
   { id: "v2", firstName: "يوسف", avatarPreset: "lion", streakDays: 21, equippedSkin: "golden_star", baseDaily: 95, baseWeekly: 590, baseMonthly: 2120, baseYearly: 15900 },
   { id: "v3", firstName: "ملك", avatarPreset: "butterfly", streakDays: 16, equippedSkin: "golden_star", baseDaily: 130, baseWeekly: 720, baseMonthly: 2290, baseYearly: 14200 },
   { id: "v4", firstName: "آدم", avatarPreset: "rocket", streakDays: 11, equippedSkin: "silver_spark", baseDaily: 80, baseWeekly: 460, baseMonthly: 1750, baseYearly: 12100 },
-  { id: "v5", firstName: "نور", avatarPreset: "cat", streakDays: 63, equippedSkin: "royal_crown", baseDaily: 145, baseWeekly: 810, baseMonthly: 2890, baseYearly: 24600 },
-  { id: "v6", firstName: "زياد", avatarPreset: "fox", streakDays: 9, equippedSkin: "silver_spark", baseDaily: 65, baseWeekly: 390, baseMonthly: 1480, baseYearly: 9800 },
-  { id: "v7", firstName: "فريدة", avatarPreset: "crown", streakDays: 18, equippedSkin: "golden_star", baseDaily: 105, baseWeekly: 615, baseMonthly: 1990, baseYearly: 13700 },
+  { id: "v5", firstName: "نور", avatarPreset: "vip_king", streakDays: 63, equippedSkin: "vip_gold_emperor", baseDaily: 145, baseWeekly: 810, baseMonthly: 2890, baseYearly: 24600 },
+  { id: "v6", firstName: "زياد", avatarPreset: "yassin_hero", streakDays: 9, equippedSkin: "silver_spark", baseDaily: 65, baseWeekly: 390, baseMonthly: 1480, baseYearly: 9800 },
+  { id: "v7", firstName: "فريدة", avatarPreset: "khadija_star", streakDays: 18, equippedSkin: "golden_star", baseDaily: 105, baseWeekly: 615, baseMonthly: 1990, baseYearly: 13700 },
   { id: "v8", firstName: "عمر", avatarPreset: "headphones", streakDays: 5, equippedSkin: "bronze_flame", baseDaily: 55, baseWeekly: 310, baseMonthly: 1180, baseYearly: 8200 },
-  { id: "v9", firstName: "هنا", avatarPreset: "panda", streakDays: 14, equippedSkin: "golden_star", baseDaily: 90, baseWeekly: 520, baseMonthly: 1860, baseYearly: 11500 },
-  { id: "v10", firstName: "كريم", avatarPreset: "tiger", streakDays: 4, equippedSkin: "bronze_flame", baseDaily: 45, baseWeekly: 270, baseMonthly: 940, baseYearly: 6900 },
-  { id: "v11", firstName: "جنى", avatarPreset: "book", streakDays: 8, equippedSkin: "silver_spark", baseDaily: 70, baseWeekly: 430, baseMonthly: 1590, baseYearly: 10400 },
-  { id: "v12", firstName: "طارق", avatarPreset: "owl", streakDays: 31, equippedSkin: "diamond_aura", baseDaily: 120, baseWeekly: 700, baseMonthly: 2610, baseYearly: 20100 },
+  { id: "v9", firstName: "هنا", avatarPreset: "cat", streakDays: 14, equippedSkin: "golden_star", baseDaily: 90, baseWeekly: 520, baseMonthly: 1860, baseYearly: 11500 },
+  { id: "v10", firstName: "كريم", avatarPreset: "book", streakDays: 4, equippedSkin: "bronze_flame", baseDaily: 45, baseWeekly: 270, baseMonthly: 940, baseYearly: 6900 },
+  { id: "v11", firstName: "جنى", avatarPreset: "flower", streakDays: 8, equippedSkin: "silver_spark", baseDaily: 70, baseWeekly: 430, baseMonthly: 1590, baseYearly: 10400 },
+  { id: "v12", firstName: "طارق", avatarPreset: "vip_eagle", streakDays: 31, equippedSkin: "vip_emerald_elite", baseDaily: 120, baseWeekly: 700, baseMonthly: 2610, baseYearly: 20100 },
   { id: "v13", firstName: "مريم", avatarPreset: "flower", streakDays: 6, equippedSkin: "bronze_flame", baseDaily: 60, baseWeekly: 345, baseMonthly: 1290, baseYearly: 8700 },
   { id: "v14", firstName: "حمزة", avatarPreset: "rocket", streakDays: 3, equippedSkin: "bronze_flame", baseDaily: 35, baseWeekly: 215, baseMonthly: 810, baseYearly: 5400 },
 ];

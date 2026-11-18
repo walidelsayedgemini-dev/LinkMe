@@ -66,6 +66,9 @@ describe("gamification catalog & student privacy", () => {
     }
     expect(vipSkins.length).toBeGreaterThanOrEqual(3);
     expect(AVATAR_PRESETS.filter(a => a.isPro).length).toBeGreaterThanOrEqual(4);
+    for (const av of AVATAR_PRESETS) {
+      expect(av.imageUrl).toMatch(/^\/avatars\/[a-z0-9_]+\.webp$/);
+    }
   });
 
   it("generates tamper-proof referral codes and parses valid ones", () => {
