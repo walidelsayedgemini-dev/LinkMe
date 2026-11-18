@@ -161,84 +161,125 @@ export default function Home() {
       <section className="container pt-6">
         <CompanionMotivationalBanner className="mb-6" />
 
-        {/* Interactive Free Playground Showcase */}
-        <div className="mb-6 rounded-3xl border border-iris/20 bg-gradient-to-br from-iris/[0.06] via-card to-amber-500/[0.05] p-5 sm:p-7">
-          <div className="flex flex-wrap items-end justify-between gap-3">
+        {/* Interactive Free Playground Showcase — Rich Branded Visual Cards */}
+        <div className="relative mb-6 overflow-hidden rounded-[28px] border border-iris/20 bg-gradient-to-br from-[#0e2248] via-[#173673] to-[#1e40af] p-5 sm:p-8 text-white shadow-[0_24px_60px_-25px_rgba(37,99,255,0.45)]">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-24 -end-24 size-72 rounded-full bg-sky-400/20 blur-3xl"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -bottom-24 -start-24 size-72 rounded-full bg-amber-400/15 blur-3xl"
+          />
+
+          <div className="relative flex flex-wrap items-end justify-between gap-3">
             <div>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-iris-soft px-3 py-1 text-[11px] font-bold text-iris">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold text-amber-300 backdrop-blur-sm">
                 <Sparkles className="size-3.5" /> جرّب مجاناً من غير تسجيل
               </span>
-              <h2 className="mt-2 text-xl font-bold text-ink sm:text-2xl">
+              <h2 className="mt-2.5 text-xl font-extrabold text-white sm:text-3xl">
                 أدوات Link Me التفاعلية — اتعلّم والعب كل يوم 🔥
               </h2>
             </div>
             <Link
               href="/competitions"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-iris hover:underline"
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs font-bold text-white backdrop-blur-sm transition hover:bg-white hover:text-iris"
             >
               ادخل ساحة التحديات <ArrowLeft className="size-3.5" />
             </Link>
           </div>
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="relative mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
               {
                 href: "/roleplay",
-                emoji: "🎭",
+                bgImage: "/img/cafe.webp",
+                overlay: "from-[#0b1736]/95 via-[#132a5c]/80 to-[#1e3a8a]/55",
+                accentBorder: "hover:border-sky-300/80",
                 badge: "22 موقف بالصوت",
                 title: "محاكي المواقف الحقيقية",
                 desc: "إنترفيو، آيلتس، تفاوض على المرتب، سفر، فندق واجتماعات Zoom بصوتك.",
-                accent: "hover:border-indigo-400",
+                icon: MessageCircle,
+                iconBg: "bg-sky-400/20 text-sky-200 border-sky-300/30",
               },
               {
                 href: "/flashcards",
-                emoji: "🃏",
-                badge: "180 بطاقة A1–C1 + IELTS",
+                bgImage: "/img/pronunciation.webp",
+                overlay: "from-[#062b26]/95 via-[#0d4a40]/80 to-[#0f766e]/55",
+                accentBorder: "hover:border-emerald-300/80",
+                badge: "180 بطاقة · 8 حزم",
                 title: "فلاش كاردز الكلمات",
-                desc: "8 حزم صوتية (A1–C1، آيلتس، بزنس وتعبيرات Native) مع ملخصات PDF.",
-                accent: "hover:border-emerald-400",
+                desc: "A1–C1 + IELTS + بزنس + تعبيرات Native بالنطق الأمريكي وملخصات PDF.",
+                icon: BookOpen,
+                iconBg: "bg-emerald-400/20 text-emerald-200 border-emerald-300/30",
               },
               {
                 href: "/speed-quiz",
-                emoji: "⚡",
+                bgImage: "/img/ielts.webp",
+                overlay: "from-[#351806]/95 via-[#6b2d0c]/80 to-[#b45309]/55",
+                accentBorder: "hover:border-amber-300/80",
                 badge: "100 سؤال · ماراثون PRO",
                 title: "تحدي الـ 60 ثانية اليومي",
-                desc: "بنك 100 سؤال سريع بتايمر وكومبو وكارت نتيجة للمشاركة على واتساب.",
-                accent: "hover:border-amber-400",
+                desc: "أسئلة سريعة بتايمر وكومبو وكارت نتيجة جاهز للمشاركة على واتساب.",
+                icon: Zap,
+                iconBg: "bg-amber-400/25 text-amber-200 border-amber-300/35",
               },
               {
                 href: "/competitions",
-                emoji: "🏆",
-                badge: "أفتارات وسكنات",
+                bgImage: "/avatars/vip_king.webp",
+                overlay: "from-[#220e42]/95 via-[#3b166e]/80 to-[#6d28d9]/55",
+                accentBorder: "hover:border-purple-300/80",
+                badge: "100 أفتار + سكنات 👑",
                 title: "دوري المسابقات والحماسة",
-                desc: "نافس أبطال اليوم والأسبوع والشهر والسنة وافتح سكنات حصرية!",
-                accent: "hover:border-purple-400",
+                desc: "نافس أبطال اليوم والأسبوع والشهر والسنة واختار من 100 أفتار فخم!",
+                icon: Trophy,
+                iconBg: "bg-purple-400/25 text-purple-200 border-purple-300/35",
               },
-            ].map(tool => (
-              <Link
-                key={tool.href}
-                href={tool.href}
-                className={`group flex flex-col justify-between rounded-2xl border border-line bg-card p-4 shadow-xs transition hover:-translate-y-0.5 ${tool.accent}`}
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-2xl">{tool.emoji}</span>
-                    <span className="rounded-full bg-paper-deep px-2.5 py-0.5 text-[10px] font-bold text-ink-soft">
+            ].map(tool => {
+              const Icon = tool.icon;
+              return (
+                <Link
+                  key={tool.href}
+                  href={tool.href}
+                  className={`group relative flex min-h-[225px] flex-col justify-between overflow-hidden rounded-2xl border border-white/15 p-5 shadow-md transition duration-300 hover:-translate-y-1 ${tool.accentBorder}`}
+                >
+                  <img
+                    src={tool.bgImage}
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                    className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div
+                    aria-hidden="true"
+                    className={`absolute inset-0 bg-gradient-to-t ${tool.overlay}`}
+                  />
+
+                  <div className="relative flex items-center justify-between gap-2">
+                    <span
+                      className={`grid size-10 place-items-center rounded-xl border backdrop-blur-md ${tool.iconBg}`}
+                    >
+                      <Icon className="size-5" />
+                    </span>
+                    <span className="rounded-full border border-white/20 bg-black/30 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur-md">
                       {tool.badge}
                     </span>
                   </div>
-                  <h3 className="mt-3 text-sm font-bold text-ink group-hover:text-iris">
-                    {tool.title}
-                  </h3>
-                  <p className="mt-1 text-xs leading-relaxed text-ink-soft">
-                    {tool.desc}
-                  </p>
-                </div>
-                <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold text-iris">
-                  جرّبها الآن <ArrowLeft className="size-3" />
-                </span>
-              </Link>
-            ))}
+
+                  <div className="relative mt-6">
+                    <h3 className="text-base font-extrabold text-white">
+                      {tool.title}
+                    </h3>
+                    <p className="mt-1.5 text-xs leading-relaxed text-white/85">
+                      {tool.desc}
+                    </p>
+                    <span className="mt-3.5 inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold text-white backdrop-blur-sm transition group-hover:bg-white group-hover:text-iris">
+                      جرّبها الآن <ArrowLeft className="size-3" />
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
 

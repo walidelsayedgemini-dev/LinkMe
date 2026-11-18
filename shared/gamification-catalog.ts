@@ -1,6 +1,13 @@
 /**
- * Link Me — Shared Avatars, Streak Skins, Competitions, and Privacy Helpers
+ * Link Me — Shared Avatars (100 Illustrated Portraits!), Streak Skins, Competitions, and Privacy Helpers
  */
+import {
+  AVATAR_CATEGORIES,
+  EXPANDED_AVATARS_87,
+  type AvatarCategory,
+} from "./avatars-100";
+
+export { AVATAR_CATEGORIES, type AvatarCategory };
 
 /**
  * Privacy helper: strictly returns ONLY the first name of a student so
@@ -18,24 +25,30 @@ export interface AvatarPreset {
   emoji: string;
   imageUrl: string;
   bgClass: string;
+  category?: AvatarCategory;
   isPro?: boolean;
 }
 
+const PIXAR_3D_AVATARS: AvatarPreset[] = [
+  { id: "lion", label: "شبل الطلاقة", emoji: "🦁", imageUrl: "/avatars/lion.webp", bgClass: "from-blue-500 to-indigo-600", category: "pixar3d" },
+  { id: "flower", label: "نجمة اللطف", emoji: "🌸", imageUrl: "/avatars/flower.webp", bgClass: "from-pink-400 to-rose-500", category: "pixar3d" },
+  { id: "rocket", label: "رائد الفضاء", emoji: "🚀", imageUrl: "/avatars/rocket.webp", bgClass: "from-violet-500 to-purple-700", category: "pixar3d" },
+  { id: "cat", label: "القطة الكيوت", emoji: "🐱", imageUrl: "/avatars/cat.webp", bgClass: "from-fuchsia-400 to-pink-500", category: "pixar3d" },
+  { id: "butterfly", label: "فراشة الإنجليزي", emoji: "🦋", imageUrl: "/avatars/butterfly.webp", bgClass: "from-sky-400 to-cyan-600", category: "pixar3d" },
+  { id: "headphones", label: "عاشق النطق", emoji: "🎧", imageUrl: "/avatars/headphones.webp", bgClass: "from-cyan-500 to-blue-600", category: "pixar3d" },
+  { id: "book", label: "عبقري الكلمات", emoji: "📚", imageUrl: "/avatars/book.webp", bgClass: "from-teal-500 to-emerald-700", category: "pixar3d" },
+  { id: "yassin_hero", label: "شخصية ياسين", emoji: "⚡", imageUrl: "/avatars/yassin_hero.webp", bgClass: "from-sky-500 to-blue-700", category: "pixar3d" },
+  { id: "khadija_star", label: "شخصية خديجة", emoji: "✨", imageUrl: "/avatars/khadija_star.webp", bgClass: "from-pink-500 to-rose-600", category: "pixar3d" },
+  // Exclusive 3D VIP / PRO Avatars
+  { id: "vip_king", label: "ملك الإنجليزي 3D PRO", emoji: "🤴", imageUrl: "/avatars/vip_king.webp", bgClass: "from-amber-400 via-yellow-500 to-orange-600", category: "pixar3d", isPro: true },
+  { id: "vip_queen", label: "ملكة الطلاقة 3D PRO", emoji: "👸", imageUrl: "/avatars/vip_queen.webp", bgClass: "from-rose-400 via-fuchsia-500 to-purple-700", category: "pixar3d", isPro: true },
+  { id: "vip_eagle", label: "نسر القمة 3D PRO", emoji: "🦅", imageUrl: "/avatars/vip_eagle.webp", bgClass: "from-sky-500 via-indigo-600 to-slate-900", category: "pixar3d", isPro: true },
+  { id: "vip_astronaut", label: "رائد المجرة 3D PRO", emoji: "👨‍🚀", imageUrl: "/avatars/vip_astronaut.webp", bgClass: "from-purple-600 via-indigo-600 to-cyan-500", category: "pixar3d", isPro: true },
+];
+
 export const AVATAR_PRESETS: AvatarPreset[] = [
-  { id: "lion", label: "شبل الطلاقة", emoji: "🦁", imageUrl: "/avatars/lion.webp", bgClass: "from-blue-500 to-indigo-600" },
-  { id: "flower", label: "نجمة اللطف", emoji: "🌸", imageUrl: "/avatars/flower.webp", bgClass: "from-pink-400 to-rose-500" },
-  { id: "rocket", label: "رائد الفضاء", emoji: "🚀", imageUrl: "/avatars/rocket.webp", bgClass: "from-violet-500 to-purple-700" },
-  { id: "cat", label: "القطة الكيوت", emoji: "🐱", imageUrl: "/avatars/cat.webp", bgClass: "from-fuchsia-400 to-pink-500" },
-  { id: "butterfly", label: "فراشة الإنجليزي", emoji: "🦋", imageUrl: "/avatars/butterfly.webp", bgClass: "from-sky-400 to-cyan-600" },
-  { id: "headphones", label: "عاشق النطق", emoji: "🎧", imageUrl: "/avatars/headphones.webp", bgClass: "from-cyan-500 to-blue-600" },
-  { id: "book", label: "عبقري الكلمات", emoji: "📚", imageUrl: "/avatars/book.webp", bgClass: "from-teal-500 to-emerald-700" },
-  { id: "yassin_hero", label: "شخصية ياسين", emoji: "⚡", imageUrl: "/avatars/yassin_hero.webp", bgClass: "from-sky-500 to-blue-700" },
-  { id: "khadija_star", label: "شخصية خديجة", emoji: "✨", imageUrl: "/avatars/khadija_star.webp", bgClass: "from-pink-500 to-rose-600" },
-  // Exclusive VIP / PRO Avatars
-  { id: "vip_king", label: "ملك الإنجليزي PRO", emoji: "🤴", imageUrl: "/avatars/vip_king.webp", bgClass: "from-amber-400 via-yellow-500 to-orange-600", isPro: true },
-  { id: "vip_queen", label: "ملكة الطلاقة PRO", emoji: "👸", imageUrl: "/avatars/vip_queen.webp", bgClass: "from-rose-400 via-fuchsia-500 to-purple-700", isPro: true },
-  { id: "vip_eagle", label: "نسر القمة PRO", emoji: "🦅", imageUrl: "/avatars/vip_eagle.webp", bgClass: "from-sky-500 via-indigo-600 to-slate-900", isPro: true },
-  { id: "vip_astronaut", label: "رائد المجرة PRO", emoji: "👨‍🚀", imageUrl: "/avatars/vip_astronaut.webp", bgClass: "from-purple-600 via-indigo-600 to-cyan-500", isPro: true },
+  ...PIXAR_3D_AVATARS,
+  ...EXPANDED_AVATARS_87,
 ];
 
 const LEGACY_AVATAR_FALLBACK: Record<string, string> = {

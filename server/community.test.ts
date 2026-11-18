@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   AVATAR_PRESETS,
@@ -49,9 +51,9 @@ describe("gamification catalog & student privacy", () => {
     }
   });
 
-  it("provides selectable avatars and streak-gated skins with safe fallbacks", () => {
-    expect(AVATAR_PRESETS.length).toBeGreaterThanOrEqual(12);
-    expect(STREAK_SKINS.length).toBeGreaterThanOrEqual(6);
+  it("provides 100 illustrated WebP avatars and streak-gated skins with safe fallbacks", () => {
+    expect(AVATAR_PRESETS.length).toBe(100);
+    expect(STREAK_SKINS.length).toBeGreaterThanOrEqual(9);
     expect(getAvatarPreset("unknown-id").id).toBe(AVATAR_PRESETS[0].id);
     expect(getStreakSkin("unknown-skin").id).toBe(STREAK_SKINS[0].id);
 
@@ -65,9 +67,11 @@ describe("gamification catalog & student privacy", () => {
       );
     }
     expect(vipSkins.length).toBeGreaterThanOrEqual(3);
-    expect(AVATAR_PRESETS.filter(a => a.isPro).length).toBeGreaterThanOrEqual(4);
+    expect(AVATAR_PRESETS.filter(a => a.isPro).length).toBeGreaterThanOrEqual(24);
     for (const av of AVATAR_PRESETS) {
       expect(av.imageUrl).toMatch(/^\/avatars\/[a-z0-9_]+\.webp$/);
+      const diskPath = path.resolve("client/public", av.imageUrl.slice(1));
+      expect(fs.existsSync(diskPath)).toBe(true);
     }
   });
 

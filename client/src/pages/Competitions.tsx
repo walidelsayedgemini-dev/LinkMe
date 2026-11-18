@@ -23,9 +23,11 @@ import { trpc } from "@/lib/trpc";
 import { soundEffects } from "@/lib/sound-effects";
 import { cn } from "@/lib/utils";
 import {
+  AVATAR_CATEGORIES,
   AVATAR_PRESETS,
   STREAK_SKINS,
   getStreakSkin,
+  type AvatarCategory,
   type CompetitionPeriod,
 } from "@shared/gamification-catalog";
 
@@ -41,6 +43,9 @@ export default function Competitions() {
   const { companion } = useCompanion();
   const utils = trpc.useUtils();
   const [period, setPeriod] = useState<CompetitionPeriod>("weekly");
+  const [avatarCategory, setAvatarCategory] = useState<
+    "all" | AvatarCategory
+  >("all");
   const [claimedQuests, setClaimedQuests] = useState<Record<string, boolean>>(() => {
     if (typeof window === "undefined") return {};
     try {
@@ -210,47 +215,58 @@ export default function Competitions() {
                     </div>
                   )}
 
-                  <div className="grid gap-2.5 sm:grid-cols-3">
+                  <div className="grid gap-3 sm:grid-cols-3">
                     {[
                       {
                         href: "/roleplay",
-                        emoji: "🎭",
-                        title: "محاكي المواقف",
-                        xp: "+30 XP",
-                        sub: "تدرّب بالصوت الآن",
+                        bg: "/img/cafe.webp",
+                        overlay: "from-[#0b1736]/92 via-[#152e64]/80 to-[#1e40af]/60",
+                        title: "محاكي المواقف (22 موقف)",
+                        xp: "+30–120 XP",
+                        sub: "تدرّب بالصوت والميكروفون الآن",
                       },
                       {
                         href: "/flashcards",
-                        emoji: "🃏",
-                        title: "فلاش كاردز الكلمات",
-                        xp: "+10 XP / كلمة",
-                        sub: "5 كلمات يومياً بالصوت",
+                        bg: "/img/pronunciation.webp",
+                        overlay: "from-[#062b26]/92 via-[#0f5146]/80 to-[#0d9488]/60",
+                        title: "فلاش كاردز (180 كلمة)",
+                        xp: "+10–20 XP",
+                        sub: "8 حزم صوتية + PDF",
                       },
                       {
                         href: "/speed-quiz",
-                        emoji: "⚡",
-                        title: "تحدي الـ 60 ثانية",
-                        xp: "+30 XP",
-                        sub: "اكسر الرقم القياسي",
+                        bg: "/img/ielts.webp",
+                        overlay: "from-[#3a1a07]/92 via-[#7c320d]/80 to-[#d97706]/60",
+                        title: "تحدي 60 ثانية وماراثون PRO",
+                        xp: "+30–300 XP",
+                        sub: "بنك 100 سؤال عملي",
                       },
                     ].map(action => (
                       <Link
                         key={action.href}
                         href={action.href}
-                        className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-card px-4 py-3 transition hover:border-iris hover:bg-iris-soft/30"
+                        className="group relative flex items-center justify-between gap-3 overflow-hidden rounded-2xl border border-white/15 px-4 py-3.5 text-white shadow-sm transition hover:-translate-y-0.5 hover:border-white/40"
                       >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <span className="text-xl">{action.emoji}</span>
-                          <div className="min-w-0">
-                            <p className="truncate text-xs font-bold text-ink">
-                              {action.title}
-                            </p>
-                            <p className="truncate text-[11px] text-ink-soft">
-                              {action.sub}
-                            </p>
-                          </div>
+                        <img
+                          src={action.bg}
+                          alt=""
+                          aria-hidden="true"
+                          loading="lazy"
+                          className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div
+                          aria-hidden="true"
+                          className={`absolute inset-0 bg-gradient-to-l ${action.overlay}`}
+                        />
+                        <div className="relative min-w-0">
+                          <p className="truncate text-xs font-extrabold text-white">
+                            {action.title}
+                          </p>
+                          <p className="truncate text-[11px] text-white/80">
+                            {action.sub}
+                          </p>
                         </div>
-                        <span className="latin shrink-0 rounded-full bg-amber-500/15 px-2.5 py-0.5 text-[11px] font-black text-amber-700 dark:text-amber-300">
+                        <span className="latin relative shrink-0 rounded-full border border-white/25 bg-black/30 px-2.5 py-1 text-[11px] font-black text-amber-300 backdrop-blur-sm">
                           {action.xp}
                         </span>
                       </Link>
@@ -496,13 +512,62 @@ export default function Competitions() {
               </div>
             )}
 
-            {/* Avatars Grid */}
-            <div className="space-y-3">
-              <h2 className="text-lg font-extrabold text-ink">
-                1. اختار الأفتار المفضل لك ({AVATAR_PRESETS.length} شخصية)
-              </h2>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-                {AVATAR_PRESETS.map(avatar => {
+            {/* Avatars Grid (100 Illustrated Avatars with Category Filters!) */}
+            <div className="space-y-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <h2 className="text-lg font-extrabold text-ink">
+                  1. اختار الأفتار المفضل لك ({AVATAR_PRESETS.length} شخصية
+                  مرسومة فخمة 🎨)
+                </h2>
+                <span className="rounded-full bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-700 dark:text-amber-300 self-start sm:self-auto">
+                  👑 {AVATAR_PRESETS.filter(a => a.isPro).length} أفتار ملكي حصري
+                  لـ PRO
+                </span>
+              </div>
+
+              {/* Category Filter Pills */}
+              <div className="flex flex-wrap gap-2">
+                {AVATAR_CATEGORIES.map(cat => {
+                  const count =
+                    cat.id === "all"
+                      ? AVATAR_PRESETS.length
+                      : cat.id === "pro_vip"
+                        ? AVATAR_PRESETS.filter(a => a.isPro).length
+                        : AVATAR_PRESETS.filter(a => a.category === cat.id)
+                            .length;
+                  const active = avatarCategory === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => {
+                        soundEffects.playClick();
+                        setAvatarCategory(cat.id);
+                      }}
+                      className={cn(
+                        "rounded-full border px-3.5 py-1.5 text-xs font-bold transition",
+                        active
+                          ? cat.id === "pro_vip"
+                            ? "border-amber-500 bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm"
+                            : "border-iris bg-iris text-white shadow-sm"
+                          : "border-line bg-card text-ink-soft hover:border-iris/50 hover:text-ink"
+                      )}
+                    >
+                      {cat.emoji} {cat.label}{" "}
+                      {cat.id !== "all" && `(${count})`}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                {AVATAR_PRESETS.filter(avatar =>
+                  avatarCategory === "all"
+                    ? true
+                    : avatarCategory === "pro_vip"
+                      ? Boolean(avatar.isPro)
+                      : avatar.category === avatarCategory
+                ).map(avatar => {
                   const selected = currentAvatar === avatar.id;
                   const lockedByPro = Boolean(avatar.isPro) && !isVip;
                   return (
@@ -512,22 +577,24 @@ export default function Competitions() {
                       disabled={!user || customize.isPending}
                       onClick={() => {
                         if (lockedByPro) {
-                          toast.info("هذا الأفتار الملكي حصري لمشتركي PRO 👑 — رقّي حسابك من صفحة الأسعار!");
+                          toast.info(
+                            "هذا الأفتار الملكي حصري لمشتركي PRO 👑 — رقّي حسابك من صفحة الأسعار!"
+                          );
                           return;
                         }
                         customize.mutate({ avatarPreset: avatar.id });
                       }}
                       className={cn(
-                        "relative flex flex-col items-center gap-2 rounded-2xl border p-4 transition hover:-translate-y-0.5",
+                        "group relative flex flex-col items-center gap-2 overflow-hidden rounded-2xl border p-3.5 transition duration-200 hover:-translate-y-1",
                         selected
-                          ? "border-iris bg-iris/10 ring-2 ring-iris/30 shadow-sm"
+                          ? "border-iris bg-gradient-to-b from-iris/15 to-card ring-2 ring-iris/40 shadow-md"
                           : avatar.isPro
-                            ? "border-amber-400/50 bg-gradient-to-b from-amber-50/40 to-card dark:from-amber-950/20"
-                            : "border-line bg-card hover:border-iris/40"
+                            ? "border-amber-400/50 bg-gradient-to-b from-amber-500/10 via-card to-card hover:border-amber-400 hover:shadow-md"
+                            : "border-line bg-gradient-to-b from-paper-deep/60 to-card hover:border-iris/50 hover:shadow-sm"
                       )}
                     >
                       {avatar.isPro && (
-                        <span className="absolute top-2 end-2 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-1.5 py-0.5 text-[9px] font-black text-white">
+                        <span className="absolute top-2 end-2 z-10 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-1.5 py-0.5 text-[9px] font-black text-white shadow-xs">
                           PRO 👑
                         </span>
                       )}
@@ -536,17 +603,24 @@ export default function Competitions() {
                         equippedSkin={currentSkin}
                         size="lg"
                         showSkinBadge={false}
+                        className="transition-transform duration-300 group-hover:scale-105"
                       />
-                      <span className="text-xs font-bold text-ink">{avatar.label}</span>
+                      <span className="line-clamp-1 text-xs font-bold text-ink">
+                        {avatar.label}
+                      </span>
                       {selected ? (
-                        <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-iris">
+                        <span className="inline-flex items-center gap-0.5 rounded-full bg-iris-soft px-2 py-0.5 text-[10px] font-bold text-iris">
                           <Check className="size-3" /> مختار
                         </span>
                       ) : lockedByPro ? (
-                        <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-amber-600">
+                        <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-amber-600 dark:text-amber-400">
                           <Lock className="size-2.5" /> لمشتركي PRO
                         </span>
-                      ) : null}
+                      ) : (
+                        <span className="text-[10px] text-ink-soft opacity-0 transition group-hover:opacity-100">
+                          اضغط للاختيار ✨
+                        </span>
+                      )}
                     </button>
                   );
                 })}

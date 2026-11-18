@@ -255,60 +255,92 @@ export default function Roleplay() {
                   selectedCategory === "all" || s.category === selectedCategory
               ).map(scenario => {
               const locked = Boolean(scenario.isPro) && !isVip;
+              const coverImg =
+                scenario.category === "work"
+                  ? "/img/business.webp"
+                  : scenario.category === "travel"
+                    ? "/img/travel.webp"
+                    : scenario.category === "ielts"
+                      ? "/img/ielts.webp"
+                      : "/img/cafe.webp";
               return (
                 <div
                   key={scenario.id}
                   className={cn(
-                    "relative flex flex-col justify-between rounded-3xl border p-6 shadow-sm transition",
+                    "group relative flex flex-col justify-between overflow-hidden rounded-3xl border bg-card shadow-sm transition hover:-translate-y-0.5 hover:shadow-md",
                     scenario.isPro
-                      ? "border-amber-400/50 bg-gradient-to-br from-amber-500/[0.06] via-card to-card hover:border-amber-400"
-                      : "border-line bg-card hover:border-iris/50"
+                      ? "border-amber-400/60"
+                      : "border-line hover:border-iris/50"
                   )}
                 >
                   <div>
-                    <div className="flex items-start justify-between gap-3">
+                    {/* Scenic Brand-Matched Cover Header */}
+                    <div className="relative h-32 overflow-hidden">
+                      <img
+                        src={coverImg}
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
                       <div
+                        aria-hidden="true"
                         className={cn(
-                          "grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br text-2xl text-white shadow-sm",
-                          scenario.accent
+                          "absolute inset-0 bg-gradient-to-t opacity-90",
+                          scenario.isPro
+                            ? "from-[#1c1004]/95 via-[#3b2108]/65 to-transparent"
+                            : "from-[#0a1b33]/95 via-[#132c54]/60 to-transparent"
                         )}
-                      >
-                        {scenario.emoji}
-                      </div>
-                      <div className="flex flex-wrap items-center justify-end gap-1.5">
-                        {scenario.isPro && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-2.5 py-1 text-[11px] font-black text-white shadow-xs">
-                            <Crown className="size-3" /> حصري PRO
+                      />
+                      <div className="absolute inset-x-3 top-3 flex flex-wrap items-center justify-between gap-1.5">
+                        <span
+                          className={cn(
+                            "grid size-10 place-items-center rounded-xl bg-gradient-to-br text-lg text-white shadow-sm ring-1 ring-white/25",
+                            scenario.accent
+                          )}
+                        >
+                          {scenario.emoji}
+                        </span>
+                        <div className="flex flex-wrap items-center gap-1">
+                          {scenario.isPro && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-2.5 py-0.5 text-[10px] font-black text-white shadow-sm">
+                              <Crown className="size-3" /> PRO
+                            </span>
+                          )}
+                          <span className="latin rounded-full border border-white/20 bg-black/40 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm">
+                            {scenario.level}
                           </span>
-                        )}
-                        <span className="latin rounded-full bg-iris-soft px-2.5 py-1 text-xs font-bold text-iris">
-                          {scenario.level}
-                        </span>
-                        <span className="latin inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-bold text-amber-700 dark:text-amber-300">
-                          <Zap className="size-3 fill-amber-500 text-amber-500" />
-                          +{isVip ? scenario.rewardXp * 2 : scenario.rewardXp} XP
-                          {isVip ? " (2x)" : ""}
-                        </span>
+                          <span className="latin inline-flex items-center gap-0.5 rounded-full border border-amber-300/30 bg-black/45 px-2 py-0.5 text-[10px] font-bold text-amber-300 backdrop-blur-sm">
+                            <Zap className="size-2.5 fill-amber-400 text-amber-400" />
+                            +{isVip ? scenario.rewardXp * 2 : scenario.rewardXp}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="absolute inset-x-4 bottom-2.5">
+                        <h2 className="line-clamp-1 text-base font-extrabold text-white">
+                          {scenario.titleAr}
+                        </h2>
+                        <p
+                          className="latin truncate text-[11px] font-medium text-sky-200"
+                          dir="ltr"
+                        >
+                          {scenario.titleEn} · {scenario.partnerName}
+                        </p>
                       </div>
                     </div>
-                    <h2 className="mt-4 text-xl font-bold text-ink">
-                      {scenario.titleAr}
-                    </h2>
-                    <p
-                      className="latin text-xs font-semibold text-iris"
-                      dir="ltr"
-                    >
-                      {scenario.titleEn} · {scenario.partnerName}
-                    </p>
-                    <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-                      {scenario.settingAr}
-                    </p>
+
+                    <div className="p-5 pb-0">
+                      <p className="text-xs leading-relaxed text-ink-soft sm:text-sm">
+                        {scenario.settingAr}
+                      </p>
+                    </div>
                   </div>
 
+                  <div className="p-5 pt-4">
                   {locked ? (
                     <Button
                       asChild
-                      className="mt-5 w-full rounded-full bg-gradient-to-r from-amber-500 to-orange-500 font-bold text-white hover:from-amber-600 hover:to-orange-600"
+                      className="w-full rounded-full bg-gradient-to-r from-amber-500 to-orange-500 font-bold text-white hover:from-amber-600 hover:to-orange-600"
                     >
                       <Link href="/pricing">
                         <Lock className="me-1.5 size-4" /> اشترك في PRO لفتح
@@ -319,11 +351,12 @@ export default function Roleplay() {
                     <Button
                       type="button"
                       onClick={() => startScenario(scenario)}
-                      className="mt-5 w-full rounded-full bg-iris font-bold text-white hover:bg-iris-deep"
+                      className="w-full rounded-full bg-iris font-bold text-white hover:bg-iris-deep"
                     >
                       ابدأ المحادثة الآن ({scenario.turns.length} جولات) 🎙️
                     </Button>
                   )}
+                  </div>
                 </div>
               );
             })}
