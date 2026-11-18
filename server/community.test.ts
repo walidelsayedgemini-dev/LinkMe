@@ -55,13 +55,17 @@ describe("gamification catalog & student privacy", () => {
     expect(getAvatarPreset("unknown-id").id).toBe(AVATAR_PRESETS[0].id);
     expect(getStreakSkin("unknown-skin").id).toBe(STREAK_SKINS[0].id);
 
-    // Skins should be ordered by ascending minStreak starting at 0
-    expect(STREAK_SKINS[0].minStreak).toBe(0);
-    for (let i = 1; i < STREAK_SKINS.length; i++) {
-      expect(STREAK_SKINS[i].minStreak).toBeGreaterThan(
-        STREAK_SKINS[i - 1].minStreak
+    // Free streak skins should be ordered by ascending minStreak starting at 0
+    const freeStreakSkins = STREAK_SKINS.filter(s => !s.isPro);
+    const vipSkins = STREAK_SKINS.filter(s => s.isPro);
+    expect(freeStreakSkins[0].minStreak).toBe(0);
+    for (let i = 1; i < freeStreakSkins.length; i++) {
+      expect(freeStreakSkins[i].minStreak).toBeGreaterThan(
+        freeStreakSkins[i - 1].minStreak
       );
     }
+    expect(vipSkins.length).toBeGreaterThanOrEqual(3);
+    expect(AVATAR_PRESETS.filter(a => a.isPro).length).toBeGreaterThanOrEqual(4);
   });
 
   it("generates tamper-proof referral codes and parses valid ones", () => {
@@ -73,8 +77,8 @@ describe("gamification catalog & student privacy", () => {
     expect(parseReferralCode("INVALID")).toBeNull();
   });
 
-  it("ships complete audio vocabulary flashcards across A1-B2", () => {
-    const levels: FlashcardLevel[] = ["A1", "A2", "B1", "B2"];
+  it("ships complete audio vocabulary flashcards across A1-C1", () => {
+    const levels: FlashcardLevel[] = ["A1", "A2", "B1", "B2", "C1"];
     const ids = new Set<string>();
     for (const lvl of levels) {
       const cards = FLASHCARDS_DECK.filter(c => c.level === lvl);

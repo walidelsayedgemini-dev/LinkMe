@@ -10,6 +10,7 @@ import {
   lessonProgress,
   orders,
   paymentReceipts,
+  premiumMemberships,
   promoCodes,
   sessionAttendance,
   sessions,
@@ -41,8 +42,50 @@ import {
   router,
 } from "../_core/trpc";
 
-const VALID_AVATAR_IDS = new Set(AVATAR_PRESETS.map(a => a.id));
+const AVATAR_BY_ID = new Map(AVATAR_PRESETS.map(a => [a.id, a]));
 const SKIN_BY_ID = new Map(STREAK_SKINS.map(s => [s.id, s]));
+
+async function getVipUserIdSet(db: NonNullable<Awaited<ReturnType<typeof getDb>>>): Promise<Set<number>> {
+  const now = Date.now();
+  const [activeSubs, activePrem, paidOrders, approvedReceipts, admins] =
+    await Promise.all([
+      db.select({ userId: subscriptions.userId, status: subscriptions.status, currentPeriodEnd: subscriptions.currentPeriodEnd }).from(subscriptions),
+      db.select({ userId: premiumMemberships.userId, status: premiumMemberships.status, endDate: premiumMemberships.endDate }).from(premiumMemberships),
+      db.select({ userId: orders.userId, status: orders.status }).from(orders),
+      db.select({ userId: paymentReceipts.userId, status: paymentReceipts.status }).from(paymentReceipts),
+      db.select({ id: users.id }).from(users).where(eq(users.role, "admin")),
+    ]);
+
+  const vipSet = new Set<number>();
+  for (const a of admins) vipSet.add(a.id);
+  for (const s of activeSubs) {
+    if (s.status === "active" && new Date(s.currentPeriodEnd).getTime() > now) {
+      vipSet.add(s.userId);
+    }
+  }
+  for (const p of activePrem) {
+    if (p.status === "active" && new Date(p.endDate).getTime() > now) {
+      vipSet.add(p.userId);
+    }
+  }
+  for (const o of paidOrders) {
+    if (o.status === "paid") vipSet.add(o.userId);
+  }
+  for (const r of approvedReceipts) {
+    if (r.status === "approved") vipSet.add(r.userId);
+  }
+  return vipSet;
+}
+
+async function isUserVip(
+  db: NonNullable<Awaited<ReturnType<typeof getDb>>>,
+  userId: number,
+  role?: string | null
+): Promise<boolean> {
+  if (role === "admin") return true;
+  const vipSet = await getVipUserIdSet(db);
+  return vipSet.has(userId);
+}
 
 function todayKey(): string {
   const now = new Date();
@@ -79,7 +122,7 @@ export function parseReferralCode(code: string): number | null {
   return buildReferralCode(userId) === match[0] ? userId : null;
 }
 
-async function ensureGameProfile(userId: number) {
+async function ensureGameProfile(userId: number, isVip = false) {
   const db = await getDb();
   if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "قاعدة البيانات غير متاحة" });
 
@@ -90,6 +133,7 @@ async function ensureGameProfile(userId: number) {
     .limit(1);
 
   const today = todayKey();
+  const baseDailyBonus = isVip ? 50 : 25;
 
   if (!existing) {
     await db.insert(studentGameProfiles).values({
@@ -97,10 +141,10 @@ async function ensureGameProfile(userId: number) {
       avatarPreset: "lion",
       equippedSkin: "classic",
       streakDays: 1,
-      dailyXp: 25,
-      weeklyXp: 25,
-      monthlyXp: 25,
-      yearlyXp: 25,
+      dailyXp: baseDailyBonus,
+      weeklyXp: baseDailyBonus,
+      monthlyXp: baseDailyBonus,
+      yearlyXp: baseDailyBonus,
       lastActivityDate: today,
     });
     const [created] = await db
@@ -111,20 +155,22 @@ async function ensureGameProfile(userId: number) {
     return created;
   }
 
-  // Update streak if first activity today
+  // Update streak if first activity today (VIP members have automatic Streak Freeze Shield!)
   if (existing.lastActivityDate !== today) {
     const nextStreak =
       existing.lastActivityDate === yesterdayKey()
         ? existing.streakDays + 1
-        : Math.max(1, existing.streakDays);
+        : isVip
+          ? Math.max(1, existing.streakDays)
+          : 1;
     await db
       .update(studentGameProfiles)
       .set({
         streakDays: nextStreak,
-        dailyXp: 25,
-        weeklyXp: existing.weeklyXp + 25,
-        monthlyXp: existing.monthlyXp + 25,
-        yearlyXp: existing.yearlyXp + 25,
+        dailyXp: baseDailyBonus,
+        weeklyXp: existing.weeklyXp + baseDailyBonus,
+        monthlyXp: existing.monthlyXp + baseDailyBonus,
+        yearlyXp: existing.yearlyXp + baseDailyBonus,
         lastActivityDate: today,
       })
       .where(eq(studentGameProfiles.id, existing.id));
@@ -132,10 +178,10 @@ async function ensureGameProfile(userId: number) {
     return {
       ...existing,
       streakDays: nextStreak,
-      dailyXp: 25,
-      weeklyXp: existing.weeklyXp + 25,
-      monthlyXp: existing.monthlyXp + 25,
-      yearlyXp: existing.yearlyXp + 25,
+      dailyXp: baseDailyBonus,
+      weeklyXp: existing.weeklyXp + baseDailyBonus,
+      monthlyXp: existing.monthlyXp + baseDailyBonus,
+      yearlyXp: existing.yearlyXp + baseDailyBonus,
       lastActivityDate: today,
     };
   }
@@ -418,14 +464,22 @@ export const communityRouter = router({
   }),
 
   /* =========================================================
-   * 4. GAMIFICATION PROFILE, AVATARS & STREAK SKINS
+   * 4. GAMIFICATION PROFILE, AVATARS, STREAK SKINS & VIP PERKS
    * ========================================================= */
   myGameProfile: protectedProcedure.query(async ({ ctx }) => {
-    const profile = await ensureGameProfile(ctx.user.id);
+    const db = await getDb();
+    const isVip = db ? await isUserVip(db, ctx.user.id, ctx.user.role) : ctx.user.role === "admin";
+    const profile = await ensureGameProfile(ctx.user.id, isVip);
     return {
       ...profile,
       firstName: firstNameOnly(ctx.user.name),
-      unlockedSkins: STREAK_SKINS.filter(s => profile.streakDays >= s.minStreak).map(s => s.id),
+      isVip,
+      xpMultiplier: isVip ? 2 : 1,
+      streakFreezeProtected: isVip,
+      vipTierLabel: isVip ? "عضو PRO 👑" : "عضو مجاني",
+      unlockedSkins: STREAK_SKINS.filter(s =>
+        s.isPro ? isVip : profile.streakDays >= s.minStreak
+      ).map(s => s.id),
     };
   }),
 
@@ -440,12 +494,20 @@ export const communityRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "قاعدة البيانات غير متاحة" });
 
-      const profile = await ensureGameProfile(ctx.user.id);
+      const isVip = await isUserVip(db, ctx.user.id, ctx.user.role);
+      const profile = await ensureGameProfile(ctx.user.id, isVip);
       const updates: Partial<typeof studentGameProfiles.$inferInsert> = {};
 
       if (input.avatarPreset) {
-        if (!VALID_AVATAR_IDS.has(input.avatarPreset)) {
+        const avatar = AVATAR_BY_ID.get(input.avatarPreset);
+        if (!avatar) {
           throw new TRPCError({ code: "BAD_REQUEST", message: "الأفتار المختار غير صالح" });
+        }
+        if (avatar.isPro && !isVip) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "هذا الأفتار الملكي حصري لمشتركي الباقات المدفوعة PRO 👑",
+          });
         }
         updates.avatarPreset = input.avatarPreset;
       }
@@ -455,7 +517,13 @@ export const communityRouter = router({
         if (!skin) {
           throw new TRPCError({ code: "BAD_REQUEST", message: "السكن المختار غير صالح" });
         }
-        if (profile.streakDays < skin.minStreak) {
+        if (skin.isPro && !isVip) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "هذا السكن الملكي حصري لمشتركي الباقات المدفوعة PRO 👑",
+          });
+        }
+        if (!skin.isPro && profile.streakDays < skin.minStreak) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: `هذا السكن يفتح عند الوصول إلى ${skin.minStreak} أيام حماسة متتالية 🔥`,
@@ -489,12 +557,15 @@ export const communityRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "قاعدة البيانات غير متاحة" });
 
-      const profile = await ensureGameProfile(ctx.user.id);
+      const isVip = await isUserVip(db, ctx.user.id, ctx.user.role);
+      const multiplier = isVip ? 2 : 1;
+      const awardedAmount = input.amount * multiplier;
+      const profile = await ensureGameProfile(ctx.user.id, isVip);
       const next = {
-        dailyXp: profile.dailyXp + input.amount,
-        weeklyXp: profile.weeklyXp + input.amount,
-        monthlyXp: profile.monthlyXp + input.amount,
-        yearlyXp: profile.yearlyXp + input.amount,
+        dailyXp: profile.dailyXp + awardedAmount,
+        weeklyXp: profile.weeklyXp + awardedAmount,
+        monthlyXp: profile.monthlyXp + awardedAmount,
+        yearlyXp: profile.yearlyXp + awardedAmount,
       };
 
       await db
@@ -502,7 +573,14 @@ export const communityRouter = router({
         .set(next)
         .where(eq(studentGameProfiles.id, profile.id));
 
-      return { ...profile, ...next, ok: true as const };
+      return {
+        ...profile,
+        ...next,
+        awardedAmount,
+        multiplier,
+        isVip,
+        ok: true as const,
+      };
     }),
 
   /* =========================================================
@@ -523,8 +601,12 @@ export const communityRouter = router({
       let realEntries: LeaderboardEntry[] = [];
 
       if (db) {
+        const vipSet = await getVipUserIdSet(db);
         if (ctx.user) {
-          await ensureGameProfile(ctx.user.id).catch(() => {});
+          await ensureGameProfile(
+            ctx.user.id,
+            ctx.user.role === "admin" || vipSet.has(ctx.user.id)
+          ).catch(() => {});
         }
         const [profiles, studentUsers] = await Promise.all([
           db.select().from(studentGameProfiles),
@@ -555,6 +637,7 @@ export const communityRouter = router({
               streakDays: p.streakDays,
               xp,
               isCurrentUser: ctx.user?.id === p.userId,
+              isVip: vipSet.has(p.userId),
             };
           })
           .filter((e): e is NonNullable<typeof e> => Boolean(e));

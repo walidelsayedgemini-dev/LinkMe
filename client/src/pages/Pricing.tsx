@@ -10,14 +10,19 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { FAQ_GROUPS } from "@/lib/content";
 
 const COMPARISON = [
-  { feature: "تجربة الدرس الأول مع المدرّس", starter: true, pro: true, intensive: true },
-  { feature: "الوصول لكل الكورسات", starter: false, pro: true, intensive: true },
-  { feature: "متابعة التقدم وحفظ آخر درس", starter: true, pro: true, intensive: true },
-  { feature: "شهادة إتمام", starter: false, pro: true, intensive: true },
-  { feature: "تقييم الكورسات بعد الالتحاق", starter: true, pro: true, intensive: true },
-  { feature: "جلسة فردية شهرية", starter: false, pro: false, intensive: true },
-  { feature: "تصحيح كتابة أو تسجيل صوتي", starter: false, pro: false, intensive: true },
-  { feature: "خطة تعلّم أسبوعية مخصصة", starter: false, pro: false, intensive: true },
+  { feature: "تجربة الدرس الأول + اختبار تحديد المستوى", starter: true, pro: true, intensive: true },
+  { feature: "الوصول غير المحدود لكل الـ 25 كورس", starter: false, pro: true, intensive: true },
+  { feature: "شهادة إتمام رسمية معتمدة بـ QR Code 🎓", starter: false, pro: true, intensive: true },
+  { feature: "مضاعفة نقاط المسابقات تلقائياً (2x XP Boost ⚡)", starter: false, pro: true, intensive: true },
+  { feature: "درع حماية شعلة الحماسة اليومية تلقائياً (Streak Freeze 🛡️)", starter: false, pro: true, intensive: true },
+  { feature: "سكنات وأفتارات PRO الملكية + شارة PRO 👑 في لوحة الشرف", starter: false, pro: true, intensive: true },
+  { feature: "محاكي المواقف المتقدمة (IELTS Speaking + التفاوض على المرتب 🎭)", starter: false, pro: true, intensive: true },
+  { feature: "حزمة فلاش كاردز C1 التنفيذية + تحميل ملخصات PDF للطباعة 📄", starter: false, pro: true, intensive: true },
+  { feature: "متابعة التقدم وحفظ آخر درس من أي جهاز", starter: true, pro: true, intensive: true },
+  { feature: "جلسة فردية مباشرة شهرياً مع المدرّس 🎥", starter: false, pro: false, intensive: true },
+  { feature: "تصحيح كتابة وتسجيلات صوتية فردية 🎙️", starter: false, pro: false, intensive: true },
+  { feature: "تقرير متابعة شهري مفصّل لولي الأمر على واتساب 📋", starter: false, pro: true, intensive: true },
+  { feature: "خطة تعلّم أسبوعية مخصصة ومتابعة يومية", starter: false, pro: false, intensive: true },
 ];
 
 export default function Pricing() {

@@ -1,4 +1,4 @@
-export type FlashcardLevel = "A1" | "A2" | "B1" | "B2";
+export type FlashcardLevel = "A1" | "A2" | "B1" | "B2" | "C1";
 
 export interface VocabFlashcard {
   id: string;
@@ -14,7 +14,7 @@ export interface VocabFlashcard {
 
 export const FLASHCARD_LEVEL_META: Record<
   FlashcardLevel,
-  { label: string; subtitle: string; badgeClass: string }
+  { label: string; subtitle: string; badgeClass: string; isPro?: boolean }
 > = {
   A1: {
     label: "مبتدئ A1",
@@ -35,6 +35,12 @@ export const FLASHCARD_LEVEL_META: Record<
     label: "متقدم B2",
     subtitle: "مصطلحات الشغل والإنترفيو والآيلتس",
     badgeClass: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
+  },
+  C1: {
+    label: "احترافي C1 👑",
+    subtitle: "حزمة PRO الحصرية — IELTS Band 8+ وبزنس تنفيذي",
+    badgeClass: "bg-gradient-to-r from-amber-500 to-orange-500 text-white",
+    isPro: true,
   },
 };
 
@@ -573,5 +579,139 @@ export const FLASHCARDS_DECK: VocabFlashcard[] = [
     exampleEn: "Earning your first verified certificate is a huge milestone!",
     exampleAr: "الحصول على أول شهادة معتمدة ليك إنجاز ومحطة كبيرة جداً!",
     tipAr: "استخدمها لما تحتفل بأي مرحلة مهمة وصلتلها.",
+  },
+
+  // ---------- C1 PRO EXCLUSIVE (12 executive & IELTS Band 8+ cards) ----------
+  {
+    id: "c1-1",
+    level: "C1",
+    word: "Ubiquitous",
+    phonetic: "/juːˈbɪk.wɪ.təs/",
+    partOfSpeech: "adjective",
+    meaningAr: "منتشر في كل مكان حوالينا",
+    exampleEn: "Smartphones have become ubiquitous in modern education.",
+    exampleAr: "الموبايلات الذكية بقت موجودة في كل مكان في التعليم الحديث.",
+    tipAr: "كلمة Band 8.5 ممتازة بدل ما تكرر everywhere في مقالات الآيلتس!",
+  },
+  {
+    id: "c1-2",
+    level: "C1",
+    word: "Pragmatic",
+    phonetic: "/præɡˈmæt.ɪk/",
+    partOfSpeech: "adjective",
+    meaningAr: "عملي وواقعي في حل المشاكل",
+    exampleEn: "We need a pragmatic strategy rather than an idealistic theory.",
+    exampleAr: "محتاجين خطة عملية وواقعية مش مجرد نظرية مثالية.",
+    tipAr: "ممتازة في اجتماعات الإدارة والقيادة والإنترفيوهات العليا.",
+  },
+  {
+    id: "c1-3",
+    level: "C1",
+    word: "Catalyst",
+    phonetic: "/ˈkæt.əl.ɪst/",
+    partOfSpeech: "noun",
+    meaningAr: "عامل محفّز يسرّع التغيير الكبير",
+    exampleEn: "Speaking daily served as a catalyst for her rapid career growth.",
+    exampleAr: "الكلام اليومي كان عامل محفّز لتطورها المهني السريع.",
+    tipAr: "بتيجي دايماً في تعبير: act as a catalyst for change.",
+  },
+  {
+    id: "c1-4",
+    level: "C1",
+    word: "Eloquent",
+    phonetic: "/ˈel.ə.kwənt/",
+    partOfSpeech: "adjective",
+    meaningAr: "فصيح وبليغ ومقنع في كلامه",
+    exampleEn: "She delivered an eloquent keynote speech that moved the audience.",
+    exampleAr: "ألقت كلمة رئيسية بليغة ومؤثرة حرّكت مشاعر الجمهور.",
+    tipAr: "الاسم منها eloquence (الفصاحة والبلاغة).",
+  },
+  {
+    id: "c1-5",
+    level: "C1",
+    word: "Alleviate",
+    phonetic: "/əˈliː.vi.eɪt/",
+    partOfSpeech: "verb",
+    meaningAr: "يخفّف حدة ألم أو ضغط أو مشكلة",
+    exampleEn: "Clear weekly goals help alleviate exam anxiety.",
+    exampleAr: "الأهداف الأسبوعية الواضحة بتساعد تخفّف قلق الامتحانات.",
+    tipAr: "بديل C1 راقي جداً لفعل reduce في الكتابة الأكاديمية.",
+  },
+  {
+    id: "c1-6",
+    level: "C1",
+    word: "Indispensable",
+    phonetic: "/ˌɪn.dɪˈspen.sə.bəl/",
+    partOfSpeech: "adjective",
+    meaningAr: "لا غنى عنه / أساسي جداً",
+    exampleEn: "Strong communication skills are indispensable in global teams.",
+    exampleAr: "مهارات التواصل القوية لا غنى عنها في الفرق العالمية.",
+    tipAr: "أقوى وأشيك بكتير من very important في الـ CV والمقابلات.",
+  },
+  {
+    id: "c1-7",
+    level: "C1",
+    word: "Unprecedented",
+    phonetic: "/ʌnˈpres.ɪ.den.tɪd/",
+    partOfSpeech: "adjective",
+    meaningAr: "غير مسبوق / لم يحدث مثله من قبل",
+    exampleEn: "Remote work has grown at an unprecedented pace.",
+    exampleAr: "الشغل عن بُعد زاد بسرعة غير مسبوقة.",
+    tipAr: "خد بالك من النطق: أن-بريسيدنتد (مفيش صوت i طويل).",
+  },
+  {
+    id: "c1-8",
+    level: "C1",
+    word: "Synergy",
+    phonetic: "/ˈsɪn.ər.dʒi/",
+    partOfSpeech: "noun",
+    meaningAr: "تناغم وتكامل بين فريقين يعطي نتيجة أكبر",
+    exampleEn: "The synergy between live coaching and daily practice accelerates fluency.",
+    exampleAr: "التناغم بين التدريب المباشر والتمرين اليومي بيسرّع الطلاقة.",
+    tipAr: "مصطلح تنفيذي شهير في عروض الشركات والمشاريع.",
+  },
+  {
+    id: "c1-9",
+    level: "C1",
+    word: "Meticulous",
+    phonetic: "/məˈtɪk.jə.ləs/",
+    partOfSpeech: "adjective",
+    meaningAr: "دقيق جداً ومهتم بأصغر التفاصيل",
+    exampleEn: "Her meticulous preparation earned her a Band 8.5 in IELTS.",
+    exampleAr: "تحضيرها الدقيق جداً خلاها تجيب Band 8.5 في الآيلتس.",
+    tipAr: "صفة رائعة تصف بيها أسلوب شغلك في مقابلة وظيفة!",
+  },
+  {
+    id: "c1-10",
+    level: "C1",
+    word: "Paradigm shift",
+    phonetic: "/ˈpær.ə.daɪm ʃɪft/",
+    partOfSpeech: "noun phrase",
+    meaningAr: "تحوّل جذري في طريقة التفكير أو العمل",
+    exampleEn: "Thinking directly in English creates a true paradigm shift.",
+    exampleAr: "التفكير المباشر بالإنجليزي بيعمل تحوّل جذري حقيقي.",
+    tipAr: "حرف الـ g في paradigm سايلنت تماماً (بارادايم).",
+  },
+  {
+    id: "c1-11",
+    level: "C1",
+    word: "Viable",
+    phonetic: "/ˈvaɪ.ə.bəl/",
+    partOfSpeech: "adjective",
+    meaningAr: "قابل للنجاح والاستمرار عملياً",
+    exampleEn: "Launching a pilot group is the most viable way to scale.",
+    exampleAr: "إطلاق مجموعة تجريبية هو أنجح طريقة عملية للتوسع.",
+    tipAr: "بتيجي دايماً مع viable option / viable solution.",
+  },
+  {
+    id: "c1-12",
+    level: "C1",
+    word: "Credibility",
+    phonetic: "/ˌkred.əˈbɪl.ə.ti/",
+    partOfSpeech: "noun",
+    meaningAr: "المصداقية والثقة المهنية",
+    exampleEn: "Verified QR certificates immediately boost your professional credibility.",
+    exampleAr: "الشهادات المعتمدة بالـ QR بترفع مصداقيتك المهنية فوراً.",
+    tipAr: "استخدم معاها build credibility (يبني مصداقية) أو earn credibility.",
   },
 ];

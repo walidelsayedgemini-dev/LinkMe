@@ -3,6 +3,8 @@ import { Link } from "wouter";
 import {
   ArrowRight,
   CheckCircle2,
+  Crown,
+  Lock,
   Mic,
   MicOff,
   RotateCcw,
@@ -44,6 +46,11 @@ export default function Roleplay() {
   const { user } = useAuth();
   const { companion } = useCompanion();
   const addXpMutation = trpc.community.addXp.useMutation();
+  const { data: gameProfile } = trpc.community.myGameProfile.useQuery(
+    undefined,
+    { enabled: Boolean(user) }
+  );
+  const isVip = Boolean(gameProfile?.isVip);
 
   const [activeScenario, setActiveScenario] = useState<RoleplayScenario | null>(
     null
@@ -201,51 +208,80 @@ export default function Roleplay() {
       <section className="container py-8 sm:py-10">
         {!activeScenario ? (
           <div className="grid gap-4 md:grid-cols-2">
-            {ROLEPLAY_SCENARIOS.map(scenario => (
-              <div
-                key={scenario.id}
-                className="flex flex-col justify-between rounded-3xl border border-line bg-card p-6 shadow-sm transition hover:border-iris/50"
-              >
-                <div>
-                  <div className="flex items-start justify-between gap-3">
-                    <div
-                      className={cn(
-                        "grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br text-2xl text-white shadow-sm",
-                        scenario.accent
-                      )}
-                    >
-                      {scenario.emoji}
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="latin rounded-full bg-iris-soft px-2.5 py-1 text-xs font-bold text-iris">
-                        {scenario.level}
-                      </span>
-                      <span className="latin inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-bold text-amber-700 dark:text-amber-300">
-                        <Zap className="size-3 fill-amber-500 text-amber-500" />
-                        +{scenario.rewardXp} XP
-                      </span>
-                    </div>
-                  </div>
-                  <h2 className="mt-4 text-xl font-bold text-ink">
-                    {scenario.titleAr}
-                  </h2>
-                  <p className="latin text-xs font-semibold text-iris" dir="ltr">
-                    {scenario.titleEn} · {scenario.partnerName}
-                  </p>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-                    {scenario.settingAr}
-                  </p>
-                </div>
-
-                <Button
-                  type="button"
-                  onClick={() => startScenario(scenario)}
-                  className="mt-5 w-full rounded-full bg-iris font-bold text-white hover:bg-iris-deep"
+            {ROLEPLAY_SCENARIOS.map(scenario => {
+              const locked = Boolean(scenario.isPro) && !isVip;
+              return (
+                <div
+                  key={scenario.id}
+                  className={cn(
+                    "relative flex flex-col justify-between rounded-3xl border p-6 shadow-sm transition",
+                    scenario.isPro
+                      ? "border-amber-400/50 bg-gradient-to-br from-amber-500/[0.06] via-card to-card hover:border-amber-400"
+                      : "border-line bg-card hover:border-iris/50"
+                  )}
                 >
-                  ابدأ المحادثة الآن ({scenario.turns.length} جولات) 🎙️
-                </Button>
-              </div>
-            ))}
+                  <div>
+                    <div className="flex items-start justify-between gap-3">
+                      <div
+                        className={cn(
+                          "grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br text-2xl text-white shadow-sm",
+                          scenario.accent
+                        )}
+                      >
+                        {scenario.emoji}
+                      </div>
+                      <div className="flex flex-wrap items-center justify-end gap-1.5">
+                        {scenario.isPro && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-2.5 py-1 text-[11px] font-black text-white shadow-xs">
+                            <Crown className="size-3" /> حصري PRO
+                          </span>
+                        )}
+                        <span className="latin rounded-full bg-iris-soft px-2.5 py-1 text-xs font-bold text-iris">
+                          {scenario.level}
+                        </span>
+                        <span className="latin inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-bold text-amber-700 dark:text-amber-300">
+                          <Zap className="size-3 fill-amber-500 text-amber-500" />
+                          +{isVip ? scenario.rewardXp * 2 : scenario.rewardXp} XP
+                          {isVip ? " (2x)" : ""}
+                        </span>
+                      </div>
+                    </div>
+                    <h2 className="mt-4 text-xl font-bold text-ink">
+                      {scenario.titleAr}
+                    </h2>
+                    <p
+                      className="latin text-xs font-semibold text-iris"
+                      dir="ltr"
+                    >
+                      {scenario.titleEn} · {scenario.partnerName}
+                    </p>
+                    <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                      {scenario.settingAr}
+                    </p>
+                  </div>
+
+                  {locked ? (
+                    <Button
+                      asChild
+                      className="mt-5 w-full rounded-full bg-gradient-to-r from-amber-500 to-orange-500 font-bold text-white hover:from-amber-600 hover:to-orange-600"
+                    >
+                      <Link href="/pricing">
+                        <Lock className="me-1.5 size-4" /> اشترك في PRO لفتح
+                        الموقف (+{scenario.rewardXp * 2} XP) 👑
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      onClick={() => startScenario(scenario)}
+                      className="mt-5 w-full rounded-full bg-iris font-bold text-white hover:bg-iris-deep"
+                    >
+                      ابدأ المحادثة الآن ({scenario.turns.length} جولات) 🎙️
+                    </Button>
+                  )}
+                </div>
+              );
+            })}
           </div>
         ) : finished ? (
           <div className="mx-auto max-w-xl rounded-3xl border border-emerald-500/40 bg-card p-8 text-center shadow-sm">

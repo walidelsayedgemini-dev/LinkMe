@@ -75,7 +75,7 @@ export default function Competitions() {
   });
 
   const addXp = trpc.community.addXp.useMutation({
-    onSuccess: async (_, vars) => {
+    onSuccess: async (data, vars) => {
       soundEffects.playTrophy();
       if (vars.questId) {
         const next = { ...claimedQuests, [vars.questId]: true };
@@ -87,7 +87,12 @@ export default function Competitions() {
       }
       await utils.community.leaderboard.invalidate();
       await utils.community.myGameProfile.invalidate();
-      toast.success(`مبروك! أضيف +${vars.amount} XP لرصيدك في المسابقة 🎉🔥`);
+      const awarded = data?.awardedAmount ?? vars.amount;
+      toast.success(
+        data?.isVip
+          ? `👑 مضاعفة PRO x2! أضيف +${awarded} XP لرصيدك في المسابقة 🎉🔥`
+          : `مبروك! أضيف +${awarded} XP لرصيدك في المسابقة 🎉🔥`
+      );
     },
     onError: err => toast.error(err.message),
   });
@@ -100,6 +105,7 @@ export default function Competitions() {
   const currentStreak = myProfile.data?.streakDays ?? 1;
   const currentAvatar = myProfile.data?.avatarPreset ?? "lion";
   const currentSkin = myProfile.data?.equippedSkin ?? "classic";
+  const isVip = Boolean(myProfile.data?.isVip);
 
   return (
     <PageShell>
@@ -128,14 +134,24 @@ export default function Competitions() {
                   size="lg"
                 />
                 <div>
-                  <p className="text-base font-extrabold text-ink">
-                    {myProfile.data.firstName}
-                  </p>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <p className="text-base font-extrabold text-ink">
+                      {myProfile.data.firstName}
+                    </p>
+                    {isVip && (
+                      <span className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-2 py-0.5 text-[10px] font-black text-white shadow-xs">
+                        PRO 👑
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs font-semibold text-amber-600 dark:text-amber-400">
                     🔥 {currentStreak} أيام حماسة متتالية
+                    {isVip && " · 🛡️ درع الحماسة مفعّل"}
                   </p>
                   <p className="mt-0.5 text-xs text-ink-soft">
-                    {getStreakSkin(currentSkin).badgeEmoji} {getStreakSkin(currentSkin).name}
+                    {isVip
+                      ? "⚡ مضاعفة النقاط 2x مفعّلة تلقائياً!"
+                      : `${getStreakSkin(currentSkin).badgeEmoji} ${getStreakSkin(currentSkin).name}`}
                   </p>
                 </div>
               </div>
@@ -345,8 +361,13 @@ export default function Competitions() {
                         equippedSkin={entry.equippedSkin}
                         size="lg"
                       />
-                      <h3 className="mt-3 text-lg font-extrabold text-ink">
-                        {entry.firstName}{" "}
+                      <h3 className="mt-3 flex flex-wrap items-center justify-center gap-1.5 text-lg font-extrabold text-ink">
+                        <span>{entry.firstName}</span>
+                        {entry.isVip && (
+                          <span className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-2 py-0.5 text-[10px] font-black text-white">
+                            PRO 👑
+                          </span>
+                        )}
                         {entry.isCurrentUser && (
                           <span className="text-xs font-bold text-iris">(أنت)</span>
                         )}
@@ -398,10 +419,15 @@ export default function Competitions() {
                           size="sm"
                         />
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-bold text-ink">
-                            {entry.firstName}{" "}
+                          <p className="flex items-center gap-1.5 truncate text-sm font-bold text-ink">
+                            <span className="truncate">{entry.firstName}</span>
+                            {entry.isVip && (
+                              <span className="shrink-0 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-1.5 py-0.5 text-[9px] font-black text-white">
+                                PRO 👑
+                              </span>
+                            )}
                             {entry.isCurrentUser && (
-                              <span className="ms-1 rounded-full bg-iris px-2 py-0.5 text-[10px] text-white">
+                              <span className="shrink-0 rounded-full bg-iris px-2 py-0.5 text-[10px] text-white">
                                 أنت
                               </span>
                             )}
@@ -454,19 +480,33 @@ export default function Competitions() {
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
                 {AVATAR_PRESETS.map(avatar => {
                   const selected = currentAvatar === avatar.id;
+                  const lockedByPro = Boolean(avatar.isPro) && !isVip;
                   return (
                     <button
                       key={avatar.id}
                       type="button"
                       disabled={!user || customize.isPending}
-                      onClick={() => customize.mutate({ avatarPreset: avatar.id })}
+                      onClick={() => {
+                        if (lockedByPro) {
+                          toast.info("هذا الأفتار الملكي حصري لمشتركي PRO 👑 — رقّي حسابك من صفحة الأسعار!");
+                          return;
+                        }
+                        customize.mutate({ avatarPreset: avatar.id });
+                      }}
                       className={cn(
-                        "flex flex-col items-center gap-2 rounded-2xl border p-4 transition hover:-translate-y-0.5",
+                        "relative flex flex-col items-center gap-2 rounded-2xl border p-4 transition hover:-translate-y-0.5",
                         selected
                           ? "border-iris bg-iris/10 ring-2 ring-iris/30 shadow-sm"
-                          : "border-line bg-card hover:border-iris/40"
+                          : avatar.isPro
+                            ? "border-amber-400/50 bg-gradient-to-b from-amber-50/40 to-card dark:from-amber-950/20"
+                            : "border-line bg-card hover:border-iris/40"
                       )}
                     >
+                      {avatar.isPro && (
+                        <span className="absolute top-2 end-2 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-1.5 py-0.5 text-[9px] font-black text-white">
+                          PRO 👑
+                        </span>
+                      )}
                       <StudentAvatarBadge
                         avatarPreset={avatar.id}
                         equippedSkin={currentSkin}
@@ -474,11 +514,15 @@ export default function Competitions() {
                         showSkinBadge={false}
                       />
                       <span className="text-xs font-bold text-ink">{avatar.label}</span>
-                      {selected && (
+                      {selected ? (
                         <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-iris">
                           <Check className="size-3" /> مختار
                         </span>
-                      )}
+                      ) : lockedByPro ? (
+                        <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-amber-600">
+                          <Lock className="size-2.5" /> لمشتركي PRO
+                        </span>
+                      ) : null}
                     </button>
                   );
                 })}
@@ -498,7 +542,7 @@ export default function Competitions() {
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {STREAK_SKINS.map(skin => {
-                  const unlocked = currentStreak >= skin.minStreak;
+                  const unlocked = skin.isPro ? isVip : currentStreak >= skin.minStreak;
                   const equipped = currentSkin === skin.id;
                   const remaining = Math.max(0, skin.minStreak - currentStreak);
                   return (
@@ -506,7 +550,7 @@ export default function Competitions() {
                       key={skin.id}
                       className={cn(
                         "flex flex-col justify-between gap-4 rounded-3xl border p-5 transition",
-                        unlocked ? skin.cardGlowClass : "border-line bg-paper/70 opacity-80",
+                        unlocked ? skin.cardGlowClass : "border-line bg-paper/70 opacity-85",
                         equipped && "ring-2 ring-iris"
                       )}
                     >
@@ -517,9 +561,14 @@ export default function Competitions() {
                           size="lg"
                         />
                         <div className="min-w-0">
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex flex-wrap items-center gap-1.5">
                             <h3 className="text-sm font-extrabold text-ink">{skin.name}</h3>
                             <span>{skin.badgeEmoji}</span>
+                            {skin.isPro && (
+                              <span className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-2 py-0.5 text-[9px] font-black text-white">
+                                حصري PRO 👑
+                              </span>
+                            )}
                           </div>
                           <p className="mt-1 text-xs text-ink-soft leading-relaxed">
                             {skin.description}
@@ -541,6 +590,16 @@ export default function Competitions() {
                           )}
                         >
                           {equipped ? "مفعّل حالياً ✓" : "تفعيل هذا السكن ✨"}
+                        </Button>
+                      ) : skin.isPro ? (
+                        <Button
+                          asChild
+                          size="sm"
+                          className="w-full rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-xs font-bold text-white hover:from-amber-600 hover:to-orange-600"
+                        >
+                          <Link href="/pricing">
+                            <Crown className="me-1.5 size-3.5" /> افتحه بترقية PRO 👑
+                          </Link>
                         </Button>
                       ) : (
                         <div className="space-y-1.5">

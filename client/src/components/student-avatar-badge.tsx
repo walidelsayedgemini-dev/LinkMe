@@ -42,7 +42,7 @@ export function StudentAvatarBadge({
       >
         <span aria-hidden="true">{avatar.emoji}</span>
       </div>
-      {showSkinBadge && skin.minStreak > 0 && (
+      {showSkinBadge && (skin.minStreak > 0 || skin.isPro) && (
         <span
           className={cn(
             "absolute grid place-items-center rounded-full border border-card bg-card shadow-sm",

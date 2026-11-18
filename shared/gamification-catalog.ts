@@ -17,6 +17,7 @@ export interface AvatarPreset {
   label: string;
   emoji: string;
   bgClass: string;
+  isPro?: boolean;
 }
 
 export const AVATAR_PRESETS: AvatarPreset[] = [
@@ -32,6 +33,11 @@ export const AVATAR_PRESETS: AvatarPreset[] = [
   { id: "crown", label: "بطل القمة", emoji: "👑", bgClass: "from-yellow-400 to-amber-600" },
   { id: "headphones", label: "عاشق النطق", emoji: "🎧", bgClass: "from-cyan-500 to-blue-600" },
   { id: "book", label: "عبقري الكلمات", emoji: "📚", bgClass: "from-teal-500 to-emerald-700" },
+  // Exclusive VIP / PRO Avatars
+  { id: "vip_king", label: "ملك الإنجليزي PRO", emoji: "🤴", bgClass: "from-amber-400 via-yellow-500 to-orange-600", isPro: true },
+  { id: "vip_queen", label: "ملكة الطلاقة PRO", emoji: "👸", bgClass: "from-rose-400 via-fuchsia-500 to-purple-700", isPro: true },
+  { id: "vip_eagle", label: "نسر القمة PRO", emoji: "🦅", bgClass: "from-sky-500 via-indigo-600 to-slate-900", isPro: true },
+  { id: "vip_astronaut", label: "رائد المجرة PRO", emoji: "👨‍🚀", bgClass: "from-purple-600 via-indigo-600 to-cyan-500", isPro: true },
 ];
 
 export function getAvatarPreset(id?: string | null): AvatarPreset {
@@ -47,6 +53,7 @@ export interface StreakSkin {
   ringClass: string;
   cardGlowClass: string;
   pillClass: string;
+  isPro?: boolean;
 }
 
 export const STREAK_SKINS: StreakSkin[] = [
@@ -109,6 +116,40 @@ export const STREAK_SKINS: StreakSkin[] = [
     ringClass: "ring-[3px] ring-fuchsia-500 shadow-[0_0_24px_rgba(217,70,239,0.75)]",
     cardGlowClass: "border-fuchsia-500/60 bg-gradient-to-br from-fuchsia-50/60 via-purple-50/40 to-amber-50/30 dark:from-fuchsia-950/30",
     pillClass: "bg-fuchsia-500/20 text-fuchsia-700 dark:text-fuchsia-300",
+  },
+  // Exclusive VIP / PRO Skins (unlocked immediately for paid subscribers!)
+  {
+    id: "vip_gold_emperor",
+    name: "هالة الإمبراطور الذهبية PRO",
+    badgeEmoji: "👑",
+    minStreak: 0,
+    isPro: true,
+    description: "سكن ملكي حصري لمشتركي الباقات المدفوعة مع شارة PRO الذهبية",
+    ringClass: "ring-[3px] ring-amber-400 shadow-[0_0_26px_rgba(245,158,11,0.85)]",
+    cardGlowClass: "border-amber-400/80 bg-gradient-to-br from-amber-100/70 via-yellow-50/40 to-card dark:from-amber-950/40",
+    pillClass: "bg-gradient-to-r from-amber-500 to-yellow-500 text-white",
+  },
+  {
+    id: "vip_cosmic_galaxy",
+    name: "المجرة الكونية VIP",
+    badgeEmoji: "🌌",
+    minStreak: 0,
+    isPro: true,
+    description: "سكن كوني متوهج حصري لمشتركي PRO — يفتح فوراً عند التفعيل",
+    ringClass: "ring-[3px] ring-purple-500 shadow-[0_0_26px_rgba(168,85,247,0.85)]",
+    cardGlowClass: "border-purple-500/70 bg-gradient-to-br from-purple-100/60 via-indigo-50/40 to-card dark:from-purple-950/40",
+    pillClass: "bg-gradient-to-r from-purple-600 to-indigo-600 text-white",
+  },
+  {
+    id: "vip_emerald_elite",
+    name: "الزمرد النخبوي VIP",
+    badgeEmoji: "❇️",
+    minStreak: 0,
+    isPro: true,
+    description: "سكن النخبة الأخضر المتألق حصري لطلاب الباقات والكورسات المدفوعة",
+    ringClass: "ring-[3px] ring-emerald-400 shadow-[0_0_24px_rgba(16,185,129,0.8)]",
+    cardGlowClass: "border-emerald-400/70 bg-gradient-to-br from-emerald-100/60 via-teal-50/30 to-card dark:from-emerald-950/35",
+    pillClass: "bg-gradient-to-r from-emerald-600 to-teal-500 text-white",
   },
 ];
 
@@ -219,7 +260,10 @@ export interface LeaderboardEntry {
   streakDays: number;
   xp: number;
   isCurrentUser?: boolean;
+  isVip?: boolean;
 }
+
+const VIP_VIRTUAL_IDS = new Set(["v1", "v5", "v12"]);
 
 export function buildVirtualCompetitors(
   period: CompetitionPeriod,
@@ -247,6 +291,7 @@ export function buildVirtualCompetitors(
       equippedSkin: seed.equippedSkin,
       streakDays: seed.streakDays,
       xp: Math.max(15, base + jitter),
+      isVip: VIP_VIRTUAL_IDS.has(seed.id),
     };
   });
 }

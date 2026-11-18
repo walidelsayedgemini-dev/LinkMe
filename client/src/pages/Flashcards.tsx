@@ -2,7 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import {
   CheckCircle2,
+  Crown,
   Flame,
+  Lock,
+  Printer,
   RotateCcw,
   Sparkles,
   Trophy,
@@ -26,7 +29,7 @@ import {
 
 const STORAGE_KEY = "linkme:flashcards-mastered:v1";
 const DAILY_KEY = "linkme:flashcards-daily:v1";
-const LEVELS: FlashcardLevel[] = ["A1", "A2", "B1", "B2"];
+const LEVELS: FlashcardLevel[] = ["A1", "A2", "B1", "B2", "C1"];
 
 function todayKey() {
   const d = new Date();
@@ -83,6 +86,38 @@ export default function Flashcards() {
   const [flipped, setFlipped] = useState(false);
 
   const addXpMutation = trpc.community.addXp.useMutation();
+  const { data: gameProfile } = trpc.community.myGameProfile.useQuery(
+    undefined,
+    { enabled: Boolean(user) }
+  );
+  const isVip = Boolean(gameProfile?.isVip);
+  const isLevelLocked = Boolean(FLASHCARD_LEVEL_META[level].isPro) && !isVip;
+
+  const handlePrintPdfSheet = () => {
+    if (!isVip) {
+      toast.info("تحميل ملخص الكلمات للطباعة (PDF) ميزة حصرية لمشتركي PRO 👑");
+      return;
+    }
+    const rows = levelCards
+      .map(
+        (c, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td style="direction:ltr;font-weight:700">${c.word}<br/><small style="color:#64748b">${c.phonetic}</small></td>
+        <td>${c.meaningAr}</td>
+        <td style="direction:ltr">${c.exampleEn}<br/><small style="color:#475569;direction:rtl;display:block">${c.exampleAr}</small></td>
+      </tr>`
+      )
+      .join("");
+    const win = window.open("", "_blank", "width=900,height=700");
+    if (!win) return;
+    win.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>Link Me Flashcards — ${level}</title>
+      <style>body{font-family:Tahoma,Arial,sans-serif;padding:24px;color:#0f172a}h1{color:#2563ff;margin-bottom:4px}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border:1px solid #cbd5e1;padding:10px;text-align:right;font-size:13px}th{background:#eff6ff}</style>
+      </head><body><h1>ملخص كلمات Link Me PRO — مستوى ${level}</h1><p>مطبوع خصيصاً لعضو PRO 👑 · link-me.tech</p>
+      <table><thead><tr><th>#</th><th>الكلمة والنطق</th><th>المعنى بالمصري</th><th>مثال عملي</th></tr></thead><tbody>${rows}</tbody></table>
+      <script>window.onload=function(){window.print()}</script></body></html>`);
+    win.document.close();
+  };
 
   const levelCards = useMemo(
     () => FLASHCARDS_DECK.filter(c => c.level === level),
@@ -225,7 +260,7 @@ export default function Flashcards() {
           </div>
 
           {/* Level selector */}
-          <div className="mt-6 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+          <div className="mt-6 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
             {LEVELS.map(lvl => {
               const meta = FLASHCARD_LEVEL_META[lvl];
               const count = FLASHCARDS_DECK.filter(c => c.level === lvl).length;
@@ -233,6 +268,7 @@ export default function Flashcards() {
                 c => c.level === lvl && mastered.includes(c.id)
               ).length;
               const active = level === lvl;
+              const locked = Boolean(meta.isPro) && !isVip;
               return (
                 <button
                   key={lvl}
@@ -242,16 +278,22 @@ export default function Flashcards() {
                     "rounded-2xl border p-3 text-start transition",
                     active
                       ? "border-iris bg-iris-soft/70 shadow-sm"
-                      : "border-line bg-card hover:border-iris/40"
+                      : meta.isPro
+                        ? "border-amber-400/50 bg-amber-500/[0.06] hover:border-amber-400"
+                        : "border-line bg-card hover:border-iris/40"
                   )}
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-sm font-bold text-ink">
                       {meta.label}
                     </span>
-                    <span className="latin text-xs font-semibold text-iris">
-                      {done}/{count}
-                    </span>
+                    {locked ? (
+                      <Lock className="size-3.5 text-amber-600" />
+                    ) : (
+                      <span className="latin text-xs font-semibold text-iris">
+                        {done}/{count}
+                      </span>
+                    )}
                   </div>
                   <p className="mt-1 line-clamp-1 text-[11px] text-ink-soft">
                     {meta.subtitle}
@@ -267,17 +309,28 @@ export default function Flashcards() {
       <section className="container py-8 sm:py-12">
         <div className="mx-auto max-w-2xl">
           {/* Progress header */}
-          <div className="mb-4 flex items-center justify-between text-xs text-ink-soft">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2 text-xs text-ink-soft">
             <span>
               تقدّم مستوى <b className="latin text-ink">{level}</b>:{" "}
               <b className="latin text-iris">
                 {levelMasteredCount} / {levelCards.length}
               </b>
             </span>
-            <span>
-              متبقي في الجلسة:{" "}
-              <b className="latin text-ink">{queue.length}</b> بطاقة
-            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={handlePrintPdfSheet}
+                className="h-8 rounded-full border-amber-400/50 bg-amber-500/10 px-3 text-[11px] font-bold text-amber-800 hover:bg-amber-500/20 dark:text-amber-300"
+              >
+                <Printer className="me-1.5 size-3.5" />
+                ملخص PDF للطباعة {isVip ? "✓" : "👑 PRO"}
+              </Button>
+              <span>
+                متبقي: <b className="latin text-ink">{queue.length}</b>
+              </span>
+            </div>
           </div>
           <div className="mb-6 h-2 overflow-hidden rounded-full bg-paper-deep">
             <div
@@ -288,7 +341,29 @@ export default function Flashcards() {
             />
           </div>
 
-          {currentCard ? (
+          {isLevelLocked ? (
+            <div className="rounded-3xl border-2 border-amber-400/50 bg-gradient-to-br from-amber-500/10 via-card to-iris/5 p-8 text-center shadow-sm">
+              <div className="mx-auto grid size-16 place-items-center rounded-2xl bg-amber-500/20 text-3xl">
+                👑
+              </div>
+              <h2 className="mt-4 text-2xl font-black text-ink">
+                حزمة الاحتراف C1 حصرية لمشتركي PRO!
+              </h2>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-ink-soft">
+                افتح 12 كلمة وتعبير تنفيذي لمستوى IELTS Band 8+ وبزنس الشركات
+                العالمية + مضاعفة نقاطك 2x XP + تحميل ملخصات PDF للطباعة فوراً!
+              </p>
+              <Button
+                asChild
+                className="mt-6 h-12 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-7 text-sm font-bold text-white hover:from-amber-600 hover:to-orange-600"
+              >
+                <Link href="/pricing">
+                  <Crown className="me-2 size-4" /> اشترك في PRO وافتح كل
+                  المزايا 👑
+                </Link>
+              </Button>
+            </div>
+          ) : currentCard ? (
             <>
               {/* Interactive Flip Card */}
               <div

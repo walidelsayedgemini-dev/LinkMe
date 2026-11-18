@@ -237,15 +237,24 @@ export default function Dashboard() {
                   size="lg"
                 />
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold text-ink-soft">
-                    هويتك في ساحة التحدي
-                  </p>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <p className="text-xs font-semibold text-ink-soft">
+                      هويتك في ساحة التحدي
+                    </p>
+                    {gameProfile.isVip && (
+                      <span className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-2 py-0.5 text-[10px] font-black text-white">
+                        PRO 👑 · 2x XP
+                      </span>
+                    )}
+                  </div>
                   <p className="truncate text-base font-bold text-ink">
                     {gameProfile.firstName}
                   </p>
                   <p className="mt-0.5 text-xs text-amber-600 dark:text-amber-400 font-semibold">
                     🔥 {gameProfile.streakDays} أيام حماسة ·{" "}
-                    {getStreakSkin(gameProfile.equippedSkin).name}
+                    {gameProfile.isVip
+                      ? "🛡️ درع الحماسة مفعّل"
+                      : getStreakSkin(gameProfile.equippedSkin).name}
                   </p>
                 </div>
               </div>
