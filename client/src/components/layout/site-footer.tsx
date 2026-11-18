@@ -12,6 +12,7 @@ const COLUMNS = [
       { label: "مسار الاستقلال اللغوي", href: "/path" },
       { label: "إنجليزي الأطفال", href: "/kids" },
       { label: "اختبار تحديد المستوى", href: "/level-test" },
+      { label: "التحقق من شهادة رسمية", href: "/verify" },
     ],
   },
   {

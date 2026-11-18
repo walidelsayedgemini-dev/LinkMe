@@ -35,6 +35,7 @@ const AdminConsole = lazy(() => import("./pages/Admin"));
 const StudentProfile = lazy(() => import("./pages/StudentProfile"));
 const Path = lazy(() => import("./pages/Path"));
 const Kids = lazy(() => import("./pages/Kids"));
+const VerifyCertificate = lazy(() => import("./pages/VerifyCertificate"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 import { CompanionProvider } from "./contexts/CompanionContext";
 import { CompanionFloatingWidget, CompanionSelectionDialog } from "./components/companion";
@@ -140,6 +141,8 @@ function Router() {
           <Route path="/instructors/:slug" component={InstructorProfile} />
           <Route path="/pricing" component={Pricing} />
           <Route path="/level-test" component={LevelTest} />
+          <Route path="/verify" component={VerifyCertificate} />
+          <Route path="/verify/:code" component={VerifyCertificate} />
           <Route path="/method" component={Method} />
           <Route path="/about" component={About} />
           <Route path="/owner" component={Owner} />

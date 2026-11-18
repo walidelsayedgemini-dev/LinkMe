@@ -1,10 +1,16 @@
-// Preconfigured storage helpers for Manus WebDev templates
-// Uploads via Forge Server presigned URL to S3 (PUT direct).
-// Downloads return /manus-storage/{key} paths served via 307 redirect.
+// Unified storage helpers for Link Me:
+// 1. Vercel Blob (when BLOB_READ_WRITE_TOKEN is configured — production cloud storage)
+// 2. Forge S3 presigned URLs (when MANUS_API_URL & MANUS_API_KEY are configured)
+// 3. Local ./uploads directory (local development fallback)
 
 import fs from "node:fs/promises";
 import path from "node:path";
+import { put as vercelBlobPut } from "@vercel/blob";
 import { ENV } from "./_core/env";
+
+function isVercelBlobAvailable(): boolean {
+  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+}
 
 function isForgeAvailable(): boolean {
   return Boolean(ENV.forgeApiUrl && ENV.forgeApiKey);
@@ -16,7 +22,7 @@ function getForgeConfig() {
 
   if (!forgeUrl || !forgeKey) {
     throw new Error(
-      "Storage config missing: set MANUS_API_URL and MANUS_API_KEY",
+      "Storage config missing: set BLOB_READ_WRITE_TOKEN or MANUS_API_URL/MANUS_API_KEY",
     );
   }
 
@@ -34,6 +40,10 @@ function appendHashSuffix(relKey: string): string {
   return `${relKey.slice(0, lastDot)}_${hash}${relKey.slice(lastDot)}`;
 }
 
+export function isCloudStorageConfigured(): boolean {
+  return isVercelBlobAvailable() || isForgeAvailable();
+}
+
 export async function storagePut(
   relKey: string,
   data: Buffer | Uint8Array | string,
@@ -41,18 +51,33 @@ export async function storagePut(
 ): Promise<{ key: string; url: string }> {
   const key = appendHashSuffix(normalizeKey(relKey));
 
+  // 1. Prefer Vercel Blob in cloud/production deployments
+  if (isVercelBlobAvailable()) {
+    const buffer =
+      typeof data === "string" ? Buffer.from(data) : Buffer.from(data);
+    const blob = await vercelBlobPut(key, buffer, {
+      access: "public",
+      contentType,
+      addRandomSuffix: false,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    });
+    return { key: blob.url, url: blob.url };
+  }
+
+  // 2. Local filesystem fallback for development
   if (!isForgeAvailable()) {
     const localDir = path.resolve(process.cwd(), "uploads");
     const filePath = path.join(localDir, key);
     await fs.mkdir(path.dirname(filePath), { recursive: true });
-    const buffer = typeof data === "string" ? Buffer.from(data) : Buffer.from(data);
+    const buffer =
+      typeof data === "string" ? Buffer.from(data) : Buffer.from(data);
     await fs.writeFile(filePath, buffer);
     return { key, url: `/uploads/${key}` };
   }
 
+  // 3. Forge S3 presigned upload
   const { forgeUrl, forgeKey } = getForgeConfig();
 
-  // 1. Get presigned PUT URL from Forge
   const presignUrl = new URL("v1/storage/presign/put", forgeUrl + "/");
   presignUrl.searchParams.set("path", key);
 
@@ -68,7 +93,6 @@ export async function storagePut(
   const { url: s3Url } = (await presignResp.json()) as { url: string };
   if (!s3Url) throw new Error("Forge returned empty presign URL");
 
-  // 2. PUT file directly to S3
   const blob =
     typeof data === "string"
       ? new Blob([data], { type: contentType })
@@ -87,7 +111,12 @@ export async function storagePut(
   return { key, url: `/manus-storage/${key}` };
 }
 
-export async function storageGet(relKey: string): Promise<{ key: string; url: string }> {
+export async function storageGet(
+  relKey: string,
+): Promise<{ key: string; url: string }> {
+  if (/^https?:\/\//i.test(relKey)) {
+    return { key: relKey, url: relKey };
+  }
   const key = normalizeKey(relKey);
   if (!isForgeAvailable()) {
     return { key, url: `/uploads/${key}` };
@@ -96,6 +125,9 @@ export async function storageGet(relKey: string): Promise<{ key: string; url: st
 }
 
 export async function storageGetSignedUrl(relKey: string): Promise<string> {
+  if (/^https?:\/\//i.test(relKey)) {
+    return relKey;
+  }
   const key = normalizeKey(relKey);
   if (!isForgeAvailable()) {
     return `/uploads/${key}`;

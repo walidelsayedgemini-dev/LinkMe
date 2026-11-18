@@ -423,3 +423,4 @@ export const assessmentSessions = mysqlTable(
 export * from "./premium-schema";
 export * from "./profile-schema";
 export * from "./receipts-schema";
+export * from "./certificates-schema";

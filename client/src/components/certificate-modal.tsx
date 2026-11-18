@@ -1,16 +1,29 @@
-import { useRef, useState } from "react";
-import { Award, Download, Printer, Share2, Sparkles, CheckCircle2, ShieldCheck } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import {
+  Award,
+  Download,
+  ExternalLink,
+  Loader2,
+  Printer,
+  QrCode,
+  Share2,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
+import QRCode from "qrcode";
+import { Link } from "wouter";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCompanion, CompanionAvatar } from "@/components/companion";
 import { soundEffects } from "@/lib/sound-effects";
+import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
 interface CertificateModalProps {
@@ -32,18 +45,69 @@ export function CertificateModal({
 }: CertificateModalProps) {
   const [studentName, setStudentName] = useState(defaultStudentName);
   const [isEditing, setIsEditing] = useState(false);
+  const [certId, setCertId] = useState<string>("");
+  const [isVerifiedInDb, setIsVerifiedInDb] = useState(false);
+  const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const certRef = useRef<HTMLDivElement>(null);
+  const issuedOnceRef = useRef(false);
   const { companion } = useCompanion();
 
-  // Stable random certificate ID
-  const [certId] = useState(() => {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    let code = "LM-";
-    for (let i = 0; i < 8; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return code;
+  const issueMutation = trpc.certificates.issue.useMutation({
+    onSuccess: data => {
+      setCertId(data.code);
+      setIsVerifiedInDb(true);
+    },
+    onError: () => {
+      // Fallback code if offline so preview still renders
+      if (!certId) {
+        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        let fallback = "LM-";
+        for (let i = 0; i < 8; i++) {
+          fallback += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        setCertId(fallback);
+      }
+    },
   });
+
+  // Auto-issue a real verifiable certificate in DB when modal opens
+  useEffect(() => {
+    if (!open) return;
+    if (issuedOnceRef.current && certId) return;
+    issuedOnceRef.current = true;
+    issueMutation.mutate({
+      studentName: studentName.trim() || defaultStudentName,
+      courseTitle,
+      levelTitle,
+      scorePercentage,
+    });
+  }, [open]);
+
+  const verifyUrl =
+    typeof window !== "undefined" && certId
+      ? `${window.location.origin}/verify/${certId}`
+      : certId
+        ? `https://www.link-me.tech/verify/${certId}`
+        : "";
+
+  // Generate crisp QR Code whenever verifyUrl changes
+  useEffect(() => {
+    if (!verifyUrl) return;
+    let active = true;
+    QRCode.toDataURL(verifyUrl, {
+      width: 220,
+      margin: 1,
+      errorCorrectionLevel: "M",
+      color: { dark: "#0f172a", light: "#ffffff" },
+    })
+      .then(url => {
+        if (active) setQrDataUrl(url);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [verifyUrl]);
 
   const currentDate = new Intl.DateTimeFormat("ar-EG", {
     year: "numeric",
@@ -51,12 +115,36 @@ export function CertificateModal({
     day: "numeric",
   }).format(new Date());
 
+  const handleSaveName = () => {
+    const clean = studentName.trim();
+    if (clean.length < 2) {
+      toast.error("اكتب اسمك بشكل واضح (حرفين على الأقل)");
+      return;
+    }
+    setIsEditing(false);
+    issueMutation.mutate(
+      {
+        existingCode: certId || undefined,
+        studentName: clean,
+        courseTitle,
+        levelTitle,
+        scorePercentage,
+      },
+      {
+        onSuccess: () => {
+          soundEffects.playCorrect();
+          toast.success("تم حفظ اسمك وتوثيق الشهادة في سجل Link Me الرسمي ✓");
+        },
+      }
+    );
+  };
+
   const handlePrint = () => {
     soundEffects.playClick();
     window.print();
   };
 
-  const handleDownloadImage = () => {
+  const handleDownloadImage = async () => {
     soundEffects.playClick();
     const canvas = document.createElement("canvas");
     canvas.width = 1200;
@@ -96,52 +184,53 @@ export function CertificateModal({
     ctx.fillStyle = "#92400e";
     ctx.font = "bold 20px sans-serif";
     ctx.textAlign = "center";
-    ctx.letterSpacing = "6px";
-    ctx.fillText("LINK ME ENGLISH ACADEMY", 600, 110);
+    ctx.fillText("LINK ME ENGLISH ACADEMY", 600, 105);
 
     // Title
     ctx.fillStyle = "#0f172a";
     ctx.font = "bold 44px serif";
-    ctx.letterSpacing = "2px";
-    ctx.fillText("CERTIFICATE OF ACHIEVEMENT", 600, 180);
+    ctx.fillText("CERTIFICATE OF ACHIEVEMENT", 600, 170);
 
     // Arabic title
     ctx.fillStyle = "#475569";
     ctx.font = "bold 22px 'IBM Plex Sans Arabic', sans-serif";
-    ctx.letterSpacing = "0px";
-    ctx.fillText("شهادة إتمام وتفوق معتمدة", 600, 225);
+    ctx.fillText("شهادة إتمام وتفوق معتمدة", 600, 215);
 
     // Subtitle
     ctx.fillStyle = "#64748b";
     ctx.font = "16px sans-serif";
-    ctx.fillText("THIS IS PROUDLY PRESENTED TO", 600, 290);
+    ctx.fillText("THIS IS PROUDLY PRESENTED TO", 600, 275);
 
     // Student Name
     ctx.fillStyle = "#4338ca";
     ctx.font = "bold 46px serif";
-    ctx.fillText(studentName, 600, 365);
+    ctx.fillText(studentName, 600, 345);
 
     // Underline
     ctx.strokeStyle = "#d97706";
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(350, 385);
-    ctx.lineTo(850, 385);
+    ctx.moveTo(350, 365);
+    ctx.lineTo(850, 365);
     ctx.stroke();
 
     // Body text
     ctx.fillStyle = "#334155";
     ctx.font = "20px 'IBM Plex Sans Arabic', sans-serif";
-    ctx.fillText(`تقديراً لإتمامه بنجاح متطلبات «${courseTitle}»`, 600, 445);
-    ctx.fillText(`واجتياز تقييم الكفاءة اللغوية بنسبة تفوق ${scorePercentage}% وفق المعايير الأوروبية`, 600, 485);
+    ctx.fillText(`تقديراً لإتمامه بنجاح متطلبات «${courseTitle}»`, 600, 425);
+    ctx.fillText(
+      `واجتياز تقييم الكفاءة اللغوية بنسبة تفوق ${scorePercentage}% وفق المعايير الأوروبية`,
+      600,
+      462
+    );
 
     // Level Badge
     ctx.fillStyle = "#fef3c7";
     ctx.beginPath();
     if ((ctx as any).roundRect) {
-      (ctx as any).roundRect(400, 525, 400, 45, [22]);
+      (ctx as any).roundRect(380, 495, 440, 46, [23]);
     } else {
-      ctx.rect(400, 525, 400, 45);
+      ctx.rect(380, 495, 440, 46);
     }
     ctx.fill();
     ctx.strokeStyle = "#d97706";
@@ -150,76 +239,88 @@ export function CertificateModal({
 
     ctx.fillStyle = "#78350f";
     ctx.font = "bold 18px sans-serif";
-    ctx.fillText(`★  ${levelTitle}  ★`, 600, 554);
+    ctx.fillText(`★  ${levelTitle}  ★`, 600, 524);
 
-    // Signatures
+    // Signature (Left)
     ctx.fillStyle = "#0f172a";
-    ctx.font = "italic bold 22px serif";
-    ctx.fillText("Omar Elsayed", 300, 680);
+    ctx.font = "italic bold 24px serif";
+    ctx.fillText("Walid Elsayed", 260, 665);
     ctx.strokeStyle = "#94a3b8";
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(200, 695);
-    ctx.lineTo(400, 695);
+    ctx.moveTo(160, 682);
+    ctx.lineTo(360, 682);
     ctx.stroke();
     ctx.fillStyle = "#64748b";
     ctx.font = "16px 'IBM Plex Sans Arabic', sans-serif";
-    ctx.fillText("المشرف الأكاديمي", 300, 725);
+    ctx.fillText("مدير الأكاديمية", 260, 712);
 
-    // Golden Seal in center
+    // Golden Seal (Center)
     ctx.fillStyle = "#f59e0b";
     ctx.beginPath();
-    ctx.arc(600, 690, 48, 0, Math.PI * 2);
+    ctx.arc(600, 660, 48, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = "#78350f";
     ctx.font = "bold 13px sans-serif";
-    ctx.fillText("OFFICIAL", 600, 685);
-    ctx.fillText("VERIFIED", 600, 702);
+    ctx.fillText("OFFICIAL", 600, 655);
+    ctx.fillText("VERIFIED", 600, 672);
 
+    ctx.fillStyle = "#334155";
+    ctx.font = "bold 14px monospace";
+    ctx.fillText(certId || "LM-VERIFIED", 600, 732);
     ctx.fillStyle = "#64748b";
-    ctx.font = "12px monospace";
-    ctx.fillText(certId, 600, 755);
+    ctx.font = "13px sans-serif";
+    ctx.fillText(`Verify: link-me.tech/verify/${certId}`, 600, 756);
 
-    // Date
-    ctx.fillStyle = "#0f172a";
-    ctx.font = "bold 18px sans-serif";
-    ctx.fillText(currentDate, 900, 680);
-    ctx.strokeStyle = "#94a3b8";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(800, 695);
-    ctx.lineTo(1000, 695);
-    ctx.stroke();
-    ctx.fillStyle = "#64748b";
-    ctx.font = "16px 'IBM Plex Sans Arabic', sans-serif";
-    ctx.fillText("تاريخ الاعتماد", 900, 725);
+    // Date & QR Code (Right)
+    if (qrDataUrl) {
+      await new Promise<void>(resolve => {
+        const qrImg = new Image();
+        qrImg.onload = () => {
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(928, 578, 124, 124);
+          ctx.strokeStyle = "#d97706";
+          ctx.lineWidth = 2;
+          ctx.strokeRect(928, 578, 124, 124);
+          ctx.drawImage(qrImg, 934, 584, 112, 112);
+          ctx.fillStyle = "#64748b";
+          ctx.font = "12px sans-serif";
+          ctx.fillText("Scan to Verify", 990, 720);
+          ctx.font = "13px 'IBM Plex Sans Arabic', sans-serif";
+          ctx.fillText(currentDate, 990, 744);
+          resolve();
+        };
+        qrImg.onerror = () => resolve();
+        qrImg.src = qrDataUrl;
+      });
+    }
 
     // Download image
     const link = document.createElement("a");
-    link.download = `LinkMe-Certificate-${certId}.png`;
+    link.download = `LinkMe-Certificate-${certId || "official"}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
     soundEffects.playTrophy();
-    toast.success("تم تنزيل الشهادة كصورة عالية الجودة بنجاح! 🎓📸");
+    toast.success("تم تنزيل الشهادة الرسمية مع QR Code التحقق بنجاح! 🎓📸");
   };
 
   const handleShare = async () => {
     soundEffects.playClick();
-    const shareText = `🎓 حصلت على شهادة إتمام ${courseTitle} من منصة Link Me! كود التحقق: ${certId}`;
+    const shareText = `🎓 حصلت على شهادة موثقة لـ «${courseTitle}» من أكاديمية Link Me!\nكود التحقق الرسمي: ${certId}\nرابط التحقق: ${verifyUrl}`;
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "شهادة إتمام معتمدة — Link Me",
+          title: "شهادة إتمام موثقة — Link Me",
           text: shareText,
-          url: window.location.origin,
+          url: verifyUrl,
         });
         toast.success("تمت المشاركة بنجاح!");
       } catch {
-        // User cancelled share
+        // Cancelled
       }
     } else {
-      await navigator.clipboard.writeText(`${shareText}\n${window.location.origin}`);
-      toast.success("تم نسخ تفاصيل الشهادة للمشاركة على واتساب أو لينكد إن!");
+      await navigator.clipboard.writeText(shareText);
+      toast.success("تم نسخ رابط التحقق الرسمي للشهادة للمشاركة على واتساب أو لينكد إن!");
     }
   };
 
@@ -227,61 +328,83 @@ export function CertificateModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl overflow-y-auto max-h-[92vh] p-4 sm:p-6 bg-paper print:m-0 print:p-0 print:border-none print:shadow-none">
         <DialogHeader className="print:hidden">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <Award className="size-6 text-amber-500" />
-              <DialogTitle className="text-lg font-bold">الشهادة الرقمية المعتمدة</DialogTitle>
+              <DialogTitle className="text-lg font-bold">
+                الشهادة الرقمية المعتمدة
+              </DialogTitle>
             </div>
             <div className="flex items-center gap-2">
+              {isVerifiedInDb ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-300">
+                  <ShieldCheck className="size-3.5" /> موثقة برقم رسمي
+                </span>
+              ) : issueMutation.isPending ? (
+                <span className="inline-flex items-center gap-1 text-[11px] text-ink-soft">
+                  <Loader2 className="size-3.5 animate-spin" /> جارٍ التوثيق...
+                </span>
+              ) : null}
               <CompanionAvatar size={32} />
-              <span className="text-xs font-semibold text-ink-soft">
-                {companion.id === "khadija" ? "مبارك يا سكرة! 🌸" : "عاش يا وحش! 🔥"}
-              </span>
             </div>
           </div>
           <DialogDescription className="text-xs text-ink-soft">
-            شهادتك الرسمية من أكاديمية Link Me موثقة برقم تحقق حصري
+            شهادتك الرسمية من أكاديمية Link Me مسجلة في قاعدة البيانات مع QR Code للتحقق الفوري
           </DialogDescription>
         </DialogHeader>
 
         {/* Name Customizer Banner */}
         <div className="print:hidden flex flex-wrap items-center justify-between gap-2 rounded-xl bg-card border border-line p-3 text-xs">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="font-semibold text-ink">الاسم على الشهادة:</span>
             {isEditing ? (
               <Input
                 value={studentName}
-                onChange={(e) => setStudentName(e.target.value)}
-                className="h-8 w-48 text-xs font-bold"
+                onChange={e => setStudentName(e.target.value)}
+                className="h-8 w-52 text-xs font-bold"
                 placeholder="اكتب اسمك الثلاثي"
                 autoFocus
+                onKeyDown={e => {
+                  if (e.key === "Enter") handleSaveName();
+                }}
               />
             ) : (
               <span className="font-bold text-iris text-sm">{studentName}</span>
             )}
           </div>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setIsEditing(!isEditing)}
-            className="h-7 text-xs rounded-full"
-          >
-            {isEditing ? "تأكيد الاسم" : "تعديل الاسم"}
-          </Button>
+          {isEditing ? (
+            <Button
+              size="sm"
+              onClick={handleSaveName}
+              disabled={issueMutation.isPending}
+              className="h-7 text-xs rounded-full bg-iris text-white"
+            >
+              {issueMutation.isPending ? "جاري الحفظ..." : "حفظ وتوثيق الاسم"}
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setIsEditing(true)}
+              className="h-7 text-xs rounded-full"
+            >
+              تعديل الاسم
+            </Button>
+          )}
         </div>
 
-        {/* The Printable Certificate Design */}
+        {/* Printable Certificate Design */}
         <div
           ref={certRef}
           id="linkme-certificate"
-          className="relative overflow-hidden rounded-2xl border-8 border-double border-amber-600/40 bg-gradient-to-br from-amber-50/70 via-white to-amber-50/50 p-6 sm:p-10 text-center shadow-2xl dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 dark:border-amber-500/40"
+          className="relative overflow-hidden rounded-2xl border-8 border-double border-amber-600/40 bg-gradient-to-br from-amber-50/70 via-white to-amber-50/50 p-5 sm:p-10 text-center shadow-2xl dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 dark:border-amber-500/40"
           dir="ltr"
         >
           {/* Decorative Corner Filigrees */}
-          <div className="absolute top-2 left-2 size-12 border-t-2 border-l-2 border-amber-500/60 pointer-events-none" />
-          <div className="absolute top-2 right-2 size-12 border-t-2 border-r-2 border-amber-500/60 pointer-events-none" />
-          <div className="absolute bottom-2 left-2 size-12 border-b-2 border-l-2 border-amber-500/60 pointer-events-none" />
-          <div className="absolute bottom-2 right-2 size-12 border-b-2 border-r-2 border-amber-500/60 pointer-events-none" />
+          <div className="absolute top-2 left-2 size-10 sm:size-12 border-t-2 border-l-2 border-amber-500/60 pointer-events-none" />
+          <div className="absolute top-2 right-2 size-10 sm:size-12 border-t-2 border-r-2 border-amber-500/60 pointer-events-none" />
+          <div className="absolute bottom-2 left-2 size-10 sm:size-12 border-b-2 border-l-2 border-amber-500/60 pointer-events-none" />
+          <div className="absolute bottom-2 right-2 size-10 sm:size-12 border-b-2 border-r-2 border-amber-500/60 pointer-events-none" />
 
           {/* Watermark Logo */}
           <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
@@ -291,27 +414,30 @@ export function CertificateModal({
           <div className="relative z-10 space-y-4">
             {/* Header Badge */}
             <div className="flex items-center justify-center gap-2">
-              <span className="h-px w-12 bg-amber-500/50" />
-              <span className="text-xs uppercase tracking-[0.25em] font-bold text-amber-700 dark:text-amber-400">
+              <span className="h-px w-10 sm:w-12 bg-amber-500/50" />
+              <span className="text-[11px] sm:text-xs uppercase tracking-[0.22em] font-bold text-amber-700 dark:text-amber-400">
                 Link Me English Academy
               </span>
-              <span className="h-px w-12 bg-amber-500/50" />
+              <span className="h-px w-10 sm:w-12 bg-amber-500/50" />
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-wider text-slate-900 dark:text-white font-serif">
+            <h1 className="text-xl sm:text-3xl font-extrabold tracking-wider text-slate-900 dark:text-white font-serif">
               CERTIFICATE OF ACHIEVEMENT
             </h1>
-            <p className="text-xs sm:text-sm font-arabic font-medium text-slate-600 dark:text-slate-400" dir="rtl">
+            <p
+              className="text-xs sm:text-sm font-arabic font-medium text-slate-600 dark:text-slate-400"
+              dir="rtl"
+            >
               شهادة إتمام وتفوق معتمدة
             </p>
 
-            <div className="pt-2 text-xs text-slate-500 uppercase tracking-widest">
+            <div className="pt-1 text-[11px] text-slate-500 uppercase tracking-widest">
               This is proudly presented to
             </div>
 
             {/* Recipient Name */}
-            <div className="py-2">
-              <div className="inline-block border-b-2 border-amber-600/60 pb-1 px-8">
+            <div className="py-1">
+              <div className="inline-block border-b-2 border-amber-600/60 pb-1 px-6 sm:px-8">
                 <span className="text-2xl sm:text-4xl font-extrabold text-iris-deep dark:text-iris font-serif">
                   {studentName}
                 </span>
@@ -319,8 +445,17 @@ export function CertificateModal({
             </div>
 
             {/* Description */}
-            <p className="max-w-xl mx-auto text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-arabic" dir="rtl">
-              تقديراً لإتمامه بنجاح متطلبات <span className="font-bold text-slate-900 dark:text-white">«{courseTitle}»</span> واجتياز تقييم الكفاءة اللغوية بنسبة تفوق <span className="font-bold text-iris">{scorePercentage}%</span> وفق الإطار الأوروبي المرجعي (CEFR).
+            <p
+              className="max-w-xl mx-auto text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-arabic"
+              dir="rtl"
+            >
+              تقديراً لإتمامه بنجاح متطلبات{" "}
+              <span className="font-bold text-slate-900 dark:text-white">
+                «{courseTitle}»
+              </span>{" "}
+              واجتياز تقييم الكفاءة اللغوية بنسبة تفوق{" "}
+              <span className="font-bold text-iris">{scorePercentage}%</span> وفق
+              الإطار الأوروبي المرجعي (CEFR).
             </p>
 
             <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-100/80 px-4 py-1 text-xs font-bold text-amber-900 dark:bg-amber-950/60 dark:text-amber-200">
@@ -328,16 +463,16 @@ export function CertificateModal({
               <span>{levelTitle}</span>
             </div>
 
-            {/* Bottom Signatures & Seal */}
-            <div className="pt-6 grid grid-cols-3 items-end text-xs">
+            {/* Bottom Signatures, Gold Seal & Live Scannable QR Code */}
+            <div className="pt-5 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-2 items-center text-xs">
               <div className="space-y-1 text-center">
-                <div className="h-10 flex items-center justify-center">
+                <div className="h-9 flex items-center justify-center">
                   <span className="font-serif italic font-bold text-slate-800 dark:text-slate-200 text-base">
-                    Omar Elsayed
+                    Walid Elsayed
                   </span>
                 </div>
                 <div className="border-t border-slate-300 dark:border-slate-700 pt-1 font-arabic text-[11px] text-slate-500">
-                  المشرف الأكاديمي
+                  مدير الأكاديمية · {currentDate}
                 </div>
               </div>
 
@@ -349,18 +484,35 @@ export function CertificateModal({
                     <span>VERIFIED</span>
                   </div>
                 </div>
-                <span className="mt-1 font-mono text-[10px] text-slate-500 tracking-wider">
-                  {certId}
+                <span className="mt-1.5 font-mono text-[11px] font-bold text-slate-700 dark:text-slate-300 tracking-wider">
+                  {certId || "..."}
                 </span>
               </div>
 
-              <div className="space-y-1 text-center font-arabic">
-                <div className="h-10 flex items-center justify-center font-medium text-slate-700 dark:text-slate-300 text-xs">
-                  {currentDate}
-                </div>
-                <div className="border-t border-slate-300 dark:border-slate-700 pt-1 text-[11px] text-slate-500">
-                  تاريخ الاعتماد
-                </div>
+              {/* Scannable QR Code for /verify/:code */}
+              <div className="flex flex-col items-center justify-center">
+                {qrDataUrl ? (
+                  <a
+                    href={verifyUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group rounded-xl border-2 border-amber-500/50 bg-white p-1.5 shadow-sm transition hover:scale-105"
+                    title="امسح الـ QR Code أو اضغط للتحقق الرسمي"
+                  >
+                    <img
+                      src={qrDataUrl}
+                      alt={`QR Code للتحقق من الشهادة ${certId}`}
+                      className="size-20 sm:size-24"
+                    />
+                  </a>
+                ) : (
+                  <div className="size-20 rounded-xl border border-dashed border-slate-300 grid place-items-center text-slate-400">
+                    <QrCode className="size-8" />
+                  </div>
+                )}
+                <span className="mt-1 text-[10px] font-medium text-slate-500">
+                  Scan to Verify · link-me.tech
+                </span>
               </div>
             </div>
           </div>
@@ -371,36 +523,54 @@ export function CertificateModal({
           <CompanionAvatar size={36} />
           <p className="text-xs text-ink leading-relaxed font-medium">
             {companion.id === "khadija"
-              ? "مبسوطة بيكي أوي ومستنياكي تكملي الكورس اللي بعده كمان عشان نشيل شهادات أكتر! 🌸🎓"
-              : "كده اللعب ع الكبار يا صاحبي! نزل الشهادة وابعتها ع الواتساب أو شاركها وخلّي الكل يشوف مجهودك! 🔥🚀"}
+              ? "مبسوطة بيكي أوي! شهادتك اتوثقت رسمياً بـ QR Code تقدري تشاركيها في الـ CV وعلى لينكد إن 🌸🎓"
+              : "كده اللعب ع الكبار يا بطل! شهادتك اتوثقت رسمياً بـ QR Code، نزّلها صورة أو شارك رابط التحقق! 🔥🚀"}
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="print:hidden flex flex-wrap items-center justify-end gap-2 pt-2">
-          <Button
-            onClick={handleDownloadImage}
-            className="h-9 gap-1.5 rounded-full bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-700 shadow-md"
-          >
-            <Download className="size-3.5" />
-            تحميل كصورة (PNG)
-          </Button>
-          <Button
-            onClick={handleShare}
-            variant="outline"
-            className="h-9 gap-1.5 rounded-full text-xs font-semibold"
-          >
-            <Share2 className="size-3.5" />
-            مشاركة الشهادة
-          </Button>
-          <Button
-            onClick={handlePrint}
-            variant="outline"
-            className="h-9 gap-1.5 rounded-full border-iris text-iris text-xs font-bold hover:bg-iris/10"
-          >
-            <Printer className="size-3.5" />
-            طباعة أو حفظ كـ PDF
-          </Button>
+        <div className="print:hidden flex flex-wrap items-center justify-between gap-2 pt-1">
+          {certId ? (
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="h-9 gap-1.5 rounded-full text-xs font-bold text-emerald-700 hover:bg-emerald-500/10 dark:text-emerald-400"
+            >
+              <Link href={`/verify/${certId}`} onClick={() => onOpenChange(false)}>
+                <ExternalLink className="size-3.5" />
+                فتح صفحة التحقق الرسمية
+              </Link>
+            </Button>
+          ) : (
+            <div />
+          )}
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              onClick={handleDownloadImage}
+              className="h-9 gap-1.5 rounded-full bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-700 shadow-md"
+            >
+              <Download className="size-3.5" />
+              تحميل صورة + QR (PNG)
+            </Button>
+            <Button
+              onClick={handleShare}
+              variant="outline"
+              className="h-9 gap-1.5 rounded-full text-xs font-semibold"
+            >
+              <Share2 className="size-3.5" />
+              مشاركة رابط التحقق
+            </Button>
+            <Button
+              onClick={handlePrint}
+              variant="outline"
+              className="h-9 gap-1.5 rounded-full border-iris text-iris text-xs font-bold hover:bg-iris/10"
+            >
+              <Printer className="size-3.5" />
+              طباعة / PDF
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

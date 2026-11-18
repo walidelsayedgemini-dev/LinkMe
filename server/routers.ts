@@ -14,6 +14,7 @@ import { premiumRouter } from "./routers/premium";
 import { profileRouter } from "./routers/profile";
 import { curriculumRouter } from "./routers/curriculum";
 import { receiptsRouter } from "./routers/receipts";
+import { certificatesRouter } from "./routers/certificates";
 export const appRouter = router({
   system: systemRouter,
   auth: authRouter,
@@ -30,6 +31,7 @@ export const appRouter = router({
   profile: profileRouter,
   curriculum: curriculumRouter,
   receipts: receiptsRouter,
+  certificates: certificatesRouter,
 });
 
 export type AppRouter = typeof appRouter;

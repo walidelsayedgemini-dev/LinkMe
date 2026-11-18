@@ -53,7 +53,12 @@ export function createApiApp() {
     } catch {
       database = "down";
     }
-    res.status(200).json({ status: "ok", database, uptime: Math.round(process.uptime()) });
+    res.status(200).json({
+      status: "ok",
+      database,
+      storage: process.env.BLOB_READ_WRITE_TOKEN ? "vercel-blob" : "local",
+      uptime: Math.round(process.uptime()),
+    });
   });
 
   app.get("/api/platform/config.js", (_req, res) => {
