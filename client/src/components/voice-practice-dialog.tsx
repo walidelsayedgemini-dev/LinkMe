@@ -136,7 +136,7 @@ export function VoicePracticeDialog({
       }
       setTranscript(finalTranscript);
 
-      if (event.results[0].isFinal) {
+      if (event.results[event.results.length - 1]?.isFinal) {
         evaluateSpeech(finalTranscript, phrase.en);
       }
     };

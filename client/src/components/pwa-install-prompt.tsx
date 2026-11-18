@@ -15,12 +15,18 @@ export function PwaInstallPrompt() {
   const { companion } = useCompanion();
 
   useEffect(() => {
-    // Register Service Worker
-    if ("serviceWorker" in navigator && process.env.NODE_ENV !== "test") {
-      navigator.serviceWorker
-        .register("/sw.js")
-        .then(() => console.log("[PWA] Service Worker registered"))
-        .catch((err) => console.warn("[PWA] Service Worker registration failed:", err));
+    // Register Service Worker only in production; unregister stale ones in dev mode
+    if ("serviceWorker" in navigator) {
+      if (import.meta.env.PROD) {
+        navigator.serviceWorker
+          .register("/sw.js")
+          .then(() => console.log("[PWA] Service Worker registered"))
+          .catch((err) => console.warn("[PWA] Service Worker registration failed:", err));
+      } else {
+        navigator.serviceWorker.getRegistrations().then((regs) => {
+          regs.forEach((reg) => reg.unregister());
+        }).catch(() => {});
+      }
     }
 
     // Check if already in standalone mode

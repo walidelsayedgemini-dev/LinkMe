@@ -73,7 +73,7 @@ export function QuestionCard({
         soundEffects.playIncorrect();
       }
     }
-  }, [currentFeedback?.questionId, currentFeedback?.correct]);
+  }, [currentFeedback?.questionId, currentFeedback?.chosenIndex, currentFeedback?.correct]);
 
   return (
     <div className="assessment-question-layout">

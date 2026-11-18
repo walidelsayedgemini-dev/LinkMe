@@ -241,15 +241,7 @@ export default defineConfig({
         path.startsWith("/tmp") ||
         path.startsWith("/usr"),
     },
-    allowedHosts: [
-      ".manuspre.computer",
-      ".manus.computer",
-      ".manus-asia.computer",
-      ".manuscomputer.ai",
-      ".manusvm.computer",
-      "localhost",
-      "127.0.0.1",
-    ],
+    allowedHosts: true,
     fs: {
       strict: true,
       // Setting deny replaces Vite's defaults, so they are repeated here first. Then dotfiles, and the
