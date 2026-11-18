@@ -29,7 +29,16 @@ import {
 
 const STORAGE_KEY = "linkme:flashcards-mastered:v1";
 const DAILY_KEY = "linkme:flashcards-daily:v1";
-const LEVELS: FlashcardLevel[] = ["A1", "A2", "B1", "B2", "C1"];
+const LEVELS: FlashcardLevel[] = [
+  "A1",
+  "A2",
+  "B1",
+  "B2",
+  "C1",
+  "IELTS",
+  "BUSINESS",
+  "IDIOMS",
+];
 
 function todayKey() {
   const d = new Date();
@@ -260,7 +269,7 @@ export default function Flashcards() {
           </div>
 
           {/* Level selector */}
-          <div className="mt-6 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="mt-6 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
             {LEVELS.map(lvl => {
               const meta = FLASHCARD_LEVEL_META[lvl];
               const count = FLASHCARDS_DECK.filter(c => c.level === lvl).length;
@@ -347,11 +356,12 @@ export default function Flashcards() {
                 👑
               </div>
               <h2 className="mt-4 text-2xl font-black text-ink">
-                حزمة الاحتراف C1 حصرية لمشتركي PRO!
+                حزمة «{FLASHCARD_LEVEL_META[level].label}» حصرية لمشتركي PRO!
               </h2>
               <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-ink-soft">
-                افتح 12 كلمة وتعبير تنفيذي لمستوى IELTS Band 8+ وبزنس الشركات
-                العالمية + مضاعفة نقاطك 2x XP + تحميل ملخصات PDF للطباعة فوراً!
+                افتح 84 بطاقة متقدمة (C1 + IELTS Band 8+ + بزنس وفريلانس +
+                تعبيرات Native) مع النطق الأمريكي ومضاعفة النقاط 2x XP وتحميل
+                ملخصات PDF للطباعة فوراً!
               </p>
               <Button
                 asChild

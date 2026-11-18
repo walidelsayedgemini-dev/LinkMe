@@ -24,7 +24,9 @@ import { awardXP } from "@/lib/gamification";
 import { soundEffects } from "@/lib/sound-effects";
 import { cn } from "@/lib/utils";
 import {
+  ROLEPLAY_CATEGORIES,
   ROLEPLAY_SCENARIOS,
+  type RoleplayCategory,
   type RoleplayOption,
   type RoleplayScenario,
 } from "@shared/roleplay-scenarios";
@@ -55,6 +57,9 @@ export default function Roleplay() {
   const [activeScenario, setActiveScenario] = useState<RoleplayScenario | null>(
     null
   );
+  const [selectedCategory, setSelectedCategory] = useState<
+    "all" | RoleplayCategory
+  >("all");
   const [turnIndex, setTurnIndex] = useState(0);
   const [pickedOption, setPickedOption] = useState<RoleplayOption | null>(null);
   const [scores, setScores] = useState<number[]>([]);
@@ -207,8 +212,48 @@ export default function Roleplay() {
 
       <section className="container py-8 sm:py-10">
         {!activeScenario ? (
-          <div className="grid gap-4 md:grid-cols-2">
-            {ROLEPLAY_SCENARIOS.map(scenario => {
+          <div className="space-y-6">
+            {/* Summary Banner + Category Filter Pills */}
+            <div className="flex flex-col gap-3 rounded-2xl border border-line bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-wrap gap-2">
+                {ROLEPLAY_CATEGORIES.map(cat => {
+                  const count =
+                    cat.id === "all"
+                      ? ROLEPLAY_SCENARIOS.length
+                      : ROLEPLAY_SCENARIOS.filter(s => s.category === cat.id)
+                          .length;
+                  const active = selectedCategory === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => {
+                        soundEffects.playClick();
+                        setSelectedCategory(cat.id);
+                      }}
+                      className={cn(
+                        "rounded-full border px-3.5 py-1.5 text-xs font-bold transition",
+                        active
+                          ? "border-iris bg-iris text-white shadow-xs"
+                          : "border-line bg-paper text-ink-soft hover:border-iris/50 hover:text-ink"
+                      )}
+                    >
+                      {cat.emoji} {cat.label} ({count})
+                    </button>
+                  );
+                })}
+              </div>
+              <span className="shrink-0 rounded-full bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-700 dark:text-amber-300">
+                👑 {ROLEPLAY_SCENARIOS.filter(s => s.isPro).length} موقف حصري لـ
+                PRO من أصل {ROLEPLAY_SCENARIOS.length}
+              </span>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {ROLEPLAY_SCENARIOS.filter(
+                s =>
+                  selectedCategory === "all" || s.category === selectedCategory
+              ).map(scenario => {
               const locked = Boolean(scenario.isPro) && !isVip;
               return (
                 <div
@@ -282,6 +327,7 @@ export default function Roleplay() {
                 </div>
               );
             })}
+            </div>
           </div>
         ) : finished ? (
           <div className="mx-auto max-w-xl rounded-3xl border border-emerald-500/40 bg-card p-8 text-center shadow-sm">

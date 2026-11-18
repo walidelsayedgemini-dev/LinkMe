@@ -173,6 +173,7 @@ export interface ChallengeQuest {
   description: string;
   rewardXp: number;
   icon: string;
+  isPro?: boolean;
 }
 
 export const CHALLENGE_QUESTS: ChallengeQuest[] = [
@@ -188,9 +189,18 @@ export const CHALLENGE_QUESTS: ChallengeQuest[] = [
     id: "daily_voice",
     period: "daily",
     title: "تحدي النطق السريع 🎙️",
-    description: "تدرّب على جملة واحدة على الأقل في معمل النطق بالصوت",
+    description: "تدرّب على موقف واحد في محاكي المواقف أو 5 بطاقات فلاش كاردز",
     rewardXp: 40,
     icon: "🎙️",
+  },
+  {
+    id: "daily_pro_boost",
+    period: "daily",
+    title: "مكافأة PRO اليومية 👑",
+    description: "هدية حصرية يومية لمشتركي الباقات المدفوعة (تُضاعف تلقائياً ×2!)",
+    rewardXp: 75,
+    icon: "👑",
+    isPro: true,
   },
   {
     id: "weekly_lessons",
@@ -209,6 +219,15 @@ export const CHALLENGE_QUESTS: ChallengeQuest[] = [
     icon: "🛡️",
   },
   {
+    id: "weekly_pro_roleplay",
+    period: "weekly",
+    title: "بطل مواقف PRO الأسبوعي 🎭",
+    description: "أنهِ موقفين من مواقف PRO (آيلتس / بزنس / سفر) هذا الأسبوع",
+    rewardXp: 250,
+    icon: "🎭",
+    isPro: true,
+  },
+  {
     id: "monthly_champ",
     period: "monthly",
     title: "بطل الشهر 🏆",
@@ -217,12 +236,30 @@ export const CHALLENGE_QUESTS: ChallengeQuest[] = [
     icon: "🏆",
   },
   {
+    id: "monthly_pro_master",
+    period: "monthly",
+    title: "إتقان حزم PRO الشهرية 💎",
+    description: "أتقن 30 بطاقة من حزم C1 / IELTS / Business / Idioms هذا الشهر",
+    rewardXp: 500,
+    icon: "💎",
+    isPro: true,
+  },
+  {
     id: "yearly_legend",
     period: "yearly",
     title: "أسطورة دوري السنة 👑",
     description: "حقق 30 يوم حماسة وافتح السكن الماسي وتصدّر دوري Link Me السنوي",
-    rewardXp: 1500,
+    rewardXp: 500,
     icon: "👑",
+  },
+  {
+    id: "yearly_pro_emperor",
+    period: "yearly",
+    title: "إمبراطور الطلاقة PRO 🌌",
+    description: "مكافأة سنوية كبرى لأعضاء PRO الملتزمين بمسار الإتقان الكامل",
+    rewardXp: 500,
+    icon: "🌌",
+    isPro: true,
   },
 ];
 

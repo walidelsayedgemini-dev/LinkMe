@@ -1,3 +1,5 @@
+import { SPEED_QUIZ_EXPANSION } from "./speed-quiz-expanded";
+
 export interface SpeedQuizQuestion {
   id: string;
   category: "محادثة" | "قواعد" | "كلمات" | "مواقف";
@@ -7,7 +9,7 @@ export interface SpeedQuizQuestion {
   explanationAr: string;
 }
 
-export const SPEED_QUIZ_BANK: SpeedQuizQuestion[] = [
+const BASE_SPEED_QUIZ_BANK: SpeedQuizQuestion[] = [
   {
     id: "sq-1",
     category: "قواعد",
@@ -168,6 +170,11 @@ export const SPEED_QUIZ_BANK: SpeedQuizQuestion[] = [
     correctIndex: 1,
     explanationAr: "Straightforward معناها مباشر وواضح وبسيط من غير تعقيد.",
   },
+];
+
+export const SPEED_QUIZ_BANK: SpeedQuizQuestion[] = [
+  ...BASE_SPEED_QUIZ_BANK,
+  ...SPEED_QUIZ_EXPANSION,
 ];
 
 /** Returns 5 deterministic questions for today's Daily Challenge, or a fresh random set in endless mode. */

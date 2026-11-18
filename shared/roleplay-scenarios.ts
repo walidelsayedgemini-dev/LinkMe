@@ -1,3 +1,15 @@
+import { ROLEPLAY_PRO_EXPANSION } from "./roleplay-pro-pack";
+
+export type RoleplayCategory = "work" | "travel" | "daily" | "ielts";
+
+export const ROLEPLAY_CATEGORIES: { id: "all" | RoleplayCategory; label: string; emoji: string }[] = [
+  { id: "all", label: "الكل", emoji: "✨" },
+  { id: "work", label: "العمل والإنترفيو", emoji: "💼" },
+  { id: "travel", label: "السفر والمطارات", emoji: "✈️" },
+  { id: "daily", label: "الحياة اليومية", emoji: "☕" },
+  { id: "ielts", label: "IELTS والأكاديمية", emoji: "🎯" },
+];
+
 export interface RoleplayOption {
   id: string;
   textEn: string;
@@ -17,6 +29,7 @@ export interface RoleplayTurn {
 
 export interface RoleplayScenario {
   id: string;
+  category?: RoleplayCategory;
   titleAr: string;
   titleEn: string;
   emoji: string;
@@ -29,9 +42,10 @@ export interface RoleplayScenario {
   turns: RoleplayTurn[];
 }
 
-export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
+const BASE_ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
   {
     id: "job-interview",
+    category: "work",
     titleAr: "إنترفيو شغل بالإنجليزي",
     titleEn: "Job Interview",
     emoji: "💼",
@@ -185,6 +199,7 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
   },
   {
     id: "cafe-order",
+    category: "daily",
     titleAr: "طلب قهوة وأكل في كافيه",
     titleEn: "Ordering at a Café",
     emoji: "☕",
@@ -314,6 +329,7 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
   },
   {
     id: "airport-hotel",
+    category: "travel",
     titleAr: "المطار وتسجيل الفندق",
     titleEn: "Airport & Hotel Check-in",
     emoji: "✈️",
@@ -443,6 +459,7 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
   },
   {
     id: "online-meeting",
+    category: "work",
     titleAr: "اجتماع شغل أونلاين (Zoom)",
     titleEn: "Online Business Meeting",
     emoji: "💻",
@@ -573,6 +590,7 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
   // ================= PRO / VIP EXCLUSIVE SCENARIOS =================
   {
     id: "ielts-speaking-pro",
+    category: "ielts",
     titleAr: "محاكاة اختبار IELTS Speaking الرسمي",
     titleEn: "IELTS Speaking Examiner Simulation",
     emoji: "🎯",
@@ -703,6 +721,7 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
   },
   {
     id: "salary-negotiation-pro",
+    category: "work",
     titleAr: "التفاوض على المرتب والترقية",
     titleEn: "Salary Negotiation Masterclass",
     emoji: "💰",
@@ -833,6 +852,7 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
   },
   {
     id: "medical-travel-pro",
+    category: "travel",
     titleAr: "العيادة والصيدلية أثناء السفر",
     titleEn: "Doctor & Pharmacy Abroad",
     emoji: "🏥",
@@ -961,4 +981,9 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
       },
     ],
   },
+];
+
+export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
+  ...BASE_ROLEPLAY_SCENARIOS,
+  ...ROLEPLAY_PRO_EXPANSION,
 ];

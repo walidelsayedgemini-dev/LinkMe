@@ -295,21 +295,45 @@ export default function Competitions() {
               <div className="grid gap-3 sm:grid-cols-2">
                 {quests.map(quest => {
                   const claimed = Boolean(claimedQuests[quest.id]);
+                  const lockedPro = Boolean(quest.isPro) && !isVip;
+                  const displayXp = isVip ? quest.rewardXp * 2 : quest.rewardXp;
                   return (
                     <div
                       key={quest.id}
-                      className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-card p-4 shadow-xs"
+                      className={cn(
+                        "flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-4 shadow-xs",
+                        quest.isPro
+                          ? "border-amber-400/50 bg-gradient-to-r from-amber-500/[0.07] to-card"
+                          : "border-line bg-card"
+                      )}
                     >
                       <div className="flex items-start gap-3">
                         <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-iris/10 text-xl">
                           {quest.icon}
                         </span>
                         <div>
-                          <h3 className="text-sm font-bold text-ink">{quest.title}</h3>
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <h3 className="text-sm font-bold text-ink">{quest.title}</h3>
+                            {quest.isPro && (
+                              <span className="rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-2 py-0.5 text-[9px] font-black text-white">
+                                حصري PRO 👑
+                              </span>
+                            )}
+                          </div>
                           <p className="mt-0.5 text-xs text-ink-soft">{quest.description}</p>
                         </div>
                       </div>
-                      {user ? (
+                      {lockedPro ? (
+                        <Button
+                          asChild
+                          size="sm"
+                          className="rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-xs font-bold text-white hover:from-amber-600 hover:to-orange-600"
+                        >
+                          <Link href="/pricing">
+                            <Lock className="me-1 size-3" /> افتح بـ PRO (+{quest.rewardXp * 2} XP)
+                          </Link>
+                        </Button>
+                      ) : user ? (
                         <Button
                           size="sm"
                           disabled={claimed || addXp.isPending}
@@ -323,7 +347,7 @@ export default function Competitions() {
                               : "bg-iris text-white hover:bg-iris-deep"
                           )}
                         >
-                          {claimed ? "تم الاستلام ✓" : `استلم +${quest.rewardXp} XP`}
+                          {claimed ? "تم الاستلام ✓" : `استلم +${displayXp} XP`}
                         </Button>
                       ) : (
                         <span className="rounded-full bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-700 dark:text-amber-300">

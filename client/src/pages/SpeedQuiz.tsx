@@ -5,7 +5,9 @@ import {
   CheckCircle2,
   Clock,
   Copy,
+  Crown,
   Flame,
+  Lock,
   MessageCircle,
   Play,
   RotateCcw,
@@ -23,24 +25,29 @@ import { awardXP } from "@/lib/gamification";
 import { soundEffects } from "@/lib/sound-effects";
 import { cn } from "@/lib/utils";
 import {
+  SPEED_QUIZ_BANK,
   getDailySpeedQuiz,
   getRandomSpeedQuiz,
   type SpeedQuizQuestion,
 } from "@shared/speed-quiz-bank";
 
-const QUIZ_SECONDS = 60;
-
 export default function SpeedQuiz() {
   const { user } = useAuth();
   const addXpMutation = trpc.community.addXp.useMutation();
+  const { data: gameProfile } = trpc.community.myGameProfile.useQuery(
+    undefined,
+    { enabled: Boolean(user) }
+  );
+  const isVip = Boolean(gameProfile?.isVip);
 
-  const [mode, setMode] = useState<"daily" | "random">("daily");
+  const [mode, setMode] = useState<"daily" | "random" | "pro_marathon">("daily");
   const [phase, setPhase] = useState<"ready" | "playing" | "done">("ready");
   const [questions, setQuestions] = useState<SpeedQuizQuestion[]>(() =>
     getDailySpeedQuiz()
   );
   const [idx, setIdx] = useState(0);
-  const [secondsLeft, setSecondsLeft] = useState(QUIZ_SECONDS);
+  const [totalSeconds, setTotalSeconds] = useState(60);
+  const [secondsLeft, setSecondsLeft] = useState(60);
   const [answers, setAnswers] = useState<(number | null)[]>([]);
   const [combo, setCombo] = useState(0);
   const [copied, setCopied] = useState(false);
@@ -59,15 +66,26 @@ export default function SpeedQuiz() {
     return () => clearInterval(timer);
   }, [phase, secondsLeft]);
 
-  const startQuiz = (nextMode: "daily" | "random") => {
+  const startQuiz = (nextMode: "daily" | "random" | "pro_marathon") => {
+    if (nextMode === "pro_marathon" && !isVip) {
+      toast.info("ماراثون الـ 15 سؤال حصري لمشتركي PRO 👑");
+      return;
+    }
     soundEffects.playClick();
-    const qs = nextMode === "daily" ? getDailySpeedQuiz() : getRandomSpeedQuiz(5);
+    const qs =
+      nextMode === "daily"
+        ? getDailySpeedQuiz()
+        : nextMode === "pro_marathon"
+          ? getRandomSpeedQuiz(15)
+          : getRandomSpeedQuiz(5);
+    const secs = nextMode === "pro_marathon" ? 120 : 60;
     setMode(nextMode);
     setQuestions(qs);
     setIdx(0);
     setAnswers([]);
     setCombo(0);
-    setSecondsLeft(QUIZ_SECONDS);
+    setTotalSeconds(secs);
+    setSecondsLeft(secs);
     setPhase("playing");
   };
 
@@ -77,20 +95,25 @@ export default function SpeedQuiz() {
       (sum, q, i) => sum + (finalAnswers[i] === q.correctIndex ? 1 : 0),
       0
     );
-    const earnedXp = Math.max(10, correctCount * 6);
-    if (correctCount >= 3) {
+    const baseEarned =
+      mode === "pro_marathon"
+        ? Math.max(25, correctCount * 10)
+        : Math.max(10, correctCount * 6);
+    if (correctCount >= Math.ceil(questions.length * 0.6)) {
       soundEffects.playTrophy();
     } else {
       soundEffects.playClick();
     }
-    awardXP(earnedXp);
+    awardXP(baseEarned);
     if (user) {
       addXpMutation.mutate({
-        amount: earnedXp,
+        amount: baseEarned,
         questId: `speed_quiz_${mode}_${new Date().toISOString().slice(0, 10)}`,
       });
     }
-    toast.success(`⚡ انتهى التحدي! كسبت +${earnedXp} XP!`);
+    toast.success(
+      `⚡ انتهى التحدي! كسبت +${isVip ? baseEarned * 2 : baseEarned} XP${isVip ? " (مضاعفة PRO 2x!)" : ""}!`
+    );
   };
 
   const handleAnswer = (choiceIndex: number) => {
@@ -118,8 +141,12 @@ export default function SpeedQuiz() {
     (sum, q, i) => sum + (answers[i] === q.correctIndex ? 1 : 0),
     0
   );
-  const timeUsed = QUIZ_SECONDS - secondsLeft;
-  const earnedXp = Math.max(10, correctCount * 6);
+  const timeUsed = totalSeconds - secondsLeft;
+  const baseEarnedXp =
+    mode === "pro_marathon"
+      ? Math.max(25, correctCount * 10)
+      : Math.max(10, correctCount * 6);
+  const earnedXp = isVip ? baseEarnedXp * 2 : baseEarnedXp;
 
   const shareText = `⚡ تحدي الـ 60 ثانية على منصة Link Me!\n🏆 جبت ${correctCount} من ${questions.length} في ${timeUsed} ثانية بس 🔥\nتقدر تكسر رقمي؟ جرّب دلوقتي:\nhttps://www.link-me.tech/speed-quiz`;
 
@@ -160,8 +187,8 @@ export default function SpeedQuiz() {
                 جاهز تتحدى الوقت؟
               </h2>
               <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-ink-soft">
-                قدّامك 60 ثانية لحل 5 أسئلة متنوعة بين القواعد والمحادثة
-                والمواقف اليومية. كل إجابة صح تزودلك الكومبو ونقاط الـ XP!
+                بنك ضخم من <b className="latin text-iris">{SPEED_QUIZ_BANK.length} سؤال عملي</b>{" "}
+                بين القواعد والمحادثة والبزنس والآيلتس! اختار التحدي اللي يناسبك:
               </p>
 
               <div className="mt-6 flex flex-wrap justify-center gap-3">
@@ -170,8 +197,8 @@ export default function SpeedQuiz() {
                   onClick={() => startQuiz("daily")}
                   className="h-12 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-7 text-sm font-bold text-white shadow-sm hover:from-amber-600 hover:to-orange-600"
                 >
-                  <Play className="me-2 size-4 fill-white" /> ابدأ تحدي النهارده
-                  🔥
+                  <Play className="me-2 size-4 fill-white" /> تحدي النهارده (5
+                  أسئلة) 🔥
                 </Button>
                 <Button
                   type="button"
@@ -179,8 +206,29 @@ export default function SpeedQuiz() {
                   onClick={() => startQuiz("random")}
                   className="h-12 rounded-full px-6 text-sm font-bold"
                 >
-                  جولة أسئلة عشوائية 🎲
+                  جولة سريعة عشوائية 🎲
                 </Button>
+                {isVip ? (
+                  <Button
+                    type="button"
+                    onClick={() => startQuiz("pro_marathon")}
+                    className="h-12 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 px-7 text-sm font-bold text-white shadow-sm hover:from-purple-700 hover:to-indigo-700"
+                  >
+                    <Crown className="me-2 size-4" /> ماراثون PRO (15 سؤال ·
+                    +300 XP) 👑
+                  </Button>
+                ) : (
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="h-12 rounded-full border-amber-400/60 bg-amber-500/10 px-6 text-sm font-bold text-amber-800 hover:bg-amber-500/20 dark:text-amber-300"
+                  >
+                    <Link href="/pricing">
+                      <Lock className="me-1.5 size-4" /> ماراثون PRO (15 سؤال ·
+                      +300 XP) 👑
+                    </Link>
+                  </Button>
+                )}
               </div>
             </div>
           )}
@@ -225,7 +273,7 @@ export default function SpeedQuiz() {
                     "h-full rounded-full transition-all duration-1000",
                     secondsLeft <= 15 ? "bg-destructive" : "bg-amber-500"
                   )}
-                  style={{ width: `${Math.round((secondsLeft / QUIZ_SECONDS) * 100)}%` }}
+                  style={{ width: `${Math.round((secondsLeft / totalSeconds) * 100)}%` }}
                 />
               </div>
 

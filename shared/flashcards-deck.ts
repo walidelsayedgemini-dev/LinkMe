@@ -1,4 +1,14 @@
-export type FlashcardLevel = "A1" | "A2" | "B1" | "B2" | "C1";
+import { FLASHCARDS_EXPANSION } from "./flashcards-expanded";
+
+export type FlashcardLevel =
+  | "A1"
+  | "A2"
+  | "B1"
+  | "B2"
+  | "C1"
+  | "IELTS"
+  | "BUSINESS"
+  | "IDIOMS";
 
 export interface VocabFlashcard {
   id: string;
@@ -18,33 +28,51 @@ export const FLASHCARD_LEVEL_META: Record<
 > = {
   A1: {
     label: "مبتدئ A1",
-    subtitle: "كلمات وجمل الحياة اليومية الأساسية",
+    subtitle: "24 كلمة وجملة للحياة اليومية الأساسية",
     badgeClass: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
   },
   A2: {
     label: "تأسيسي A2",
-    subtitle: "مواقف الشغل والسفر والمحادثة السريعة",
+    subtitle: "24 كلمة لمواقف الشغل والسفر والمحادثة",
     badgeClass: "bg-sky-500/15 text-sky-700 dark:text-sky-300",
   },
   B1: {
     label: "متوسط B1",
-    subtitle: "تعبيرات طبيعية تخليك تتكلم بطلاقة",
+    subtitle: "24 تعبير طبيعي يخليك تتكلم بطلاقة",
     badgeClass: "bg-indigo-500/15 text-indigo-700 dark:text-indigo-300",
   },
   B2: {
     label: "متقدم B2",
-    subtitle: "مصطلحات الشغل والإنترفيو والآيلتس",
+    subtitle: "24 مصطلح للشغل والإنترفيو المتقدم",
     badgeClass: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
   },
   C1: {
     label: "احترافي C1 👑",
-    subtitle: "حزمة PRO الحصرية — IELTS Band 8+ وبزنس تنفيذي",
+    subtitle: "24 كلمة تنفيذية وأكاديمية حصرية لـ PRO",
     badgeClass: "bg-gradient-to-r from-amber-500 to-orange-500 text-white",
+    isPro: true,
+  },
+  IELTS: {
+    label: "IELTS Band 8+ 👑",
+    subtitle: "20 كلمة ورابط أكاديمي يرفعوا درجتك في الآيلتس",
+    badgeClass: "bg-gradient-to-r from-purple-600 to-indigo-600 text-white",
+    isPro: true,
+  },
+  BUSINESS: {
+    label: "بزنس وفريلانس 👑",
+    subtitle: "20 مصطلح للشركات العالمية ومكالمات العملاء",
+    badgeClass: "bg-gradient-to-r from-emerald-600 to-teal-600 text-white",
+    isPro: true,
+  },
+  IDIOMS: {
+    label: "تعبيرات Native 👑",
+    subtitle: "20 Idiom أمريكي وبريطاني من الأفلام والشارع",
+    badgeClass: "bg-gradient-to-r from-rose-500 to-pink-600 text-white",
     isPro: true,
   },
 };
 
-export const FLASHCARDS_DECK: VocabFlashcard[] = [
+const BASE_FLASHCARDS_DECK: VocabFlashcard[] = [
   // ---------- A1 (12 cards) ----------
   {
     id: "a1-1",
@@ -714,4 +742,9 @@ export const FLASHCARDS_DECK: VocabFlashcard[] = [
     exampleAr: "الشهادات المعتمدة بالـ QR بترفع مصداقيتك المهنية فوراً.",
     tipAr: "استخدم معاها build credibility (يبني مصداقية) أو earn credibility.",
   },
+];
+
+export const FLASHCARDS_DECK: VocabFlashcard[] = [
+  ...BASE_FLASHCARDS_DECK,
+  ...FLASHCARDS_EXPANSION,
 ];

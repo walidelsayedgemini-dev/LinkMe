@@ -80,12 +80,22 @@ describe("gamification catalog & student privacy", () => {
     expect(parseReferralCode("INVALID")).toBeNull();
   });
 
-  it("ships complete audio vocabulary flashcards across A1-C1", () => {
-    const levels: FlashcardLevel[] = ["A1", "A2", "B1", "B2", "C1"];
+  it("ships complete audio vocabulary flashcards across all 8 decks (180+ cards)", () => {
+    const levels: FlashcardLevel[] = [
+      "A1",
+      "A2",
+      "B1",
+      "B2",
+      "C1",
+      "IELTS",
+      "BUSINESS",
+      "IDIOMS",
+    ];
     const ids = new Set<string>();
+    expect(FLASHCARDS_DECK.length).toBeGreaterThanOrEqual(180);
     for (const lvl of levels) {
       const cards = FLASHCARDS_DECK.filter(c => c.level === lvl);
-      expect(cards.length).toBeGreaterThanOrEqual(12);
+      expect(cards.length).toBeGreaterThanOrEqual(20);
       for (const card of cards) {
         expect(ids.has(card.id)).toBe(false);
         ids.add(card.id);
@@ -96,8 +106,9 @@ describe("gamification catalog & student privacy", () => {
     }
   });
 
-  it("provides multi-turn roleplay scenarios and deterministic daily speed quizzes", () => {
-    expect(ROLEPLAY_SCENARIOS.length).toBeGreaterThanOrEqual(4);
+  it("provides 22+ multi-turn roleplay scenarios and 100+ speed quiz questions", () => {
+    expect(ROLEPLAY_SCENARIOS.length).toBeGreaterThanOrEqual(22);
+    expect(ROLEPLAY_SCENARIOS.filter(s => s.isPro).length).toBeGreaterThanOrEqual(18);
     for (const s of ROLEPLAY_SCENARIOS) {
       expect(s.turns.length).toBeGreaterThanOrEqual(4);
       for (const turn of s.turns) {
@@ -105,7 +116,7 @@ describe("gamification catalog & student privacy", () => {
       }
     }
 
-    expect(SPEED_QUIZ_BANK.length).toBeGreaterThanOrEqual(20);
+    expect(SPEED_QUIZ_BANK.length).toBeGreaterThanOrEqual(100);
     const fixedDate = new Date("2026-11-18T10:00:00Z");
     const q1 = getDailySpeedQuiz(fixedDate);
     const q2 = getDailySpeedQuiz(fixedDate);
