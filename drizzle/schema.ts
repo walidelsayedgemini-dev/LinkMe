@@ -424,3 +424,4 @@ export * from "./premium-schema";
 export * from "./profile-schema";
 export * from "./receipts-schema";
 export * from "./certificates-schema";
+export * from "./community-schema";

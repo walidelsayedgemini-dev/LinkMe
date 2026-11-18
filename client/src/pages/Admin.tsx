@@ -3,8 +3,13 @@ import { Link, useLocation, useSearch } from "wouter";
 import {
   ArrowUpRight,
   CalendarPlus,
+  Check,
   ClipboardList,
+  Copy,
   ExternalLink,
+  KeyRound,
+  MessageCircle,
+  RefreshCw,
   Search,
   Star,
   UserCheck,
@@ -14,6 +19,7 @@ import {
 import { toast } from "sonner";
 import { BookingRequests } from "@/components/booking-requests";
 import { ReceiptsManager } from "@/components/admin/receipts-manager";
+import { ClassroomsManager } from "@/components/admin/classrooms-manager";
 import { AdminHomeworkPanel } from "@/components/homework";
 import { OwnerInbox } from "@/components/chat";
 import { PremiumAdminPanel } from "@/components/premium/PremiumAdminPanel";
@@ -59,6 +65,7 @@ export default function AdminConsole() {
   const tabFromUrl = new URLSearchParams(search).get("tab");
   const validTabs = [
     "students",
+    "classrooms",
     "sessions",
     "tasks",
     "messages",
@@ -103,6 +110,11 @@ export default function AdminConsole() {
   const [taskTarget, setTaskTarget] = useState<{
     id: number;
     name: string;
+  } | null>(null);
+  const [passwordTarget, setPasswordTarget] = useState<{
+    id: number;
+    name: string;
+    email: string;
   } | null>(null);
 
   const students = useMemo(() => {
@@ -233,6 +245,12 @@ export default function AdminConsole() {
               الطلاب ({overview.data?.students.length ?? 0})
             </TabsTrigger>
             <TabsTrigger
+              value="classrooms"
+              className="rounded-xl px-4 py-2 data-[state=active]:bg-iris data-[state=active]:text-white"
+            >
+              الفصول الدراسية 🏫
+            </TabsTrigger>
+            <TabsTrigger
               value="sessions"
               className="rounded-xl px-4 py-2 data-[state=active]:bg-iris data-[state=active]:text-white"
             >
@@ -282,6 +300,9 @@ export default function AdminConsole() {
             <TabsTrigger value="premium" className="rounded-xl px-4 py-2 data-[state=active]:bg-iris data-[state=active]:text-white">الخطط المدفوعة والمتابعة اليومية</TabsTrigger>
           </TabsList>
           <TabsContent value="premium"><PremiumAdminPanel /></TabsContent>
+          <TabsContent value="classrooms">
+            <ClassroomsManager />
+          </TabsContent>
           <TabsContent value="receipts">
             <ReceiptsManager />
           </TabsContent>
@@ -387,7 +408,7 @@ export default function AdminConsole() {
                       ({student.attendedSessions}/{student.totalSessions})
                     </span>
                   </div>
-                  <div className="flex flex-nowrap items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-1.5">
                     <RatingStars value={student.ratingAvg} />
                     <button
                       onClick={() =>
@@ -410,6 +431,19 @@ export default function AdminConsole() {
                       className="rounded-full border border-line px-2.5 py-1 text-[11px] font-medium text-ink-soft transition-colors hover:border-iris hover:text-iris"
                     >
                       مهمة
+                    </button>
+                    <button
+                      onClick={() =>
+                        setPasswordTarget({
+                          id: student.id,
+                          name: student.name ?? "طالب",
+                          email: student.email ?? "",
+                        })
+                      }
+                      title="استعادة أو تعيين كلمة مرور الطالب لإرسالها له"
+                      className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold text-amber-700 transition-colors hover:bg-amber-500 hover:text-white dark:text-amber-300"
+                    >
+                      <KeyRound className="size-3" /> كلمة السر
                     </button>
                     <Link
                       href={`/students/${student.id}`}
@@ -466,6 +500,13 @@ export default function AdminConsole() {
           studentName={taskTarget.name}
           open
           onOpenChange={open => !open && setTaskTarget(null)}
+        />
+      )}
+      {passwordTarget && (
+        <StudentPasswordDialog
+          student={passwordTarget}
+          open
+          onOpenChange={open => !open && setPasswordTarget(null)}
         />
       )}
     </PageShell>
@@ -751,3 +792,203 @@ function NewSessionDialog() {
 }
 
 export { TASK_LABELS };
+
+function StudentPasswordDialog({
+  student,
+  open,
+  onOpenChange,
+}: {
+  student: { id: number; name: string; email: string };
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const [customPassword, setCustomPassword] = useState("");
+  const [copied, setCopied] = useState(false);
+  const [issued, setIssued] = useState<{
+    name: string;
+    email: string;
+    phone: string;
+    newPassword: string;
+  } | null>(null);
+
+  const resetMutation = trpc.community.adminResetStudentPassword.useMutation({
+    onSuccess: data => {
+      setIssued({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        newPassword: data.newPassword,
+      });
+      toast.success("تم تعيين كلمة المرور الجديدة بنجاح 🔑");
+    },
+    onError: err => toast.error(err.message),
+  });
+
+  const buildShareText = (info: {
+    name: string;
+    email: string;
+    newPassword: string;
+  }) =>
+    `أهلاً ${info.name} 👋\nبيانات الدخول الجديدة لحسابك على منصة Link Me:\n📧 الإيميل: ${info.email}\n🔑 كلمة المرور: ${info.newPassword}\n🌐 رابط الدخول: https://link-me.tech/login`;
+
+  const handleCopy = async () => {
+    if (!issued) return;
+    try {
+      await navigator.clipboard.writeText(buildShareText(issued));
+      setCopied(true);
+      toast.success("تم نسخ بيانات الدخول للحافظة 📋");
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      toast.error("تعذّر النسخ التلقائي");
+    }
+  };
+
+  const whatsappHref = issued
+    ? (() => {
+        const cleanDigits = issued.phone.replace(/[^\d]/g, "");
+        const intlPhone = cleanDigits
+          ? cleanDigits.startsWith("0")
+            ? `2${cleanDigits}`
+            : cleanDigits
+          : "";
+        return `https://wa.me/${intlPhone}?text=${encodeURIComponent(
+          buildShareText(issued)
+        )}`;
+      })()
+    : "#";
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent dir="rtl" className="max-w-md bg-card text-ink">
+        <DialogHeader className="text-start">
+          <DialogTitle className="flex items-center gap-2">
+            <KeyRound className="size-5 text-amber-500" />
+            بيانات الدخول وكلمة السر — {student.name}
+          </DialogTitle>
+          <DialogDescription>
+            لو الطالب نسي كلمة المرور بتاعته، تقدر تولّد له كلمة سر جديدة فورية
+            أو تحدد كلمة سر بنفسك وتبعتها له في ثانية على واتساب.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <div className="rounded-xl border border-line bg-paper-deep/60 p-3 text-xs">
+            <p className="text-ink-soft">إيميل حساب الطالب:</p>
+            <p className="latin mt-0.5 font-bold text-ink" dir="ltr">
+              {student.email || "لا يوجد إيميل مسجل"}
+            </p>
+          </div>
+
+          {!issued ? (
+            <>
+              <div>
+                <Label className="mb-1.5 block text-xs">
+                  كلمة مرور مخصصة (اختياري — اتركه فارغاً للتوليد التلقائي)
+                </Label>
+                <input
+                  value={customPassword}
+                  onChange={e => setCustomPassword(e.target.value)}
+                  placeholder="مثال: ahmed2026 (6 أحرف على الأقل)"
+                  className={inputClass}
+                  dir="ltr"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Button
+                  type="button"
+                  disabled={
+                    resetMutation.isPending ||
+                    (customPassword.trim().length > 0 &&
+                      customPassword.trim().length < 6)
+                  }
+                  onClick={() =>
+                    resetMutation.mutate({
+                      studentId: student.id,
+                      customPassword: customPassword.trim() || undefined,
+                    })
+                  }
+                  className="w-full rounded-full bg-iris text-white hover:bg-iris-deep"
+                >
+                  <RefreshCw
+                    className={cn(
+                      "me-2 size-4",
+                      resetMutation.isPending && "animate-spin"
+                    )}
+                  />
+                  {customPassword.trim()
+                    ? "حفظ كلمة المرور المخصصة"
+                    : "توليد كلمة مرور جديدة فورية 🔑"}
+                </Button>
+                <p className="text-center text-[11px] text-ink-soft">
+                  لأمان حسابات الطلبة، كلمات السر مشفرة بالكامل — التوليد الجديد
+                  بيشتغل فوراً ويلغي الجلسات القديمة.
+                </p>
+              </div>
+            </>
+          ) : (
+            <div className="space-y-3 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-4">
+              <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                ✅ تم تفعيل كلمة المرور الجديدة بنجاح!
+              </p>
+              <div className="space-y-2 rounded-xl border border-line bg-card p-3 text-xs">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-ink-soft">الإيميل:</span>
+                  <span className="latin font-semibold text-ink" dir="ltr">
+                    {issued.email}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-ink-soft">كلمة السر الجديدة:</span>
+                  <span
+                    className="latin rounded-md bg-amber-500/15 px-2 py-0.5 font-mono text-sm font-black text-amber-700 dark:text-amber-300"
+                    dir="ltr"
+                  >
+                    {issued.newPassword}
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCopy}
+                  className="rounded-full"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="me-1.5 size-3.5 text-emerald-600" /> تم النسخ
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="me-1.5 size-3.5" /> نسخ البيانات
+                    </>
+                  )}
+                </Button>
+                <Button
+                  asChild
+                  className="rounded-full bg-[#16A34A] text-white hover:bg-[#15803D]"
+                >
+                  <a href={whatsappHref} target="_blank" rel="noreferrer">
+                    <MessageCircle className="me-1.5 size-3.5" /> إرسال واتساب
+                  </a>
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+          >
+            إغلاق
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "wouter";
 import { Flame, Zap, Trophy, Award, Lock, Sparkles, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -176,12 +177,25 @@ export function BadgesModal({
           })}
         </div>
 
-        <Button
-          onClick={() => onOpenChange(false)}
-          className="mt-4 rounded-full w-full bg-iris hover:bg-iris-deep text-white"
-        >
-          يلا نكمّل المذاكرة! 🚀
-        </Button>
+        <div className="mt-4 flex flex-col gap-2">
+          <Button
+            asChild
+            onClick={() => onOpenChange(false)}
+            className="rounded-full w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold shadow-sm"
+          >
+            <Link href="/competitions">
+              <Sparkles className="me-1.5 size-4" />
+              افتح ساحة المسابقات والأفتارات والسكنات 🏆
+            </Link>
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="rounded-full w-full"
+          >
+            يلا نكمّل المذاكرة! 🚀
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

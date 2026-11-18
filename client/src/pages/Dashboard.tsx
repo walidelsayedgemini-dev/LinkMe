@@ -15,6 +15,8 @@ import {
   ShieldCheck,
   Sparkles,
   Target,
+  Trophy,
+  Users,
   Video,
 } from "lucide-react";
 import { PageShell } from "@/components/layout/site-footer";
@@ -29,6 +31,8 @@ import { PremiumAccountSummary } from "@/components/premium-account-summary";
 import { YassinSays, useCompanion } from "@/components/companion";
 import { VoicePracticeDialog } from "@/components/voice-practice-dialog";
 import { CertificateModal } from "@/components/certificate-modal";
+import { StudentAvatarBadge } from "@/components/student-avatar-badge";
+import { getStreakSkin } from "@shared/gamification-catalog";
 
 export default function Dashboard() {
   const { user, loading } = useAuth();
@@ -55,6 +59,13 @@ export default function Dashboard() {
   const { data: upcoming } = trpc.admin.upcoming.useQuery(undefined, {
     enabled: Boolean(user),
   });
+  const { data: myGroups } = trpc.community.myGroups.useQuery(undefined, {
+    enabled: Boolean(user),
+  });
+  const { data: gameProfile } = trpc.community.myGameProfile.useQuery(
+    undefined,
+    { enabled: Boolean(user) }
+  );
 
   if (loading) {
     return (
@@ -133,6 +144,15 @@ export default function Dashboard() {
               </Button>
               <Button
                 asChild
+                variant="outline"
+                className="rounded-full border-purple-500/40 bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold gap-1.5"
+              >
+                <Link href="/competitions">
+                  <Trophy className="size-4 text-amber-500" /> المسابقات وفصلي
+                </Link>
+              </Button>
+              <Button
+                asChild
                 className="rounded-full bg-iris text-white hover:bg-iris-deep"
               >
                 <Link href="/courses">
@@ -179,6 +199,90 @@ export default function Dashboard() {
       </section>
 
       <div className="container pt-7"><PremiumAccountSummary /></div>
+      {gameProfile && (
+        <section className="container pt-6">
+          <div className="grid gap-4 lg:grid-cols-[1fr_1.4fr]">
+            <div className="flex items-center justify-between gap-4 rounded-2xl border border-line bg-card p-5">
+              <div className="flex items-center gap-3.5 min-w-0">
+                <StudentAvatarBadge
+                  avatarPreset={gameProfile.avatarPreset}
+                  equippedSkin={gameProfile.equippedSkin}
+                  size="lg"
+                />
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-ink-soft">
+                    هويتك في ساحة التحدي
+                  </p>
+                  <p className="truncate text-base font-bold text-ink">
+                    {gameProfile.firstName}
+                  </p>
+                  <p className="mt-0.5 text-xs text-amber-600 dark:text-amber-400 font-semibold">
+                    🔥 {gameProfile.streakDays} أيام حماسة ·{" "}
+                    {getStreakSkin(gameProfile.equippedSkin).name}
+                  </p>
+                </div>
+              </div>
+              <Button
+                asChild
+                size="sm"
+                variant="outline"
+                className="shrink-0 rounded-full border-iris/30 text-iris hover:bg-iris hover:text-white"
+              >
+                <Link href="/competitions">تغيير الأفتار</Link>
+              </Button>
+            </div>
+
+            <div className="rounded-2xl border border-line bg-card p-5">
+              <div className="flex items-center justify-between gap-2">
+                <h2 className="flex items-center gap-2 text-sm font-bold text-ink">
+                  <Users className="size-4 text-iris" />
+                  {(myGroups ?? []).length > 0
+                    ? `فصلك الدراسي: ${myGroups![0].name}`
+                    : "المنافسات والتحديات اليومية 🏆"}
+                </h2>
+                <Link
+                  href="/competitions"
+                  className="text-xs font-semibold text-iris hover:underline"
+                >
+                  افتح ساحة التحدي ←
+                </Link>
+              </div>
+              {(myGroups ?? []).length > 0 ? (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {myGroups![0].classmates.slice(0, 8).map(mate => (
+                    <span
+                      key={mate.id}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
+                        mate.isCurrentUser
+                          ? "border-iris/40 bg-iris-soft text-iris font-bold"
+                          : "border-line bg-paper-deep/60 text-ink"
+                      )}
+                    >
+                      <StudentAvatarBadge
+                        avatarPreset={mate.avatarPreset}
+                        equippedSkin={mate.equippedSkin}
+                        size="sm"
+                        showSkinBadge={false}
+                        className="scale-75 -m-1.5"
+                      />
+                      <span>
+                        {mate.firstName}
+                        {mate.isCurrentUser ? " (أنت)" : ""}
+                      </span>
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-2 text-xs leading-relaxed text-ink-soft">
+                  نافس أبطال Link Me في التحديات اليومية والأسبوعية والشهرية
+                  والسنوية، وافتح سكنات حصرية كل ما شعلة حماستك تزيد 🔥
+                </p>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
       {dashboardError && <div role="alert" className="container mt-5 text-ink"><p>تقدمك ما اتحمّلش دلوقتي. بياناتك مش صفر؛ جرّب تحميلها تاني.</p><Button variant="outline" onClick={() => void reloadDashboard()} className="mt-3">إعادة تحميل التقدم</Button></div>}
       {classroom && (
         <section className="container pt-8">
