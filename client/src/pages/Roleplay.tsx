@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import {
   ArrowRight,
@@ -8,6 +8,7 @@ import {
   Mic,
   MicOff,
   RotateCcw,
+  Search,
   Sparkles,
   Trophy,
   Volume2,
@@ -15,7 +16,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { PageShell } from "@/components/layout/site-footer";
-import { Eyebrow } from "@/components/bits";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCompanion } from "@/components/companion";
@@ -25,8 +25,10 @@ import { soundEffects } from "@/lib/sound-effects";
 import { cn } from "@/lib/utils";
 import {
   ROLEPLAY_CATEGORIES,
+  ROLEPLAY_LEVELS,
   ROLEPLAY_SCENARIOS,
   type RoleplayCategory,
+  type RoleplayLevel,
   type RoleplayOption,
   type RoleplayScenario,
 } from "@shared/roleplay-scenarios";
@@ -54,16 +56,82 @@ export default function Roleplay() {
   );
   const isVip = Boolean(gameProfile?.isVip);
 
+  const [allScenarios, setAllScenarios] =
+    useState<RoleplayScenario[]>(ROLEPLAY_SCENARIOS);
+  const [loadingVault, setLoadingVault] = useState(true);
   const [activeScenario, setActiveScenario] = useState<RoleplayScenario | null>(
     null
+  );
+  const [selectedLevel, setSelectedLevel] = useState<"all" | RoleplayLevel>(
+    "all"
   );
   const [selectedCategory, setSelectedCategory] = useState<
     "all" | RoleplayCategory
   >("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [visibleCount, setVisibleCount] = useState(18);
   const [turnIndex, setTurnIndex] = useState(0);
   const [pickedOption, setPickedOption] = useState<RoleplayOption | null>(null);
   const [scores, setScores] = useState<number[]>([]);
   const [finished, setFinished] = useState(false);
+
+  // Lazy-load the complete 1,000-scenario vault ONLY when visiting /roleplay (keeps rest of site ultra-light!)
+  useEffect(() => {
+    let active = true;
+    fetch("/data/roleplay-1000.json")
+      .then(res => (res.ok ? res.json() : null))
+      .then((data: RoleplayScenario[] | null) => {
+        if (active && Array.isArray(data) && data.length > 0) {
+          setAllScenarios(data);
+        }
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (active) setLoadingVault(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const filteredScenarios = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return allScenarios.filter(s => {
+      if (selectedLevel !== "all" && s.level !== selectedLevel) return false;
+      if (selectedCategory !== "all" && s.category !== selectedCategory)
+        return false;
+      if (!q) return true;
+      return (
+        s.titleAr.toLowerCase().includes(q) ||
+        s.titleEn.toLowerCase().includes(q) ||
+        s.settingAr.toLowerCase().includes(q) ||
+        s.partnerName.toLowerCase().includes(q)
+      );
+    });
+  }, [allScenarios, selectedLevel, selectedCategory, searchQuery]);
+
+  const levelCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: allScenarios.length };
+    for (const s of allScenarios) {
+      counts[s.level] = (counts[s.level] || 0) + 1;
+    }
+    return counts;
+  }, [allScenarios]);
+
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const s of allScenarios) {
+      if (selectedLevel !== "all" && s.level !== selectedLevel) continue;
+      counts.all = (counts.all || 0) + 1;
+      if (s.category) counts[s.category] = (counts[s.category] || 0) + 1;
+    }
+    return counts;
+  }, [allScenarios, selectedLevel]);
+
+  const proTotal = useMemo(
+    () => allScenarios.filter(s => s.isPro).length,
+    [allScenarios]
+  );
 
   // Voice speaking practice for the chosen best response
   const [listening, setListening] = useState(false);
@@ -195,15 +263,15 @@ export default function Roleplay() {
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold text-amber-300">
-                🎭 محادثة عملية بالصوت · {ROLEPLAY_SCENARIOS.length} موقف
+                🎭 مكتبة {allScenarios.length.toLocaleString()} موقف حياتي بالصوت (A1–C2)
               </span>
               <h1 className="mt-2.5 text-2xl font-extrabold text-white sm:text-4xl">
-                محاكي <span className="text-sky-300">المواقف الحقيقية.</span> 🎭
+                محاكي <span className="text-sky-300">الـ 1,000 موقف حقيقي.</span> 🎭
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/80">
-                اتدرّب على مواقف الحياة والشغل الحقيقية (إنترفيو، كافيه، فندق،
-                اجتماع Zoom) — اسمع الجملة بالصوت، اختار أذكى رد، وجرّب تنطقه
-                بصوتك مع تقييم فوري من {companion.name}!
+                مقسمين بدقة على 6 مستويات (من مبتدئ A1 لحد Native C2) و10 مجالات
+                حياتية حقيقية — اسمع الجملة، اختار أذكى رد، وجرّب تنطقه بصوتك مع{" "}
+                {companion.name}!
               </p>
             </div>
             {activeScenario && (
@@ -217,21 +285,98 @@ export default function Roleplay() {
               </Button>
             )}
           </div>
+
+          {/* 6 CEFR Level Selector Cards inside Hero */}
+          {!activeScenario && (
+            <div className="mt-6 grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:grid-cols-7">
+              {ROLEPLAY_LEVELS.map(lvl => {
+                const active = selectedLevel === lvl.id;
+                const count = levelCounts[lvl.id] ?? 0;
+                return (
+                  <button
+                    key={lvl.id}
+                    type="button"
+                    onClick={() => {
+                      soundEffects.playClick();
+                      setSelectedLevel(lvl.id);
+                      setVisibleCount(18);
+                    }}
+                    className={cn(
+                      "rounded-2xl border p-3 text-start transition-colors",
+                      active
+                        ? "border-amber-300 bg-white text-[#0e2248] shadow-md"
+                        : "border-white/20 bg-black/25 text-white hover:border-white/50 hover:bg-white/10"
+                    )}
+                  >
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-xs font-extrabold">{lvl.label}</span>
+                      <span
+                        className={cn(
+                          "latin rounded-full px-1.5 py-0.5 text-[10px] font-black",
+                          active
+                            ? "bg-iris text-white"
+                            : "bg-white/15 text-amber-300"
+                        )}
+                      >
+                        {count}
+                      </span>
+                    </div>
+                    <p
+                      className={cn(
+                        "mt-1 line-clamp-1 text-[10px]",
+                        active ? "text-ink-soft" : "text-white/75"
+                      )}
+                    >
+                      {lvl.subtitle}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 
       <section className="container py-8 sm:py-10">
         {!activeScenario ? (
           <div className="space-y-6">
-            {/* Summary Banner + Category Filter Pills */}
-            <div className="flex flex-col gap-3 rounded-2xl border border-line bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
+            {/* Search + Category Filter Pills + PRO Counter */}
+            <div className="space-y-4 rounded-3xl border border-iris/20 bg-gradient-to-l from-iris-soft/50 via-card to-card p-4 sm:p-5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="relative flex-1 max-w-md">
+                  <Search className="pointer-events-none absolute start-3.5 top-1/2 size-4 -translate-y-1/2 text-ink-soft" />
+                  <input
+                    type="search"
+                    value={searchQuery}
+                    onChange={e => {
+                      setSearchQuery(e.target.value);
+                      setVisibleCount(18);
+                    }}
+                    placeholder="ابحث في 1,000 موقف (مطار، فندق، إنترفيو، دكتور، فريلانس...)"
+                    className="h-10 w-full rounded-full border border-line bg-paper ps-10 pe-4 text-xs text-ink placeholder:text-ink-soft/75 focus:border-iris focus:outline-none sm:text-sm"
+                  />
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-amber-500/15 px-3 py-1.5 text-xs font-bold text-amber-800 dark:text-amber-300">
+                    👑 {proTotal.toLocaleString()} موقف حصري لـ PRO من أصل{" "}
+                    {allScenarios.length.toLocaleString()}
+                  </span>
+                  {!isVip && (
+                    <Button
+                      asChild
+                      size="sm"
+                      className="h-8 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-3.5 text-xs font-bold text-white hover:from-amber-600 hover:to-orange-600"
+                    >
+                      <Link href="/pricing">افتح الـ 1,000 موقف 👑</Link>
+                    </Button>
+                  )}
+                </div>
+              </div>
+
               <div className="flex flex-wrap gap-2">
                 {ROLEPLAY_CATEGORIES.map(cat => {
-                  const count =
-                    cat.id === "all"
-                      ? ROLEPLAY_SCENARIOS.length
-                      : ROLEPLAY_SCENARIOS.filter(s => s.category === cat.id)
-                          .length;
+                  const count = categoryCounts[cat.id] ?? 0;
+                  if (cat.id !== "all" && count === 0) return null;
                   const active = selectedCategory === cat.id;
                   return (
                     <button
@@ -240,9 +385,10 @@ export default function Roleplay() {
                       onClick={() => {
                         soundEffects.playClick();
                         setSelectedCategory(cat.id);
+                        setVisibleCount(18);
                       }}
                       className={cn(
-                        "rounded-full border px-3.5 py-1.5 text-xs font-bold transition",
+                        "rounded-full border px-3 py-1.5 text-xs font-bold transition-colors",
                         active
                           ? "border-iris bg-iris text-white shadow-xs"
                           : "border-line bg-paper text-ink-soft hover:border-iris/50 hover:text-ink"
@@ -253,26 +399,30 @@ export default function Roleplay() {
                   );
                 })}
               </div>
-              <span className="shrink-0 rounded-full bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-700 dark:text-amber-300">
-                👑 {ROLEPLAY_SCENARIOS.filter(s => s.isPro).length} موقف حصري لـ
-                PRO من أصل {ROLEPLAY_SCENARIOS.length}
+            </div>
+
+            {loadingVault && allScenarios.length <= 22 && (
+              <p className="text-center text-xs font-semibold text-iris">
+                جارٍ تجهيز مكتبة الـ 1,000 موقف حياتي... ✨
+              </p>
+            )}
+
+            <div className="flex items-center justify-between text-xs text-ink-soft">
+              <span>
+                معروض <b className="latin text-ink">{Math.min(visibleCount, filteredScenarios.length)}</b>{" "}
+                من أصل <b className="latin text-iris">{filteredScenarios.length.toLocaleString()}</b> موقف
               </span>
+              {isVip && (
+                <span className="rounded-full bg-emerald-500/15 px-3 py-1 font-bold text-emerald-700 dark:text-emerald-300">
+                  👑 حساب PRO مفعّل — كل الـ 1,000 موقف مفتوحين لك!
+                </span>
+              )}
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {ROLEPLAY_SCENARIOS.filter(
-                s =>
-                  selectedCategory === "all" || s.category === selectedCategory
-              ).map(scenario => {
+              {filteredScenarios.slice(0, visibleCount).map(scenario => {
               const locked = Boolean(scenario.isPro) && !isVip;
-              const coverImg =
-                scenario.category === "work"
-                  ? "/img/business.webp"
-                  : scenario.category === "travel"
-                    ? "/img/travel.webp"
-                    : scenario.category === "ielts"
-                      ? "/img/ielts.webp"
-                      : "/img/cafe.webp";
+              const coverImg = scenario.imageUrl || "/img/ui/tool-roleplay.webp";
               return (
                 <div
                   key={scenario.id}
@@ -284,14 +434,16 @@ export default function Roleplay() {
                   )}
                 >
                   <div>
-                    {/* Scenic Brand-Matched Cover Header */}
-                    <div className="relative h-32 overflow-hidden">
+                    {/* Unique Realistic Cover Header (Zero Repeats Across All 1,000 Scenarios!) */}
+                    <div className="relative h-36 overflow-hidden">
                       <img
                         src={coverImg}
-                        alt=""
-                        aria-hidden="true"
+                        alt={scenario.titleEn}
                         loading="lazy"
                         decoding="async"
+                        onError={e => {
+                          e.currentTarget.src = "/img/ui/tool-roleplay.webp";
+                        }}
                         className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                       <div
@@ -313,9 +465,13 @@ export default function Roleplay() {
                           {scenario.emoji}
                         </span>
                         <div className="flex flex-wrap items-center gap-1">
-                          {scenario.isPro && (
+                          {scenario.isPro ? (
                             <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-2.5 py-0.5 text-[10px] font-black text-white shadow-sm">
                               <Crown className="size-3" /> PRO
+                            </span>
+                          ) : (
+                            <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-black text-white shadow-sm">
+                              مجاني ✨
                             </span>
                           )}
                           <span className="latin rounded-full border border-white/20 bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
@@ -372,6 +528,20 @@ export default function Roleplay() {
               );
             })}
             </div>
+
+            {visibleCount < filteredScenarios.length && (
+              <div className="flex justify-center pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setVisibleCount(prev => prev + 24)}
+                  className="h-12 rounded-full border-iris/40 bg-iris-soft/60 px-8 text-sm font-bold text-iris hover:bg-iris hover:text-white"
+                >
+                  عرض المزيد من المواقف (+{Math.min(24, filteredScenarios.length - visibleCount)} من أصل{" "}
+                  {(filteredScenarios.length - visibleCount).toLocaleString()} متبقي) 🎭
+                </Button>
+              </div>
+            )}
           </div>
         ) : finished ? (
           <div className="mx-auto max-w-xl rounded-3xl border border-emerald-500/40 bg-card p-8 text-center shadow-sm">
@@ -417,14 +587,34 @@ export default function Roleplay() {
           </div>
         ) : currentTurn ? (
           <div className="mx-auto max-w-2xl space-y-5">
-            {/* Progress */}
-            <div className="flex items-center justify-between text-xs text-ink-soft">
-              <span className="font-bold text-ink">
-                {activeScenario.emoji} {activeScenario.titleAr}
-              </span>
-              <span className="latin font-bold text-iris">
-                الجولة {turnIndex + 1} / {activeScenario.turns.length}
-              </span>
+            {/* Active Scenario Scenic Header Banner */}
+            <div className="relative h-36 overflow-hidden rounded-3xl border border-iris/30 shadow-md">
+              <img
+                src={activeScenario.imageUrl || "/img/ui/tool-roleplay.webp"}
+                alt={activeScenario.titleEn}
+                decoding="async"
+                onError={e => {
+                  e.currentTarget.src = "/img/ui/tool-roleplay.webp";
+                }}
+                className="size-full object-cover"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 bg-gradient-to-t from-[#0a1b33]/95 via-[#102952]/70 to-transparent"
+              />
+              <div className="absolute inset-x-5 bottom-4 flex flex-wrap items-end justify-between gap-2 text-white">
+                <div>
+                  <span className="latin inline-block rounded-full border border-white/25 bg-black/50 px-2.5 py-0.5 text-[10px] font-bold text-amber-300">
+                    {activeScenario.level} · {activeScenario.partnerName}
+                  </span>
+                  <h2 className="mt-1 text-lg font-extrabold text-white">
+                    {activeScenario.emoji} {activeScenario.titleAr}
+                  </h2>
+                </div>
+                <span className="latin rounded-full bg-iris px-3 py-1 text-xs font-black text-white shadow-xs">
+                  الجولة {turnIndex + 1} / {activeScenario.turns.length}
+                </span>
+              </div>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-paper-deep">
               <div

@@ -193,29 +193,29 @@ export default function Home() {
             {[
               {
                 href: "/roleplay",
-                bgImage: "/img/cafe.webp",
+                bgImage: "/img/ui/tool-roleplay.webp",
                 overlay: "from-[#0b1736]/95 via-[#132a5c]/80 to-[#1e3a8a]/55",
                 accentBorder: "hover:border-sky-300/80",
-                badge: "22 موقف بالصوت",
+                badge: "1,000 موقف (A1–C2) 👑",
                 title: "محاكي المواقف الحقيقية",
-                desc: "إنترفيو، آيلتس، تفاوض على المرتب، سفر، فندق واجتماعات Zoom بصوتك.",
+                desc: "1,000 موقف حياتي مقسّمين مستويات (إنترفيو، سفر، آيلتس، فريلانس) بصوتك.",
                 icon: MessageCircle,
                 iconBg: "bg-sky-950/75 text-sky-200 border-sky-300/35",
               },
               {
                 href: "/flashcards",
-                bgImage: "/img/pronunciation.webp",
+                bgImage: "/img/ui/tool-flashcards.webp",
                 overlay: "from-[#062b26]/95 via-[#0d4a40]/80 to-[#0f766e]/55",
                 accentBorder: "hover:border-emerald-300/80",
                 badge: "180 بطاقة · 8 حزم",
                 title: "فلاش كاردز الكلمات",
-                desc: "A1–C1 + IELTS + بزنس + تعبيرات Native بالنطق الأمريكي وملخصات PDF.",
+                desc: "180 بطاقة بصور واقعية فريدة + النطق الأمريكي وملخصات PDF للطباعة.",
                 icon: BookOpen,
                 iconBg: "bg-emerald-950/75 text-emerald-200 border-emerald-300/35",
               },
               {
                 href: "/speed-quiz",
-                bgImage: "/img/ielts.webp",
+                bgImage: "/img/ui/tool-speedquiz.webp",
                 overlay: "from-[#351806]/95 via-[#6b2d0c]/80 to-[#b45309]/55",
                 accentBorder: "hover:border-amber-300/80",
                 badge: "100 سؤال · ماراثون PRO",
@@ -226,7 +226,7 @@ export default function Home() {
               },
               {
                 href: "/competitions",
-                bgImage: "/avatars/vip_king.webp",
+                bgImage: "/img/ui/tool-competitions.webp",
                 overlay: "from-[#220e42]/95 via-[#3b166e]/80 to-[#6d28d9]/55",
                 accentBorder: "hover:border-purple-300/80",
                 badge: "100 أفتار + سكنات 👑",
@@ -346,60 +346,159 @@ export default function Home() {
         )}
 
         <div className="mt-8 grid gap-5 lg:grid-cols-[1.2fr_1fr]">
-          <article className="path-tile path-tile-emphasis">
-            <span className="path-index">
-              THE INDEPENDENCE PATH / 12 LEVELS
-            </span>
-            <h3>
-              من الصفر لحد <span className="hl-word latin">B1.</span>
-            </h3>
-            <p>
-              رحلة متكاملة: 3 مستويات Pre-Starter، و6 أساسية، و3 محادثة متقدمة.
-              تبدأ من مستواك، وتكمّل بخطوات واضحة.
-            </p>
-            <div className="path-levels">
-              <span>01–03 · Pre-Starter</span>
-              <span>04–09 · Core</span>
-              <span>10–12 · Conversation</span>
+          <article className="group relative overflow-hidden rounded-[28px] border border-iris/30 p-7 text-white shadow-md sm:p-8">
+            <img
+              src="/img/ui/path-independence.webp"
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-gradient-to-t from-[#091833]/95 via-[#102b5c]/82 to-[#1d4ed8]/60"
+            />
+            <div className="relative flex h-full flex-col justify-between gap-4">
+              <div>
+                <span className="latin inline-block rounded-full border border-white/25 bg-black/40 px-3 py-1 text-[10px] font-bold tracking-wider text-sky-200">
+                  THE INDEPENDENCE PATH / 12 LEVELS
+                </span>
+                <h3 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">
+                  من الصفر لحد <span className="latin text-amber-300">B1.</span>
+                </h3>
+                <p className="mt-2.5 max-w-xl text-sm leading-relaxed text-white/85">
+                  رحلة متكاملة: 3 مستويات Pre-Starter، و6 أساسية، و3 محادثة متقدمة.
+                  تبدأ من مستواك، وتكمّل بخطوات واضحة.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-bold text-white">
+                  <span className="latin rounded-full border border-white/20 bg-white/15 px-3 py-1">01–03 · Pre-Starter</span>
+                  <span className="latin rounded-full border border-white/20 bg-white/15 px-3 py-1">04–09 · Core</span>
+                  <span className="latin rounded-full border border-white/20 bg-white/15 px-3 py-1">10–12 · Conversation</span>
+                </div>
+              </div>
+              <Link
+                href="/path"
+                className="inline-flex w-fit items-center gap-2 rounded-full bg-white px-5 py-2.5 text-xs font-extrabold text-[#0e2248] transition-colors hover:bg-amber-300"
+              >
+                اكتشف المسار وتفاصيل الحجز <ArrowLeft className="size-4" />
+              </Link>
             </div>
-            <Link href="/path">
-              اكتشف المسار وتفاصيل الحجز <ArrowLeft className="size-4" />
-            </Link>
           </article>
-          <article className="path-tile">
-            <span className="path-index">KIDS INTERACTIVE / KG → PREP 3</span>
-            <h3>
-              الإنجليزي للصغيرين <span className="hl-word">لعبة.</span>
-            </h3>
-            <p>
-              من KG لحد تالتة إعدادي: شرح بالأنيميشن وحل الكتب الخارجية.
-              فيديوهات للترم أو سيشن خاصة حسب احتياج ابنك.
-            </p>
-            <Link href="/kids">
-              شوف إنجليزي الأطفال <ArrowLeft className="size-4" />
-            </Link>
+
+          <article className="group relative overflow-hidden rounded-[28px] border border-emerald-400/35 p-7 text-white shadow-md sm:p-8">
+            <img
+              src="/img/ui/path-kids.webp"
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-gradient-to-t from-[#062b26]/95 via-[#0d4d42]/82 to-[#0f766e]/58"
+            />
+            <div className="relative flex h-full flex-col justify-between gap-4">
+              <div>
+                <span className="latin inline-block rounded-full border border-white/25 bg-black/40 px-3 py-1 text-[10px] font-bold tracking-wider text-emerald-200">
+                  KIDS INTERACTIVE / KG → PREP 3
+                </span>
+                <h3 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">
+                  الإنجليزي للصغيرين <span className="text-amber-300">لعبة.</span>
+                </h3>
+                <p className="mt-2.5 text-sm leading-relaxed text-white/85">
+                  من KG لحد تالتة إعدادي: شرح بالأنيميشن وحل الكتب الخارجية.
+                  فيديوهات للترم أو سيشن خاصة حسب احتياج ابنك.
+                </p>
+              </div>
+              <Link
+                href="/kids"
+                className="inline-flex w-fit items-center gap-2 rounded-full bg-amber-400 px-5 py-2.5 text-xs font-extrabold text-[#0a1b33] transition-colors hover:bg-amber-300"
+              >
+                شوف إنجليزي الأطفال <ArrowLeft className="size-4" />
+              </Link>
+            </div>
           </article>
         </div>
-        <div className="mt-9 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+
+        {/* 6 Category Cards — Unique Branded Realistic Backgrounds (Zero Flat White!) */}
+        <div className="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {categories.data
             ?.filter(c => !["kids", "path"].includes(c.slug))
             .map(category => {
               const Icon = categoryIcon(category.icon);
+              const visualMap: Record<
+                string,
+                { img: string; overlay: string; iconBg: string }
+              > = {
+                grammar: {
+                  img: "/img/ui/cat-grammar.webp",
+                  overlay: "from-[#0a1b33]/94 via-[#142f61]/82 to-[#1e40af]/58",
+                  iconBg: "bg-sky-950/75 text-sky-200 border-sky-300/35",
+                },
+                speaking: {
+                  img: "/img/ui/cat-speaking.webp",
+                  overlay: "from-[#062b26]/94 via-[#0d4d42]/82 to-[#0d9488]/58",
+                  iconBg: "bg-emerald-950/75 text-emerald-200 border-emerald-300/35",
+                },
+                vocabulary: {
+                  img: "/img/ui/cat-vocabulary.webp",
+                  overlay: "from-[#1d1145]/94 via-[#371f7a]/82 to-[#6d28d9]/58",
+                  iconBg: "bg-violet-950/75 text-violet-200 border-violet-300/35",
+                },
+                ielts: {
+                  img: "/img/ui/cat-ielts.webp",
+                  overlay: "from-[#330d12]/94 via-[#661924]/82 to-[#b91c1c]/58",
+                  iconBg: "bg-rose-950/75 text-rose-200 border-rose-300/35",
+                },
+                business: {
+                  img: "/img/ui/cat-business.webp",
+                  overlay: "from-[#0d1c36]/94 via-[#1e355e]/82 to-[#b45309]/60",
+                  iconBg: "bg-amber-950/75 text-amber-200 border-amber-300/35",
+                },
+                writing: {
+                  img: "/img/ui/cat-writing.webp",
+                  overlay: "from-[#12263a]/94 via-[#1e4363]/82 to-[#0284c7]/58",
+                  iconBg: "bg-cyan-950/75 text-cyan-200 border-cyan-300/35",
+                },
+              };
+              const v = visualMap[category.slug] ?? visualMap.grammar;
               return (
                 <Link
                   key={category.id}
                   href={`/courses?category=${category.slug}`}
-                  className="category-card"
+                  className="group relative flex min-h-[168px] flex-col justify-between overflow-hidden rounded-3xl border border-white/15 p-5 text-white shadow-md transition-transform duration-200 hover:-translate-y-1 hover:border-sky-300/70 [content-visibility:auto]"
                 >
-                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-iris-soft text-iris">
-                    <Icon className="size-5" strokeWidth={1.6} />
-                  </span>
-                  <div className="min-w-0">
-                    <h3 className="text-ink">{category.nameAr}</h3>
-                    <span className="latin text-[10px] text-ink-soft">
+                  <img
+                    src={v.img}
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div
+                    aria-hidden="true"
+                    className={`absolute inset-0 bg-gradient-to-t ${v.overlay}`}
+                  />
+                  <div className="relative flex items-start justify-between gap-3">
+                    <span
+                      className={`grid size-11 shrink-0 place-items-center rounded-2xl border ${v.iconBg}`}
+                    >
+                      <Icon className="size-5" strokeWidth={1.8} />
+                    </span>
+                    <span className="latin rounded-full border border-white/20 bg-black/45 px-2.5 py-0.5 text-[10px] font-bold text-white/90">
                       {category.nameEn}
                     </span>
-                    <p>{category.description}</p>
+                  </div>
+                  <div className="relative mt-4">
+                    <h3 className="text-lg font-extrabold text-white">
+                      {category.nameAr}
+                    </h3>
+                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-white/85">
+                      {category.description}
+                    </p>
                   </div>
                 </Link>
               );
@@ -537,7 +636,7 @@ export default function Home() {
           <div className="overflow-hidden rounded-[28px] border border-iris/25 bg-gradient-to-br from-iris-soft/50 via-card to-sky-50/40 shadow-sm dark:from-iris-soft/30 dark:via-card dark:to-card">
             <div className="relative h-36 overflow-hidden">
               <img
-                src="/img/oneonone.webp"
+                src="/img/ui/home-live-session.webp"
                 alt=""
                 aria-hidden="true"
                 loading="lazy"

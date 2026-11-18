@@ -1,13 +1,47 @@
 import { ROLEPLAY_PRO_EXPANSION } from "./roleplay-pro-pack";
 
-export type RoleplayCategory = "work" | "travel" | "daily" | "ielts";
+export type RoleplayLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
+
+export type RoleplayCategory =
+  | "cafe_food"
+  | "travel"
+  | "work"
+  | "shopping"
+  | "health"
+  | "tech_freelance"
+  | "social"
+  | "study_ielts"
+  | "finance_legal"
+  | "daily"
+  | "ielts";
+
+export const ROLEPLAY_LEVELS: {
+  id: "all" | RoleplayLevel;
+  label: string;
+  subtitle: string;
+  badge: string;
+}[] = [
+  { id: "all", label: "كل المستويات", subtitle: "1,000 موقف حياتي", badge: "bg-iris text-white" },
+  { id: "A1", label: "مبتدئ A1", subtitle: "أساسيات الحياة اليومية", badge: "bg-emerald-600 text-white" },
+  { id: "A2", label: "تأسيسي A2", subtitle: "سفر ومواقف عملية", badge: "bg-sky-600 text-white" },
+  { id: "B1", label: "متوسط B1", subtitle: "طلاقة وثقة في الحوار", badge: "bg-indigo-600 text-white" },
+  { id: "B2", label: "متقدم B2", subtitle: "عمل وتفاوض ومقابلات", badge: "bg-violet-600 text-white" },
+  { id: "C1", label: "احترافي C1 👑", subtitle: "قيادة وأكاديمية متقدمة", badge: "bg-amber-600 text-white" },
+  { id: "C2", label: "Native C2 👑", subtitle: "إتقان كامل وتعبيرات أصلية", badge: "bg-rose-600 text-white" },
+];
 
 export const ROLEPLAY_CATEGORIES: { id: "all" | RoleplayCategory; label: string; emoji: string }[] = [
   { id: "all", label: "الكل", emoji: "✨" },
   { id: "work", label: "العمل والإنترفيو", emoji: "💼" },
   { id: "travel", label: "السفر والمطارات", emoji: "✈️" },
-  { id: "daily", label: "الحياة اليومية", emoji: "☕" },
-  { id: "ielts", label: "IELTS والأكاديمية", emoji: "🎯" },
+  { id: "cafe_food", label: "كافيهات ومطاعم", emoji: "☕" },
+  { id: "tech_freelance", label: "فريلانس وتقنية", emoji: "💻" },
+  { id: "study_ielts", label: "IELTS والدراسة", emoji: "🎓" },
+  { id: "shopping", label: "تسوق ومولات", emoji: "🛍️" },
+  { id: "health", label: "صحة وعيادات", emoji: "🩺" },
+  { id: "finance_legal", label: "بنوك وسكن", emoji: "🏦" },
+  { id: "social", label: "صداقات ومناسبات", emoji: "🤝" },
+  { id: "daily", label: "حياة يومية", emoji: "🌟" },
 ];
 
 export interface RoleplayOption {
@@ -33,12 +67,13 @@ export interface RoleplayScenario {
   titleAr: string;
   titleEn: string;
   emoji: string;
-  level: "A1" | "A2" | "B1" | "B2";
+  level: RoleplayLevel;
   settingAr: string;
   partnerName: string;
   accent: string;
   rewardXp: number;
   isPro?: boolean;
+  imageUrl?: string;
   turns: RoleplayTurn[];
 }
 

@@ -45,49 +45,49 @@ const DECK_VISUALS: Record<
   { bg: string; overlay: string; activeRing: string; barColor: string }
 > = {
   A1: {
-    bg: "/img/cafe.webp",
+    bg: "/img/ui/deck-a1.webp",
     overlay: "from-[#0a1b33]/92 via-[#122e5c]/78 to-[#1e40af]/55",
     activeRing: "ring-2 ring-sky-300 border-sky-300",
     barColor: "bg-sky-300",
   },
   A2: {
-    bg: "/img/travel.webp",
+    bg: "/img/ui/deck-a2.webp",
     overlay: "from-[#08263b]/92 via-[#0f4466]/78 to-[#0284c7]/55",
     activeRing: "ring-2 ring-cyan-300 border-cyan-300",
     barColor: "bg-cyan-300",
   },
   B1: {
-    bg: "/img/pronunciation.webp",
+    bg: "/img/ui/deck-b1.webp",
     overlay: "from-[#062b26]/92 via-[#0c4d42]/78 to-[#0d9488]/55",
     activeRing: "ring-2 ring-emerald-300 border-emerald-300",
     barColor: "bg-emerald-300",
   },
   B2: {
-    bg: "/img/business.webp",
+    bg: "/img/ui/deck-b2.webp",
     overlay: "from-[#181342]/92 via-[#2b206e]/78 to-[#4f46e5]/55",
     activeRing: "ring-2 ring-indigo-300 border-indigo-300",
     barColor: "bg-indigo-300",
   },
   C1: {
-    bg: "/img/writing.webp",
+    bg: "/img/ui/deck-c1.webp",
     overlay: "from-[#2b1404]/92 via-[#5c2b09]/80 to-[#b45309]/55",
     activeRing: "ring-2 ring-amber-300 border-amber-300",
     barColor: "bg-amber-300",
   },
   IELTS: {
-    bg: "/img/ielts.webp",
+    bg: "/img/ui/deck-ielts.webp",
     overlay: "from-[#330d12]/92 via-[#6b1925]/80 to-[#b91c1c]/55",
     activeRing: "ring-2 ring-rose-300 border-rose-300",
     barColor: "bg-amber-300",
   },
   BUSINESS: {
-    bg: "/img/online.webp",
+    bg: "/img/ui/deck-business.webp",
     overlay: "from-[#0d1d3a]/92 via-[#22355c]/80 to-[#b45309]/60",
     activeRing: "ring-2 ring-amber-300 border-amber-300",
     barColor: "bg-amber-300",
   },
   IDIOMS: {
-    bg: "/img/mall.webp",
+    bg: "/img/ui/deck-idioms.webp",
     overlay: "from-[#220e42]/92 via-[#451a7a]/80 to-[#9333ea]/55",
     activeRing: "ring-2 ring-fuchsia-300 border-fuchsia-300",
     barColor: "bg-fuchsia-300",

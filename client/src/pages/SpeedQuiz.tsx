@@ -192,7 +192,7 @@ export default function SpeedQuiz() {
             <div className="overflow-hidden rounded-3xl border border-iris/25 bg-gradient-to-b from-iris-soft/45 via-card to-card text-center shadow-md">
               <div className="relative h-44 overflow-hidden">
                 <img
-                  src="/img/ielts.webp"
+                  src="/img/ui/speedquiz-banner.webp"
                   alt=""
                   aria-hidden="true"
                   loading="lazy"
