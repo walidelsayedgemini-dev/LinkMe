@@ -201,6 +201,14 @@ export default function Flashcards() {
     [queue]
   );
 
+  // Preload next flashcard's realistic photo so switching cards is instantaneous
+  useEffect(() => {
+    const nextId = queue[1];
+    if (!nextId) return;
+    const img = new Image();
+    img.src = `/flashcards/${nextId}.webp`;
+  }, [queue]);
+
   const levelMasteredCount = levelCards.filter(c =>
     mastered.includes(c.id)
   ).length;
@@ -468,7 +476,7 @@ export default function Flashcards() {
             </div>
           ) : currentCard ? (
             <>
-              {/* Interactive Flip Card */}
+              {/* Interactive Flip Card — Unique Realistic Word Photo + Link Me Brand Overlay */}
               <div
                 role="button"
                 tabIndex={0}
@@ -483,60 +491,85 @@ export default function Flashcards() {
                   }
                 }}
                 className={cn(
-                  "relative min-h-[340px] cursor-pointer select-none overflow-hidden rounded-3xl border-2 p-6 sm:p-8 shadow-md transition-colors",
+                  "group relative min-h-[370px] cursor-pointer select-none overflow-hidden rounded-3xl border-2 p-6 sm:p-8 text-white shadow-xl transition-colors",
                   flipped
-                    ? "border-emerald-500/50 bg-gradient-to-br from-emerald-500/[0.09] via-card to-iris/[0.08]"
-                    : "border-iris/35 bg-gradient-to-br from-iris-soft/60 via-card to-sky-50/40 hover:border-iris/60 dark:from-iris-soft/35 dark:via-card dark:to-card"
+                    ? "border-emerald-400/70"
+                    : FLASHCARD_LEVEL_META[currentCard.level].isPro
+                      ? "border-amber-400/75"
+                      : "border-iris/50 hover:border-sky-400"
                 )}
               >
+                {/* Unique Realistic Background Photo Describing This Exact Word */}
+                <img
+                  key={currentCard.id}
+                  src={`/flashcards/${currentCard.id}.webp`}
+                  alt={currentCard.word}
+                  decoding="async"
+                  onError={e => {
+                    e.currentTarget.src = DECK_VISUALS[currentCard.level].bg;
+                  }}
+                  className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                />
+                {/* Link Me Brand Color-Graded Overlay (keeps photo clear AND text razor-sharp) */}
+                <div
+                  aria-hidden="true"
+                  className={cn(
+                    "absolute inset-0 bg-gradient-to-t transition-opacity duration-300",
+                    flipped
+                      ? "from-[#04241e]/94 via-[#09362e]/84 to-[#0a1b33]/72"
+                      : DECK_VISUALS[currentCard.level].overlay
+                  )}
+                />
                 <div
                   aria-hidden="true"
                   className={cn(
                     "absolute inset-x-0 top-0 h-1.5",
                     flipped
-                      ? "bg-gradient-to-r from-emerald-500 to-teal-400"
-                      : "bg-gradient-to-r from-[#0e2248] via-iris to-sky-400"
+                      ? "bg-gradient-to-r from-emerald-400 to-teal-300"
+                      : FLASHCARD_LEVEL_META[currentCard.level].isPro
+                        ? "bg-gradient-to-r from-amber-400 via-yellow-300 to-orange-400"
+                        : "bg-gradient-to-r from-sky-400 via-iris to-indigo-400"
                   )}
                 />
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span
-                    className={cn(
-                      "rounded-full px-3 py-1 text-xs font-bold",
-                      FLASHCARD_LEVEL_META[currentCard.level].badgeClass
-                    )}
-                  >
+
+                <div className="relative flex flex-wrap items-center justify-between gap-2">
+                  <span className="rounded-full border border-white/25 bg-black/50 px-3 py-1 text-xs font-bold text-white">
                     {FLASHCARD_LEVEL_META[currentCard.level].label} ·{" "}
-                    <span className="latin">{currentCard.partOfSpeech}</span>
+                    <span className="latin text-sky-200">
+                      {currentCard.partOfSpeech}
+                    </span>
                   </span>
-                  <span className="rounded-full bg-paper-deep px-3 py-1 text-[11px] font-semibold text-ink-soft">
-                    {flipped ? "الوجه الخلفي — المعنى والمثال" : "اضغط لقلب البطاقة 👆"}
+                  <span className="rounded-full border border-white/20 bg-black/45 px-3 py-1 text-[11px] font-semibold text-white/90">
+                    {flipped
+                      ? "الوجه الخلفي — المعنى والمثال"
+                      : "اضغط لقلب البطاقة 👆"}
                   </span>
                 </div>
 
                 {!flipped ? (
-                  <div className="flex min-h-[230px] flex-col items-center justify-center text-center">
+                  <div className="relative flex min-h-[260px] flex-col items-center justify-center text-center">
                     <h2
-                      className="latin text-3xl font-black tracking-tight text-ink sm:text-5xl"
+                      className="latin text-3xl font-black tracking-tight text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.55)] sm:text-5xl"
                       dir="ltr"
                     >
                       {currentCard.word}
                     </h2>
                     <p
-                      className="latin mt-2 text-sm text-ink-soft sm:text-base"
+                      className="latin mt-2.5 rounded-full bg-black/35 px-3.5 py-1 text-sm font-semibold text-sky-200 sm:text-base"
                       dir="ltr"
                     >
                       {currentCard.phonetic}
                     </p>
 
                     <div
-                      className="mt-6 flex flex-wrap items-center justify-center gap-2"
+                      className="mt-6 flex flex-wrap items-center justify-center gap-2.5"
                       onClick={e => e.stopPropagation()}
                     >
                       <Button
                         type="button"
                         size="sm"
                         onClick={() => speakText(currentCard.word, 0.95)}
-                        className="rounded-full bg-iris text-white hover:bg-iris-deep"
+                        className="h-10 rounded-full bg-iris px-5 font-bold text-white shadow-md hover:bg-iris-deep"
                       >
                         <Volume2 className="me-1.5 size-4" /> اسمع النطق
                       </Button>
@@ -545,24 +578,24 @@ export default function Flashcards() {
                         size="sm"
                         variant="outline"
                         onClick={() => speakText(currentCard.word, 0.65)}
-                        className="rounded-full"
+                        className="h-10 rounded-full border-white/35 bg-black/45 px-4 font-bold text-white hover:bg-white hover:text-[#0a1b33]"
                       >
                         🐢 نطق بطيء
                       </Button>
                     </div>
 
-                    <p className="mt-6 text-xs text-ink-soft">
+                    <p className="mt-6 rounded-full bg-black/35 px-4 py-1.5 text-xs font-medium text-white/90">
                       حاول تفتكر معناها الأول، وبعدين اضغط على البطاقة عشان تتأكد!
                     </p>
                   </div>
                 ) : (
-                  <div className="mt-5 space-y-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line pb-3">
+                  <div className="relative mt-5 space-y-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/20 pb-3">
                       <div>
-                        <p className="text-xs font-semibold text-ink-soft">
+                        <p className="text-xs font-semibold text-emerald-200/90">
                           المعنى بالمصري:
                         </p>
-                        <h3 className="mt-0.5 text-2xl font-black text-emerald-700 dark:text-emerald-300">
+                        <h3 className="mt-0.5 text-2xl font-black text-emerald-300 drop-shadow-xs sm:text-3xl">
                           {currentCard.meaningAr}
                         </h3>
                       </div>
@@ -572,19 +605,19 @@ export default function Flashcards() {
                           e.stopPropagation();
                           speakText(currentCard.word, 0.95);
                         }}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-line bg-paper px-3 py-1.5 text-xs font-bold text-ink hover:border-iris"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-black/45 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-white hover:text-[#0a1b33]"
                       >
-                        <Volume2 className="size-3.5 text-iris" />
+                        <Volume2 className="size-3.5 text-sky-300" />
                         <span className="latin" dir="ltr">
                           {currentCard.word}
                         </span>
                       </button>
                     </div>
 
-                    <div className="rounded-2xl border border-line bg-paper-deep/60 p-4">
+                    <div className="rounded-2xl border border-white/20 bg-black/45 p-4">
                       <div className="flex items-start justify-between gap-2">
                         <p
-                          className="latin text-sm font-bold text-ink sm:text-base"
+                          className="latin text-sm font-bold text-white sm:text-base"
                           dir="ltr"
                         >
                           “{currentCard.exampleEn}”
@@ -596,20 +629,21 @@ export default function Flashcards() {
                             speakText(currentCard.exampleEn, 0.92);
                           }}
                           aria-label="اسمع المثال بالصوت"
-                          className="grid size-8 shrink-0 place-items-center rounded-full bg-iris-soft text-iris hover:bg-iris hover:text-white"
+                          className="grid size-8 shrink-0 place-items-center rounded-full bg-iris text-white hover:bg-iris-deep"
                         >
                           <Volume2 className="size-4" />
                         </button>
                       </div>
-                      <p className="mt-2 text-xs leading-relaxed text-ink-soft sm:text-sm">
+                      <p className="mt-2 text-xs leading-relaxed text-white/85 sm:text-sm">
                         {currentCard.exampleAr}
                       </p>
                     </div>
 
-                    <div className="flex items-start gap-2 rounded-2xl border border-amber-400/40 bg-amber-500/10 p-3.5 text-xs leading-relaxed text-amber-900 dark:text-amber-200">
-                      <Sparkles className="mt-0.5 size-4 shrink-0 text-amber-500" />
+                    <div className="flex items-start gap-2 rounded-2xl border border-amber-300/40 bg-amber-950/60 p-3.5 text-xs leading-relaxed text-amber-100">
+                      <Sparkles className="mt-0.5 size-4 shrink-0 text-amber-300" />
                       <p>
-                        <b>نصيحة Link Me:</b> {currentCard.tipAr}
+                        <b className="text-amber-300">نصيحة Link Me:</b>{" "}
+                        {currentCard.tipAr}
                       </p>
                     </div>
                   </div>
