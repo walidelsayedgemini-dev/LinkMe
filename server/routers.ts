@@ -16,6 +16,7 @@ import { curriculumRouter } from "./routers/curriculum";
 import { receiptsRouter } from "./routers/receipts";
 import { certificatesRouter } from "./routers/certificates";
 import { communityRouter } from "./routers/community";
+import { writingRouter } from "./routers/writing";
 export const appRouter = router({
   system: systemRouter,
   auth: authRouter,
@@ -34,6 +35,7 @@ export const appRouter = router({
   receipts: receiptsRouter,
   certificates: certificatesRouter,
   community: communityRouter,
+  writing: writingRouter,
 });
 
 export type AppRouter = typeof appRouter;

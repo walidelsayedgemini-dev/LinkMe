@@ -26,6 +26,7 @@ import { Eyebrow } from "@/components/bits";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { soundEffects } from "@/lib/sound-effects";
+import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
 
 type CefrLevel = "A1" | "A2" | "B1" | "B2" | "C1";
@@ -353,22 +354,49 @@ export default function WritingPage() {
       .filter(Boolean).length;
   }, [inputText]);
 
-  const handleEvaluate = () => {
-    if (wordCount < 6) {
-      toast.warning("اكتب على الأقل 6 كلمات بالإنجليزية عشان نقدر نقيّم النص بدقة.");
+  const evaluateMutation = trpc.writing.evaluate.useMutation();
+
+  const handleEvaluate = async () => {
+    if (wordCount < 4) {
+      toast.warning("اكتب على الأقل 4 كلمات بالإنجليزية عشان نقدر نقيّم النص بدقة.");
       return;
     }
     soundEffects.playClick();
     setIsEvaluating(true);
 
-    setTimeout(() => {
-      const result = analyzeTextDeterministic(inputText);
-      setActiveResult(result);
-      setIsEvaluating(false);
-      soundEffects.playCorrect();
-      toast.success("تم تقييم النص وتشخيص نقاط الضعف بنجاح 🎯");
+    try {
+      const serverResult = await evaluateMutation.mutateAsync({
+        text: inputText,
+      });
 
-      // Save to portfolio history
+      const result: EvaluationResult = {
+        id: `eval_${Date.now()}`,
+        timestamp: new Date().toLocaleDateString("ar-EG", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        originalText: inputText,
+        correctedText: serverResult.correctedText,
+        estimatedLevel: serverResult.estimatedLevel as CefrLevel,
+        overallScore: serverResult.overallScore,
+        wordCount: serverResult.wordCount,
+        scores: serverResult.scores,
+        overview: serverResult.overview,
+        weaknesses: serverResult.weaknesses as WeaknessDiagnosis[],
+        encouragement: serverResult.encouragement,
+      };
+
+      setActiveResult(result);
+      soundEffects.playCorrect();
+      toast.success(
+        serverResult.source === "gemini_3_8_flash"
+          ? "تم التقييم بنجاح بواسطة Google Gemini 3.8 Flash الذكي ⚡"
+          : "تم تقييم النص وتشخيص نقاط الضعف بنجاح 🎯"
+      );
+
       const updated = [result, ...history.slice(0, 19)];
       setHistory(updated);
       try {
@@ -376,7 +404,15 @@ export default function WritingPage() {
       } catch {
         // ignore storage errors
       }
-    }, 750);
+    } catch {
+      // Fallback
+      const fallback = analyzeTextDeterministic(inputText);
+      setActiveResult(fallback);
+      soundEffects.playCorrect();
+      toast.success("تم تقييم النص وتشخيص نقاط الضعف بنجاح 🎯");
+    } finally {
+      setIsEvaluating(false);
+    }
   };
 
   const handleCopyCorrected = () => {
