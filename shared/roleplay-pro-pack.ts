@@ -3,6 +3,7 @@ import type { RoleplayScenario } from "./roleplay-scenarios";
 export const ROLEPLAY_PRO_EXPANSION: RoleplayScenario[] = [
   {
     id: "tech-interview-pro",
+    imageUrl: "/img/scenarios/scenario-1.webp",
     category: "work",
     titleAr: "إنترفيو تقني وحل المشكلات",
     titleEn: "Technical & Problem-Solving Interview",
@@ -134,6 +135,7 @@ export const ROLEPLAY_PRO_EXPANSION: RoleplayScenario[] = [
   },
   {
     id: "client-pitch-pro",
+    imageUrl: "/img/scenarios/scenario-2.webp",
     category: "work",
     titleAr: "إقناع عميل أجنبي بمشروعك (Freelance Pitch)",
     titleEn: "Winning an International Client",
@@ -265,6 +267,7 @@ export const ROLEPLAY_PRO_EXPANSION: RoleplayScenario[] = [
   },
   {
     id: "angry-customer-pro",
+    imageUrl: "/img/scenarios/scenario-3.webp",
     category: "work",
     titleAr: "تهدئة عميل غاضب باحترافية",
     titleEn: "De-escalating an Upset Customer",
@@ -396,6 +399,7 @@ export const ROLEPLAY_PRO_EXPANSION: RoleplayScenario[] = [
   },
   {
     id: "remote-standup-pro",
+    imageUrl: "/img/scenarios/scenario-4.webp",
     category: "work",
     titleAr: "اجتماع الديلي ستاند أب اليومي",
     titleEn: "Daily Standup Team Update",
@@ -527,6 +531,7 @@ export const ROLEPLAY_PRO_EXPANSION: RoleplayScenario[] = [
   },
   {
     id: "performance-review-pro",
+    imageUrl: "/img/oneonone.webp",
     category: "work",
     titleAr: "جلسة التقييم والرد على النقد البنّاء",
     titleEn: "Handling Constructive Feedback",
@@ -658,6 +663,7 @@ export const ROLEPLAY_PRO_EXPANSION: RoleplayScenario[] = [
   },
   {
     id: "networking-event-pro",
+    imageUrl: "/img/scenarios/scenario-5.webp",
     category: "work",
     titleAr: "التعارف وبناء علاقات في مؤتمر دولي",
     titleEn: "International Conference Networking",
@@ -789,6 +795,7 @@ export const ROLEPLAY_PRO_EXPANSION: RoleplayScenario[] = [
   },
   {
     id: "passport-control-pro",
+    imageUrl: "/img/travel.webp",
     category: "travel",
     titleAr: "ضابط الجوازات والجمارك في المطار",
     titleEn: "Airport Immigration & Customs",
@@ -920,6 +927,7 @@ export const ROLEPLAY_PRO_EXPANSION: RoleplayScenario[] = [
   },
   {
     id: "lost-luggage-pro",
+    imageUrl: "/img/scenarios/scenario-6.webp",
     category: "travel",
     titleAr: "الشنطة ضاعت في المطار!",
     titleEn: "Reporting Lost Luggage",
@@ -1051,6 +1059,7 @@ export const ROLEPLAY_PRO_EXPANSION: RoleplayScenario[] = [
   },
   {
     id: "renting-apartment-pro",
+    imageUrl: "/img/scenarios/scenario-7.webp",
     category: "travel",
     titleAr: "استئجار شقة بالخارج والاتفاق مع المالك",
     titleEn: "Renting an Apartment Abroad",
@@ -1182,6 +1191,7 @@ export const ROLEPLAY_PRO_EXPANSION: RoleplayScenario[] = [
   },
   {
     id: "bank-account-pro",
+    imageUrl: "/img/business.webp",
     category: "travel",
     titleAr: "فتح حساب بنكي وحل مشكلة الكارت",
     titleEn: "Banking & Card Support Abroad",
@@ -1313,6 +1323,7 @@ export const ROLEPLAY_PRO_EXPANSION: RoleplayScenario[] = [
   },
   {
     id: "fine-dining-pro",
+    imageUrl: "/img/cafe.webp",
     category: "daily",
     titleAr: "مطعم راقي وتعديل الطلب بذوق",
     titleEn: "Fine Dining & Dietary Requests",
@@ -1444,6 +1455,7 @@ export const ROLEPLAY_PRO_EXPANSION: RoleplayScenario[] = [
   },
   {
     id: "shopping-return-pro",
+    imageUrl: "/img/mall.webp",
     category: "daily",
     titleAr: "استرجاع أو تبديل منتج في مول عالمي",
     titleEn: "Shopping, Sizes & Easy Returns",
@@ -1575,6 +1587,7 @@ export const ROLEPLAY_PRO_EXPANSION: RoleplayScenario[] = [
   },
   {
     id: "gym-coach-pro",
+    imageUrl: "/img/scenarios/scenario-8.webp",
     category: "daily",
     titleAr: "الاشتراك في الجيم والتكلم مع المدرب",
     titleEn: "Joining a Gym & Fitness Goals",
@@ -1706,6 +1719,7 @@ export const ROLEPLAY_PRO_EXPANSION: RoleplayScenario[] = [
   },
   {
     id: "small-talk-pro",
+    imageUrl: "/img/scenarios/scenario-9.webp",
     category: "daily",
     titleAr: "فتح كلام طبيعي مع أجانب بدون إحراج",
     titleEn: "Effortless Everyday Small Talk",
@@ -1837,6 +1851,7 @@ export const ROLEPLAY_PRO_EXPANSION: RoleplayScenario[] = [
   },
   {
     id: "ielts-cue-card-pro",
+    imageUrl: "/img/ielts.webp",
     category: "ielts",
     titleAr: "تحدي IELTS Speaking Part 2 & 3 (Band 8+)",
     titleEn: "IELTS Cue Card & Abstract Follow-ups",

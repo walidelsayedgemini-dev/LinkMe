@@ -80,6 +80,7 @@ export interface RoleplayScenario {
 const BASE_ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
   {
     id: "job-interview",
+    imageUrl: "/img/scenarios/scenario-10.webp",
     category: "work",
     titleAr: "إنترفيو شغل بالإنجليزي",
     titleEn: "Job Interview",
@@ -234,6 +235,7 @@ const BASE_ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
   },
   {
     id: "cafe-order",
+    imageUrl: "/img/scenarios/scenario-11.webp",
     category: "daily",
     titleAr: "طلب قهوة وأكل في كافيه",
     titleEn: "Ordering at a Café",
@@ -364,6 +366,7 @@ const BASE_ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
   },
   {
     id: "airport-hotel",
+    imageUrl: "/img/scenarios/scenario-12.webp",
     category: "travel",
     titleAr: "المطار وتسجيل الفندق",
     titleEn: "Airport & Hotel Check-in",
@@ -494,6 +497,7 @@ const BASE_ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
   },
   {
     id: "online-meeting",
+    imageUrl: "/img/online.webp",
     category: "work",
     titleAr: "اجتماع شغل أونلاين (Zoom)",
     titleEn: "Online Business Meeting",
@@ -625,6 +629,7 @@ const BASE_ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
   // ================= PRO / VIP EXCLUSIVE SCENARIOS =================
   {
     id: "ielts-speaking-pro",
+    imageUrl: "/img/scenarios/scenario-13.webp",
     category: "ielts",
     titleAr: "محاكاة اختبار IELTS Speaking الرسمي",
     titleEn: "IELTS Speaking Examiner Simulation",
@@ -756,6 +761,7 @@ const BASE_ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
   },
   {
     id: "salary-negotiation-pro",
+    imageUrl: "/img/scenarios/scenario-14.webp",
     category: "work",
     titleAr: "التفاوض على المرتب والترقية",
     titleEn: "Salary Negotiation Masterclass",
@@ -887,6 +893,7 @@ const BASE_ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
   },
   {
     id: "medical-travel-pro",
+    imageUrl: "/img/scenarios/scenario-15.webp",
     category: "travel",
     titleAr: "العيادة والصيدلية أثناء السفر",
     titleEn: "Doctor & Pharmacy Abroad",

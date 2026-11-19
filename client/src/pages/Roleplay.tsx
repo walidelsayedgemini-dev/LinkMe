@@ -33,6 +33,113 @@ import {
   type RoleplayScenario,
 } from "@shared/roleplay-scenarios";
 
+export const CATEGORY_SCENARIO_PHOTOS: Record<string, string[]> = {
+  work: [
+    "/img/scenarios/scenario-1.webp",
+    "/img/business.webp",
+    "/img/scenarios/scenario-5.webp",
+    "/img/scenarios/scenario-9.webp",
+    "/img/ui/cat-business.webp",
+    "/img/scenarios/scenario-13.webp",
+    "/img/oneonone.webp",
+  ],
+  travel: [
+    "/img/travel.webp",
+    "/img/scenarios/scenario-2.webp",
+    "/img/scenarios/scenario-6.webp",
+    "/img/scenarios/scenario-10.webp",
+    "/img/scenarios/scenario-14.webp",
+  ],
+  cafe_food: [
+    "/img/cafe.webp",
+    "/img/scenarios/scenario-3.webp",
+    "/img/scenarios/scenario-7.webp",
+    "/img/scenarios/scenario-11.webp",
+    "/img/scenarios/scenario-15.webp",
+  ],
+  tech_freelance: [
+    "/img/online.webp",
+    "/img/scenarios/scenario-4.webp",
+    "/img/scenarios/scenario-8.webp",
+    "/img/scenarios/scenario-12.webp",
+    "/img/scenarios/scenario-16.webp",
+    "/img/ui/cat-speaking.webp",
+  ],
+  study_ielts: [
+    "/img/ielts.webp",
+    "/img/writing.webp",
+    "/img/pronunciation.webp",
+    "/img/scenarios/scenario-1.webp",
+    "/img/ui/cat-ielts.webp",
+    "/img/ui/cat-grammar.webp",
+  ],
+  shopping: [
+    "/img/mall.webp",
+    "/img/scenarios/scenario-3.webp",
+    "/img/scenarios/scenario-7.webp",
+    "/img/scenarios/scenario-11.webp",
+  ],
+  health: [
+    "/img/scenarios/scenario-2.webp",
+    "/img/scenarios/scenario-6.webp",
+    "/img/scenarios/scenario-10.webp",
+    "/img/scenarios/scenario-14.webp",
+  ],
+  finance_legal: [
+    "/img/business.webp",
+    "/img/scenarios/scenario-4.webp",
+    "/img/scenarios/scenario-8.webp",
+    "/img/scenarios/scenario-12.webp",
+  ],
+  social: [
+    "/img/cafe.webp",
+    "/img/scenarios/scenario-5.webp",
+    "/img/scenarios/scenario-9.webp",
+    "/img/scenarios/scenario-13.webp",
+    "/img/scenarios/scenario-15.webp",
+  ],
+  daily: [
+    "/img/scenarios/scenario-1.webp",
+    "/img/scenarios/scenario-2.webp",
+    "/img/scenarios/scenario-3.webp",
+    "/img/scenarios/scenario-4.webp",
+    "/img/scenarios/scenario-5.webp",
+    "/img/scenarios/scenario-6.webp",
+    "/img/scenarios/scenario-7.webp",
+    "/img/scenarios/scenario-8.webp",
+    "/img/scenarios/scenario-9.webp",
+    "/img/scenarios/scenario-10.webp",
+    "/img/scenarios/scenario-11.webp",
+    "/img/scenarios/scenario-12.webp",
+    "/img/scenarios/scenario-13.webp",
+    "/img/scenarios/scenario-14.webp",
+    "/img/scenarios/scenario-15.webp",
+    "/img/scenarios/scenario-16.webp",
+  ],
+};
+
+export function getScenarioCoverImage(
+  scenario: { id: string; category?: string; imageUrl?: string },
+  index = 0
+): string {
+  if (
+    scenario.imageUrl &&
+    scenario.imageUrl.startsWith("/img/") &&
+    !scenario.imageUrl.includes("tool-roleplay.webp")
+  ) {
+    return scenario.imageUrl;
+  }
+  const pool =
+    CATEGORY_SCENARIO_PHOTOS[scenario.category || "daily"] ||
+    CATEGORY_SCENARIO_PHOTOS.daily;
+  let hash = 0;
+  for (let i = 0; i < scenario.id.length; i++) {
+    hash = ((hash << 5) - hash + scenario.id.charCodeAt(i)) | 0;
+  }
+  const positiveHash = Math.abs(hash);
+  return pool[(positiveHash + index) % pool.length];
+}
+
 function speakEnglish(text: string, rate = 0.94) {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
   try {
@@ -420,9 +527,9 @@ export default function Roleplay() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredScenarios.slice(0, visibleCount).map(scenario => {
+              {filteredScenarios.slice(0, visibleCount).map((scenario, index) => {
               const locked = Boolean(scenario.isPro) && !isVip;
-              const coverImg = scenario.imageUrl || "/img/ui/tool-roleplay.webp";
+              const coverImg = getScenarioCoverImage(scenario, index);
               return (
                 <div
                   key={scenario.id}
@@ -442,7 +549,10 @@ export default function Roleplay() {
                         loading="lazy"
                         decoding="async"
                         onError={e => {
-                          e.currentTarget.src = "/img/ui/tool-roleplay.webp";
+                          const pool =
+                            CATEGORY_SCENARIO_PHOTOS[scenario.category || "daily"] ||
+                            CATEGORY_SCENARIO_PHOTOS.daily;
+                          e.currentTarget.src = pool[(index + 1) % pool.length];
                         }}
                         className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
@@ -577,11 +687,14 @@ export default function Roleplay() {
             {/* Active Scenario Scenic Header Banner */}
             <div className="relative h-36 overflow-hidden rounded-3xl border border-iris/30 shadow-md">
               <img
-                src={activeScenario.imageUrl || "/img/ui/tool-roleplay.webp"}
+                src={getScenarioCoverImage(activeScenario, 0)}
                 alt={activeScenario.titleEn}
                 decoding="async"
                 onError={e => {
-                  e.currentTarget.src = "/img/ui/tool-roleplay.webp";
+                  const pool =
+                    CATEGORY_SCENARIO_PHOTOS[activeScenario.category || "daily"] ||
+                    CATEGORY_SCENARIO_PHOTOS.daily;
+                  e.currentTarget.src = pool[1];
                 }}
                 className="size-full object-cover"
               />
