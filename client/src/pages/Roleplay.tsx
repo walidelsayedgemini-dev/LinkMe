@@ -33,13 +33,41 @@ import {
   type RoleplayScenario,
 } from "@shared/roleplay-scenarios";
 
+export const UNIQUE_SCENARIO_PHOTOS = [
+  "/img/scenarios/scenario-1.webp",
+  "/img/scenarios/scenario-2.webp",
+  "/img/scenarios/scenario-3.webp",
+  "/img/scenarios/scenario-4.webp",
+  "/img/scenarios/scenario-5.webp",
+  "/img/scenarios/scenario-6.webp",
+  "/img/scenarios/scenario-7.webp",
+  "/img/scenarios/scenario-8.webp",
+  "/img/scenarios/scenario-9.webp",
+  "/img/scenarios/scenario-10.webp",
+  "/img/scenarios/scenario-11.webp",
+  "/img/scenarios/scenario-12.webp",
+  "/img/scenarios/scenario-13.webp",
+  "/img/scenarios/scenario-14.webp",
+  "/img/scenarios/scenario-15.webp",
+  "/img/scenarios/scenario-16.webp",
+  "/img/business.webp",
+  "/img/cafe.webp",
+  "/img/hero.webp",
+  "/img/ielts.webp",
+  "/img/mall.webp",
+  "/img/oneonone.webp",
+  "/img/online.webp",
+  "/img/pronunciation.webp",
+  "/img/travel.webp",
+  "/img/writing.webp",
+] as const;
+
 export const CATEGORY_SCENARIO_PHOTOS: Record<string, string[]> = {
   work: [
     "/img/scenarios/scenario-1.webp",
     "/img/business.webp",
     "/img/scenarios/scenario-5.webp",
     "/img/scenarios/scenario-9.webp",
-    "/img/ui/cat-business.webp",
     "/img/scenarios/scenario-13.webp",
     "/img/oneonone.webp",
   ],
@@ -63,15 +91,13 @@ export const CATEGORY_SCENARIO_PHOTOS: Record<string, string[]> = {
     "/img/scenarios/scenario-8.webp",
     "/img/scenarios/scenario-12.webp",
     "/img/scenarios/scenario-16.webp",
-    "/img/ui/cat-speaking.webp",
   ],
   study_ielts: [
     "/img/ielts.webp",
     "/img/writing.webp",
     "/img/pronunciation.webp",
     "/img/scenarios/scenario-1.webp",
-    "/img/ui/cat-ielts.webp",
-    "/img/ui/cat-grammar.webp",
+    "/img/scenarios/scenario-9.webp",
   ],
   shopping: [
     "/img/mall.webp",
@@ -120,24 +146,19 @@ export const CATEGORY_SCENARIO_PHOTOS: Record<string, string[]> = {
 
 export function getScenarioCoverImage(
   scenario: { id: string; category?: string; imageUrl?: string },
-  index = 0
+  index?: number
 ): string {
-  if (
-    scenario.imageUrl &&
-    scenario.imageUrl.startsWith("/img/") &&
-    !scenario.imageUrl.includes("tool-roleplay.webp")
-  ) {
-    return scenario.imageUrl;
+  // Deterministic cycling across the 26 unique photos in any filtered view
+  // Guarantees zero adjacent or row duplicates across the entire grid
+  if (typeof index === "number" && index >= 0) {
+    return UNIQUE_SCENARIO_PHOTOS[index % UNIQUE_SCENARIO_PHOTOS.length];
   }
-  const pool =
-    CATEGORY_SCENARIO_PHOTOS[scenario.category || "daily"] ||
-    CATEGORY_SCENARIO_PHOTOS.daily;
+  // For modal/sheet views: scenario id hash ensures a consistent unique photo
   let hash = 0;
   for (let i = 0; i < scenario.id.length; i++) {
     hash = ((hash << 5) - hash + scenario.id.charCodeAt(i)) | 0;
   }
-  const positiveHash = Math.abs(hash);
-  return pool[(positiveHash + index) % pool.length];
+  return UNIQUE_SCENARIO_PHOTOS[Math.abs(hash) % UNIQUE_SCENARIO_PHOTOS.length];
 }
 
 function speakEnglish(text: string, rate = 0.94) {
@@ -549,10 +570,10 @@ export default function Roleplay() {
                         loading="lazy"
                         decoding="async"
                         onError={e => {
-                          const pool =
-                            CATEGORY_SCENARIO_PHOTOS[scenario.category || "daily"] ||
-                            CATEGORY_SCENARIO_PHOTOS.daily;
-                          e.currentTarget.src = pool[(index + 1) % pool.length];
+                          e.currentTarget.src =
+                            UNIQUE_SCENARIO_PHOTOS[
+                              (index + 1) % UNIQUE_SCENARIO_PHOTOS.length
+                            ];
                         }}
                         className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
@@ -687,14 +708,11 @@ export default function Roleplay() {
             {/* Active Scenario Scenic Header Banner */}
             <div className="relative h-36 overflow-hidden rounded-3xl border border-iris/30 shadow-md">
               <img
-                src={getScenarioCoverImage(activeScenario, 0)}
+                src={getScenarioCoverImage(activeScenario)}
                 alt={activeScenario.titleEn}
                 decoding="async"
                 onError={e => {
-                  const pool =
-                    CATEGORY_SCENARIO_PHOTOS[activeScenario.category || "daily"] ||
-                    CATEGORY_SCENARIO_PHOTOS.daily;
-                  e.currentTarget.src = pool[1];
+                  e.currentTarget.src = UNIQUE_SCENARIO_PHOTOS[1];
                 }}
                 className="size-full object-cover"
               />

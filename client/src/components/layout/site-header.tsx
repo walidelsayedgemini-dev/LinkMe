@@ -334,18 +334,21 @@ export function SiteHeader() {
             </SheetTrigger>
             <SheetContent
               side="right"
-              className="w-[85vw] max-w-[320px] bg-paper p-0 flex flex-col h-full overflow-hidden"
+              className="w-[88vw] max-w-[340px] bg-paper p-0 gap-0 flex flex-col h-[100dvh] max-h-[100dvh] overflow-hidden border-s border-line shadow-2xl"
               dir="rtl"
             >
               <SheetTitle className="sr-only">قائمة التنقل</SheetTitle>
               <div
-                className="flex-1 overflow-y-auto overscroll-contain px-5 py-6 space-y-5"
-                style={{ WebkitOverflowScrolling: "touch" }}
+                className="flex-1 overflow-y-auto overscroll-contain px-5 py-6 space-y-6"
+                style={{
+                  WebkitOverflowScrolling: "touch",
+                  touchAction: "pan-y",
+                }}
               >
                 <div className="shrink-0 pe-10">
                   <Logo />
                 </div>
-                <div className="shrink-0 flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-card p-3">
+                <div className="shrink-0 flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-card p-3 shadow-xs">
                   <HeaderStreakIndicator />
                   <button
                     type="button"
@@ -360,76 +363,90 @@ export function SiteHeader() {
                   </button>
                   {themeButton}
                 </div>
-                <nav aria-label="القائمة الجوالة" className="shrink-0 flex flex-col divide-y divide-line/60">
-                  {NAV.map((item, i) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={event => {
-                        goToSection(event, item);
-                        setOpen(false);
-                      }}
-                      className={cn(
-                        "flex items-center justify-between py-3.5 text-sm transition-colors",
-                        isActive(item)
-                          ? "font-bold text-iris"
-                          : "text-ink-soft hover:text-ink"
-                      )}
-                    >
-                      <span>{item.label}</span>
-                      <span className="latin text-[10px] opacity-50">0{i}</span>
-                    </Link>
-                  ))}
-                </nav>
-                <div className="shrink-0 pt-4 border-t border-line/70 space-y-3 pb-8">
+
+                <div className="space-y-2">
+                  <p className="px-1 text-[11px] font-bold tracking-wider text-ink-soft uppercase opacity-75">
+                    أقسام المنصة
+                  </p>
+                  <nav aria-label="القائمة الجوالة" className="flex flex-col divide-y divide-line/60 rounded-2xl border border-line bg-card/60 px-3 shadow-xs">
+                    {NAV.map((item, i) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={event => {
+                          goToSection(event, item);
+                          setOpen(false);
+                        }}
+                        className={cn(
+                          "flex items-center justify-between py-3.5 text-sm transition-colors",
+                          isActive(item)
+                            ? "font-bold text-iris"
+                            : "text-ink-soft hover:text-ink"
+                        )}
+                      >
+                        <span className="font-medium">{item.label}</span>
+                        <span className="latin text-[10px] font-bold text-ink-soft opacity-60">0{i}</span>
+                      </Link>
+                    ))}
+                  </nav>
+                </div>
+
+                <div className="pt-2 space-y-3 pb-14 border-t border-line/60">
+                  <p className="px-1 text-[11px] font-bold tracking-wider text-ink-soft uppercase opacity-75">
+                    {user ? "حسابك والتعلّم" : "ابدأ رحلتك"}
+                  </p>
                   {user ? (
-                    <>
+                    <div className="space-y-2.5">
                       <Button
                         asChild
-                        className="w-full rounded-full bg-iris text-white shadow-sm"
+                        className="w-full h-11 rounded-full bg-iris text-white shadow-sm font-bold justify-center"
                       >
-                        <Link href="/dashboard" onClick={() => setOpen(false)}>لوحة التعلّم</Link>
+                        <Link href="/dashboard" onClick={() => setOpen(false)}>
+                          <LayoutDashboard className="size-4 ms-1.5" /> لوحة التعلّم
+                        </Link>
                       </Button>
                       <Button
                         asChild
                         variant="outline"
-                        className="w-full rounded-full"
+                        className="w-full h-10 rounded-full font-medium justify-center"
                       >
-                        <Link href="/homework" onClick={() => setOpen(false)}>واجباتي وتسليماتي</Link>
+                        <Link href="/homework" onClick={() => setOpen(false)}>
+                          <ClipboardList className="size-4 ms-1.5" /> واجباتي وتسليماتي
+                        </Link>
                       </Button>
                       {user.role === "admin" && (
                         <Button
                           asChild
                           variant="outline"
-                          className="w-full rounded-full"
+                          className="w-full h-10 rounded-full font-medium justify-center text-iris hover:bg-iris/10 border-iris/40"
                         >
                           <Link href="/admin" onClick={() => setOpen(false)}>
-                            <ShieldCheck className="size-4" /> لوحة التحكم
+                            <ShieldCheck className="size-4 ms-1.5" /> لوحة التحكم
                           </Link>
                         </Button>
                       )}
-                    </>
+                    </div>
                   ) : (
-                    <>
+                    <div className="space-y-2.5">
                       <Button
                         asChild
-                        className="w-full rounded-full bg-iris text-white shadow-sm"
+                        className="w-full h-11 rounded-full bg-iris text-white shadow-sm font-bold justify-center"
                       >
-                        <Link href="/signup" onClick={() => setOpen(false)}>اعمل حسابك</Link>
+                        <Link href="/signup" onClick={() => setOpen(false)}>اعمل حسابك مجاناً</Link>
                       </Button>
                       <Button
                         asChild
                         variant="outline"
-                        className="w-full rounded-full"
+                        className="w-full h-10 rounded-full font-medium justify-center"
                       >
                         <Link href="/login" onClick={() => setOpen(false)}>تسجيل الدخول</Link>
                       </Button>
-                    </>
+                    </div>
                   )}
                   <Link
                     href="/contact"
                     onClick={() => setOpen(false)}
-                    className="block py-2 text-center text-xs text-ink-soft hover:text-ink"
+                    className="block pt-2 text-center text-xs text-ink-soft hover:text-ink transition-colors"
                   >
                     محتاج مساعدة؟ كلّمنا
                   </Link>

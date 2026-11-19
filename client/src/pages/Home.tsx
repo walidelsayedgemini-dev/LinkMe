@@ -222,7 +222,7 @@ export default function Home() {
             {[
               {
                 href: "/roleplay",
-                bgImage: "/img/scenarios/scenario-1.webp",
+                bgImage: "/img/scenarios/scenario-7.webp",
                 overlay: "from-[#0b1736]/95 via-[#132a5c]/80 to-[#1e3a8a]/55",
                 accentBorder: "hover:border-sky-400/80",
                 badge: "1,000 موقف (A1–C2) 👑",
