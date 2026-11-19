@@ -104,7 +104,7 @@ export function PremiumActivationDialog({
   };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="premium-dialog max-w-xl">
+      <DialogContent className="premium-dialog max-w-xl dark:bg-[#0b1120]/95 dark:backdrop-blur-xl dark:border-white/10 dark:shadow-[0_0_50px_rgba(2,132,199,0.2)]">
         <DialogHeader>
           <DialogTitle>تفعيل خطة الإتقان لـ {studentName}</DialogTitle>
           <DialogDescription>
@@ -114,30 +114,50 @@ export function PremiumActivationDialog({
         </DialogHeader>
         <div className="space-y-5">
           <div>
-            <Label className="mb-2 block">المستويات المشمولة</Label>
-            <div className="premium-level-picker">
+            <Label className="mb-2 block text-xs font-bold text-ink">
+              المستويات المشمولة (اضغط لاختيار مستوى أو أكثر)
+            </Label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
               {ASSESSMENT_LEVELS.map(level => {
                 const selected = levels.includes(level);
                 return (
-                  <label
+                  <button
                     key={level}
-                    className={`premium-level-choice ${selected ? "premium-level-choice-selected" : ""}`}
+                    type="button"
+                    onClick={() => toggleLevel(level)}
+                    className={cn(
+                      "flex items-center justify-between rounded-xl border p-3 text-start transition-all cursor-pointer",
+                      selected
+                        ? "border-sky-400 bg-sky-500/15 text-white shadow-[0_0_15px_-3px_rgba(56,189,248,0.25)] ring-1 ring-sky-400/40 dark:bg-sky-500/20"
+                        : "border-line bg-card/60 text-ink-soft hover:border-sky-400/30 hover:bg-card dark:border-white/10 dark:bg-white/5"
+                    )}
                   >
-                    <input
-                      type="checkbox"
-                      checked={selected}
-                      onChange={() => toggleLevel(level)}
-                    />
-                    <span className="latin">{level}</span>
-                    <small>{LEVEL_NAMES[level]}</small>
-                  </label>
+                    <div>
+                      <span className={cn("block text-sm font-black font-mono", selected ? "text-sky-400" : "text-ink")}>
+                        {level}
+                      </span>
+                      <span className="block text-xs font-semibold text-ink-soft">
+                        {LEVEL_NAMES[level]}
+                      </span>
+                    </div>
+                    <div
+                      className={cn(
+                        "flex size-5 shrink-0 items-center justify-center rounded-md border transition-all",
+                        selected
+                          ? "border-sky-400 bg-sky-400 text-slate-950 font-bold"
+                          : "border-line dark:border-white/20 bg-transparent"
+                      )}
+                    >
+                      {selected && <CheckCircle2 className="size-4 text-slate-950 stroke-[3]" />}
+                    </div>
+                  </button>
                 );
               })}
             </div>
           </div>
           <div>
-            <Label className="mb-2.5 block text-sm font-bold text-ink">
-              مدة العضوية (اختر شهري أو سنوي)
+            <Label className="mb-2.5 block text-xs font-bold text-ink">
+              مدة العضوية (اختر بين العضوية الشهرية أو السنوية)
             </Label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {PREMIUM_DURATIONS.map(duration => {
@@ -151,49 +171,50 @@ export function PremiumActivationDialog({
                     className={cn(
                       "relative flex items-center justify-between rounded-2xl border-2 p-3.5 text-start transition-all cursor-pointer",
                       isSelected
-                        ? "border-iris bg-iris/15 text-white shadow-md shadow-iris/10 ring-2 ring-iris/40 dark:bg-iris/20"
-                        : "border-line bg-card/60 text-ink-soft hover:border-iris/40 hover:bg-card"
+                        ? "border-sky-400 bg-sky-500/15 text-white shadow-[0_0_20px_-3px_rgba(56,189,248,0.25)] ring-2 ring-sky-400/40 dark:bg-sky-500/20"
+                        : "border-line bg-card/60 text-ink-soft hover:border-sky-400/30 hover:bg-card dark:border-white/10 dark:bg-white/5"
                     )}
                   >
                     <div className="flex items-center gap-3">
-                      {/* Active Radio Pill */}
+                      {/* Active Radio Indicator */}
                       <div
                         className={cn(
                           "flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-all",
                           isSelected
-                            ? "border-iris bg-iris text-white"
-                            : "border-line bg-transparent"
+                            ? "border-sky-400 bg-sky-400 text-slate-950"
+                            : "border-line dark:border-white/20 bg-transparent"
                         )}
                       >
-                        {isSelected && <span className="size-2 rounded-full bg-white" />}
+                        {isSelected && <span className="size-2 rounded-full bg-slate-950" />}
                       </div>
 
                       <div>
                         <div className="flex items-center gap-1.5">
                           {isYearly ? (
-                            <Crown className={cn("size-4 shrink-0", isSelected ? "text-amber-400" : "text-ink-soft")} />
+                            <Crown className={cn("size-4 shrink-0", isSelected ? "text-amber-400" : "text-amber-400/70")} />
                           ) : (
-                            <Calendar className={cn("size-4 shrink-0", isSelected ? "text-iris" : "text-ink-soft")} />
+                            <Calendar className={cn("size-4 shrink-0", isSelected ? "text-sky-400" : "text-ink-soft")} />
                           )}
                           <span className="font-extrabold text-sm text-ink">
-                            {isYearly ? "365 يوم (سنة كاملة)" : "30 يوم (شهري)"}
+                            {isYearly ? "عضوية سنوية (365 يوم)" : "عضوية شهرية (30 يوم)"}
                           </span>
-                          {isYearly && (
-                            <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-extrabold text-amber-600 dark:text-amber-300 border border-amber-500/30">
-                              خطة السنة 👑
-                            </span>
-                          )}
                         </div>
                         <p className="mt-0.5 text-[11px] text-ink-soft">
                           {isYearly
-                            ? "سنة كاملة من التدريب والوصول غير المحدود"
-                            : "عضوية قياسية تتجدد شهرياً (30 يوم)"}
+                            ? "اشتراك سنة كاملة — أفضل قيمة وأعلى التزام"
+                            : "تجديد شهري قياسي لمتابعة التقدم"}
                         </p>
                       </div>
                     </div>
 
-                    {isSelected && (
-                      <CheckCircle2 className="size-5 shrink-0 text-iris" />
+                    {isYearly ? (
+                      <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-extrabold text-amber-500 dark:text-amber-300 border border-amber-500/30">
+                        وفر 20% 👑
+                      </span>
+                    ) : (
+                      isSelected && (
+                        <CheckCircle2 className="size-5 shrink-0 text-sky-400" />
+                      )
                     )}
                   </button>
                 );
@@ -228,14 +249,15 @@ export function PremiumActivationDialog({
             <label className="space-y-1.5 text-sm">
               <span className="font-medium text-ink">مرشد مسجّل (اختياري)</span>
               <select
-                className={cn(inputClass, "dark:bg-[#0b1736] dark:text-white")}
+                className={cn(inputClass, "dark:bg-[#0b1120] dark:text-white dark:border-white/10 dark:[color-scheme:dark]")}
+                style={{ colorScheme: "dark" }}
                 value={coachUserId}
                 disabled={staff.isLoading || staff.isError}
                 onChange={event => setCoachUserId(event.target.value)}
               >
-                <option value="" className="bg-white text-slate-900 dark:bg-[#0b1736] dark:text-white">من غير تعيين دلوقتي</option>
+                <option value="" className="bg-white text-slate-900 dark:bg-[#0b1120] dark:text-white">من غير تعيين دلوقتي</option>
                 {coachCandidates.map(coach => (
-                  <option key={coach.id} value={coach.id} className="bg-white text-slate-900 dark:bg-[#0b1736] dark:text-white">
+                  <option key={coach.id} value={coach.id} className="bg-white text-slate-900 dark:bg-[#0b1120] dark:text-white font-medium py-1">
                     {coach.name ?? `حساب ${coach.id}`}
                   </option>
                 ))}
@@ -265,18 +287,36 @@ export function PremiumActivationDialog({
                 اختياريًا.
               </p>
             )}
-          <label className="premium-confirm-row">
-            <input
-              type="checkbox"
-              checked={paymentConfirmed}
-              onChange={event => setPaymentConfirmed(event.target.checked)}
-            />
-            <span>
-              <ShieldCheck className="size-4" />
-              <strong>أنا المالك وأكدت الدفع يدويًا</strong>
-              <small>لن يتم إنشاء تفعيل أو تحصيل تلقائي من هنا.</small>
-            </span>
-          </label>
+          <button
+            type="button"
+            onClick={() => setPaymentConfirmed(!paymentConfirmed)}
+            className={cn(
+              "flex w-full items-start gap-3 rounded-2xl border p-3.5 text-start transition-all cursor-pointer",
+              paymentConfirmed
+                ? "border-emerald-500/50 bg-emerald-500/10 text-white shadow-md shadow-emerald-500/10 ring-1 ring-emerald-500/30"
+                : "border-line bg-card/60 text-ink-soft hover:border-emerald-500/30 dark:border-white/10 dark:bg-white/5"
+            )}
+          >
+            <div
+              className={cn(
+                "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md border transition-all",
+                paymentConfirmed
+                  ? "border-emerald-400 bg-emerald-400 text-slate-950 font-bold"
+                  : "border-line dark:border-white/20 bg-transparent"
+              )}
+            >
+              {paymentConfirmed && <CheckCircle2 className="size-4 text-slate-950 stroke-[3]" />}
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-1.5 font-bold text-sm text-ink">
+                <ShieldCheck className={cn("size-4 shrink-0", paymentConfirmed ? "text-emerald-400" : "text-ink-soft")} />
+                <span>أنا المالك وأكدت استلام الدفع يدويًّا</span>
+              </div>
+              <p className="mt-0.5 text-xs text-ink-soft">
+                لن يتم إنشاء تفعيل أو تحصيل تلقائي من هنا — هذا الإجراء يمنح الطالب الصلاحية بعد مراجعة التحويل.
+              </p>
+            </div>
+          </button>
         </div>
         <DialogFooter>
           <Button

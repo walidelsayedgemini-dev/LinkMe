@@ -26,12 +26,12 @@ export function PlanCards({ compact = false }: { compact?: boolean }) {
   return (
     <div className="space-y-8">
       <div className="flex justify-center">
-        <div className="inline-flex items-center rounded-full border border-ink/15 bg-card p-1">
+        <div className="inline-flex items-center rounded-full border border-ink/15 bg-card p-1 dark:border-white/10 dark:bg-white/[0.05] dark:backdrop-blur-md">
           <button
             onClick={() => setCycle("monthly")}
             className={cn(
-              "rounded-full px-4 py-2 text-sm font-medium transition-colors",
-              cycle === "monthly" ? "bg-iris text-white" : "text-ink-soft"
+              "rounded-full px-4 py-2 text-sm font-medium transition-colors cursor-pointer",
+              cycle === "monthly" ? "bg-iris text-white shadow-xs" : "text-ink-soft"
             )}
           >
             شهريًا
@@ -39,12 +39,12 @@ export function PlanCards({ compact = false }: { compact?: boolean }) {
           <button
             onClick={() => setCycle("yearly")}
             className={cn(
-              "flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors",
-              cycle === "yearly" ? "bg-iris text-white" : "text-ink-soft"
+              "flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors cursor-pointer",
+              cycle === "yearly" ? "bg-iris text-white shadow-xs" : "text-ink-soft"
             )}
           >
             سنويًا
-            <span className="rounded-full bg-acid px-2 py-0.5 text-[10px] font-bold text-ink">
+            <span className="rounded-full bg-acid px-2 py-0.5 text-[10px] font-bold text-ink dark:bg-white/20 dark:text-white">
               اختار مدة اشتراكك
             </span>
           </button>
@@ -62,10 +62,10 @@ export function PlanCards({ compact = false }: { compact?: boolean }) {
             <div
               key={plan.id}
               className={cn(
-                "plan-card group relative flex h-full flex-col rounded-3xl border p-7 transition-colors duration-300",
+                "plan-card group relative flex h-full flex-col rounded-3xl border p-7 transition-all duration-300",
                 highlighted
-                  ? "border-iris bg-iris text-white shadow-[0_24px_60px_-40px_var(--color-iris)]"
-                  : "border-line bg-card hover:border-iris/60"
+                  ? "border-iris bg-iris text-white shadow-[0_24px_60px_-40px_var(--color-iris)] dark:border-sky-400/80 dark:bg-gradient-to-br dark:from-[#0e2248] dark:via-[#173673] dark:to-[#1e40af] dark:shadow-[0_20px_50px_-20px_rgba(56,189,248,0.35)]"
+                  : "border-line bg-card hover:border-iris/60 dark:bg-white/[0.04] dark:backdrop-blur-md dark:border-white/10 dark:hover:border-sky-400/40 dark:hover:shadow-[0_0_25px_-5px_rgba(56,189,248,0.2)]"
               )}
             >
               <div className="flex items-center justify-between gap-3">

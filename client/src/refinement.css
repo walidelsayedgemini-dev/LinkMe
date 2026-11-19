@@ -472,18 +472,23 @@
   }
 }
 
-/* Accent text stays soft; filled controls keep a separate high-contrast blue. */
+/* Accent text stays soft; filled controls keep a separate high-contrast blue/cyan gradient. */
 .dark :is(button, a)[class~="bg-iris"][class~="text-white"] {
-  background-color: #3265da;
+  background: linear-gradient(135deg, #0284c7 0%, #2563eb 50%, #38bdf8 100%);
   color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 4px 20px -2px rgba(2, 132, 199, 0.45);
 }
 .dark .plan-card[class~="bg-iris"] {
-  background-color: #203b64;
-  border-color: #4f73ae;
+  background: linear-gradient(135deg, rgba(14, 34, 72, 0.85) 0%, rgba(23, 54, 115, 0.75) 50%, rgba(30, 64, 175, 0.6) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  box-shadow: 0 0 25px -4px rgba(56, 189, 248, 0.25);
   color: #ffffff;
 }
 .dark :is(button, a)[class~="bg-iris"][class~="text-white"]:hover {
-  background-color: #2956be;
+  background: linear-gradient(135deg, #0369a1 0%, #1d4ed8 50%, #0ea5e9 100%);
+  box-shadow: 0 6px 28px -2px rgba(56, 189, 248, 0.6);
+  transform: translateY(-1px);
 }
 .auth-field-row input:focus-visible {
   outline: none;
@@ -540,4 +545,34 @@
   .plan-card a {
     transition: none;
   }
+}
+
+/* ==========================================================================
+   Global Dark Mode Native Controls & Dropdown Fix
+   Ensures OS-level select menus & form elements never wash out on Chromium/Windows
+   ========================================================================== */
+.dark,
+.dark select,
+.dark input,
+.dark textarea {
+  color-scheme: dark !important;
+}
+
+.dark select {
+  background-color: #0b1120 !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.dark select option,
+.dark option {
+  background-color: #0b1120 !important;
+  color: #f8fafc !important;
+}
+
+.dark select option:hover,
+.dark select option:focus,
+.dark select option:checked {
+  background-color: #0284c7 !important;
+  color: #ffffff !important;
 }

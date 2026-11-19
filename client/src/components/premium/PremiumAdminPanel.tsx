@@ -89,13 +89,14 @@ export function PremiumAdminPanel({ userId }: { userId?: number }) {
           <select
             value={status}
             onChange={event => setStatus(event.target.value as typeof status)}
-            className="h-10 min-w-[160px] rounded-xl border border-line bg-card px-3 text-xs font-bold text-ink shadow-xs focus:border-iris focus:outline-none dark:bg-[#0b1736] dark:text-white"
+            className="h-10 min-w-[160px] rounded-xl border border-line bg-card px-3 text-xs font-bold text-ink shadow-xs focus:border-iris focus:outline-none dark:bg-[#0b1120] dark:text-white dark:border-white/10 dark:[color-scheme:dark]"
+            style={{ colorScheme: "dark" }}
           >
-            <option value="" className="bg-white text-slate-900 dark:bg-[#0b1736] dark:text-white font-bold py-1">
+            <option value="" className="bg-white text-slate-900 dark:bg-[#0b1120] dark:text-white font-bold py-1.5">
               كل الحالات
             </option>
             {(Object.keys(STATUS_LABELS) as PremiumStatus[]).map(item => (
-              <option key={item} value={item} className="bg-white text-slate-900 dark:bg-[#0b1736] dark:text-white font-bold py-1">
+              <option key={item} value={item} className="bg-white text-slate-900 dark:bg-[#0b1120] dark:text-white font-bold py-1.5">
                 {STATUS_LABELS[item]}
               </option>
             ))}
@@ -106,13 +107,14 @@ export function PremiumAdminPanel({ userId }: { userId?: number }) {
           <select
             value={level}
             onChange={event => setLevel(event.target.value as typeof level)}
-            className="h-10 min-w-[160px] rounded-xl border border-line bg-card px-3 text-xs font-bold text-ink shadow-xs focus:border-iris focus:outline-none dark:bg-[#0b1736] dark:text-white"
+            className="h-10 min-w-[160px] rounded-xl border border-line bg-card px-3 text-xs font-bold text-ink shadow-xs focus:border-iris focus:outline-none dark:bg-[#0b1120] dark:text-white dark:border-white/10 dark:[color-scheme:dark]"
+            style={{ colorScheme: "dark" }}
           >
-            <option value="" className="bg-white text-slate-900 dark:bg-[#0b1736] dark:text-white font-bold py-1">
+            <option value="" className="bg-white text-slate-900 dark:bg-[#0b1120] dark:text-white font-bold py-1.5">
               كل المستويات
             </option>
             {ASSESSMENT_LEVELS.map(item => (
-              <option key={item} value={item} className="bg-white text-slate-900 dark:bg-[#0b1736] dark:text-white font-bold py-1">
+              <option key={item} value={item} className="bg-white text-slate-900 dark:bg-[#0b1120] dark:text-white font-bold py-1.5">
                 {item}
               </option>
             ))}

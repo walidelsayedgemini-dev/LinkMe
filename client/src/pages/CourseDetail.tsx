@@ -147,7 +147,11 @@ export default function CourseDetail() {
   return (
     <PageShell>
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-line bg-paper-deep/60">
+      <section className="relative overflow-hidden border-b border-line bg-paper-deep/60 dark:bg-gradient-to-br dark:from-[#0b1120] dark:via-[#0f172a] dark:to-[#172554]/40 dark:border-white/10">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-24 -end-24 size-96 rounded-full bg-cyan-500/10 blur-3xl hidden dark:block"
+        />
         <div className="absolute inset-0 -z-10 dot-grid opacity-30" />
         <div className="container grid gap-10 py-10 lg:grid-cols-[1fr_380px] lg:py-14">
           <div>

@@ -104,7 +104,11 @@ export default function Dashboard() {
 
   return (
     <PageShell>
-      <section className="border-b border-line bg-paper-deep/60">
+      <section className="relative overflow-hidden border-b border-line bg-paper-deep/60 dark:bg-gradient-to-br dark:from-[#0b1120] dark:via-[#0f172a] dark:to-[#172554]/40 dark:border-white/10">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-24 -end-24 size-96 rounded-full bg-cyan-500/10 blur-3xl hidden dark:block"
+        />
         <div className="container py-10 md:py-12">
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>

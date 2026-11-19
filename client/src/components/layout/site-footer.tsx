@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { ArrowUpLeft } from "lucide-react";
 import { Logo } from "@/components/brand";
 import { WhatsAppIcon, openWhatsApp } from "@/components/whatsapp";
+import { cn } from "@/lib/utils";
 
 const COLUMNS = [
   {
@@ -45,7 +46,7 @@ const COLUMNS = [
 
 export function SiteFooter() {
   return (
-    <footer className="relative mt-16 sm:mt-20 border-t border-line bg-paper-deep pb-24 md:pb-0">
+    <footer className="relative mt-16 sm:mt-20 border-t border-line bg-paper-deep pb-24 md:pb-0 dark:bg-[#070e1b]/95 dark:border-white/10 dark:backdrop-blur-md">
       <div className="container grid gap-9 py-12 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
         <div>
           <Logo />
@@ -57,7 +58,7 @@ export function SiteFooter() {
           <button
             type="button"
             onClick={() => openWhatsApp()}
-            className="mt-5 inline-flex items-center gap-2 rounded-full border border-line bg-card px-4 py-2.5 text-xs font-semibold text-ink hover:border-iris"
+            className="mt-5 inline-flex items-center gap-2 rounded-full border border-line bg-card px-4 py-2.5 text-xs font-semibold text-ink hover:border-iris dark:border-white/15 dark:bg-white/5 dark:hover:border-sky-400/50"
           >
             <WhatsAppIcon className="size-4 text-[#138645]" />
             كلّمنا على واتساب <ArrowUpLeft className="size-3.5" />
@@ -81,7 +82,7 @@ export function SiteFooter() {
           </div>
         ))}
       </div>
-      <div className="container flex flex-col gap-2 border-t border-line py-5 text-[11px] text-ink-soft sm:flex-row sm:items-center sm:justify-between">
+      <div className="container flex flex-col gap-2 border-t border-line py-5 text-[11px] text-ink-soft sm:flex-row sm:items-center sm:justify-between dark:border-white/10">
         <span>© {new Date().getFullYear()} Link Me · كل الحقوق محفوظة</span>
         <span>خطوة صغيرة. فرق كبير.</span>
       </div>
@@ -98,7 +99,17 @@ export function PageShell({
   className?: string;
 }) {
   return (
-    <div className={className}>
+    <div className={cn("relative min-h-screen", className)}>
+      {/* Dark Ambient Mesh & Radial Cyan/Blue Glow Backdrop */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 -z-10 hidden dark:block overflow-hidden"
+      >
+        <div className="absolute -top-32 -start-32 size-[650px] rounded-full bg-sky-600/12 blur-[140px]" />
+        <div className="absolute top-1/3 -end-32 size-[550px] rounded-full bg-cyan-500/10 blur-[130px]" />
+        <div className="absolute -bottom-32 start-1/4 size-[650px] rounded-full bg-blue-600/10 blur-[150px]" />
+      </div>
+
       <main id="main-content" className="pt-[72px]">
         {children}
       </main>

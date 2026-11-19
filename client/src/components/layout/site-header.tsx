@@ -185,7 +185,7 @@ export function SiteHeader() {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 border-b bg-paper transition-[border-color,box-shadow] duration-200",
+        "fixed inset-x-0 top-0 z-50 border-b bg-paper transition-[border-color,box-shadow] duration-200 dark:bg-[#0b1120]/85 dark:backdrop-blur-xl dark:border-white/10 dark:shadow-[0_4px_30px_rgba(0,0,0,0.5)]",
         scrolled ? "border-line shadow-sm" : "border-line/60"
       )}
     >

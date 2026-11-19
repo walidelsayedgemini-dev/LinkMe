@@ -204,7 +204,11 @@ export default function Courses() {
 
   return (
     <PageShell>
-      <section className="relative overflow-hidden border-b border-line bg-paper-deep/60">
+      <section className="relative overflow-hidden border-b border-line bg-paper-deep/60 dark:bg-gradient-to-br dark:from-[#0b1120] dark:via-[#0f172a] dark:to-[#172554]/40 dark:border-white/10">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-24 -end-24 size-96 rounded-full bg-cyan-500/10 blur-3xl hidden dark:block"
+        />
         <AnimatedAurora className="opacity-60" />
         <StudyDoodles variant="soft" />
         <div className="container relative z-10 py-10 md:py-16">
@@ -229,7 +233,7 @@ export default function Courses() {
                 value={searchInput}
                 onChange={event => setSearchInput(event.target.value)}
                 placeholder="ابحث بالعنوان، المدرّس، أو الموضوع…"
-                className="h-11 sm:h-12 w-full rounded-full border border-line bg-card ps-11 pe-4 text-sm text-ink placeholder:text-ink-soft/70 focus:border-ink focus:outline-none"
+                className="h-11 sm:h-12 w-full rounded-full border border-line bg-card ps-11 pe-4 text-sm text-ink placeholder:text-ink-soft/70 focus:border-ink focus:outline-none dark:bg-white/[0.06] dark:border-white/15 dark:text-white dark:focus:border-sky-400"
               />
             </div>
             <Button type="submit" className="h-11 sm:h-12 shrink-0 rounded-full bg-iris px-4 sm:px-6 text-white hover:bg-iris-deep">

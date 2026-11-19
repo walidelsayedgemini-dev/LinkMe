@@ -179,8 +179,18 @@ export default function Learn() {
   const isCompleted = selectedId ? completedSet.has(selectedId) : false;
 
   return (
-    <div className="min-h-screen bg-paper pt-[72px]">
-      <div className="border-b border-line bg-card">
+    <div className="relative min-h-screen bg-paper pt-[72px] dark:bg-[#0b1120] overflow-hidden">
+      {/* Dark Ambient Mesh & Radial Cyan/Blue Glow Backdrop */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 -z-10 hidden dark:block overflow-hidden"
+      >
+        <div className="absolute -top-32 -start-32 size-[650px] rounded-full bg-sky-600/12 blur-[140px]" />
+        <div className="absolute top-1/3 -end-32 size-[550px] rounded-full bg-cyan-500/10 blur-[130px]" />
+        <div className="absolute -bottom-32 start-1/4 size-[650px] rounded-full bg-blue-600/10 blur-[150px]" />
+      </div>
+
+      <div className="border-b border-line bg-card dark:bg-[#0b1120]/85 dark:backdrop-blur-xl dark:border-white/10">
         <div className="container flex flex-wrap items-center justify-between gap-3 py-3">
           <div className="flex min-w-0 items-center gap-3">
             <Link
@@ -229,7 +239,7 @@ export default function Learn() {
 
       <div className="container grid gap-8 py-8 lg:grid-cols-[300px_1fr]">
         <aside className="hidden lg:block">
-          <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto rounded-3xl border border-line bg-card p-5">
+          <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto rounded-3xl border border-line bg-card p-5 dark:bg-white/[0.04] dark:backdrop-blur-md dark:border-white/10 dark:shadow-[0_8px_32px_rgba(0,0,0,0.37)]">
             <h2 className="mb-4 text-sm font-bold text-ink">محتوى الكورس</h2>
             {curriculum}
           </div>

@@ -445,7 +445,11 @@ export default function WritingPage() {
   return (
     <PageShell>
       {/* Hero Header */}
-      <section className="border-b border-line bg-paper-deep/60">
+      <section className="relative overflow-hidden border-b border-line bg-paper-deep/60 dark:bg-gradient-to-br dark:from-[#0b1120] dark:via-[#0f172a] dark:to-[#172554]/40 dark:border-white/10">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-24 -start-24 size-96 rounded-full bg-sky-500/10 blur-3xl hidden dark:block"
+        />
         <div className="container py-10 md:py-12">
           <Eyebrow>الذكاء الاصطناعي في خدمتك</Eyebrow>
           <div className="mt-3 flex flex-col justify-between gap-5 md:flex-row md:items-end">
@@ -502,7 +506,7 @@ export default function WritingPage() {
         </div>
 
         {/* Input & Action Area */}
-        <div className="rounded-3xl border border-line bg-card p-5 sm:p-7 shadow-xs">
+        <div className="rounded-3xl border border-line bg-card p-5 sm:p-7 shadow-xs dark:bg-white/[0.04] dark:backdrop-blur-md dark:border-white/10 dark:shadow-[0_8px_32px_rgba(0,0,0,0.37)]">
           <div className="flex items-center justify-between pb-3 border-b border-line/60 text-xs text-ink-soft">
             <span className="font-bold text-ink flex items-center gap-1.5">
               <PenLine className="size-4 text-iris" /> منطقة الكتابة بالإنجليزية

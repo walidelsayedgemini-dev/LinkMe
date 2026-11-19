@@ -918,7 +918,15 @@
   background: var(--color-background);
   color: var(--color-ink);
   font: inherit;
-  color-scheme: light dark;
+  color-scheme: light;
+}
+.dark .premium-filter-bar select,
+.dark .premium-coach-assign select,
+.dark select {
+  color-scheme: dark !important;
+  background-color: #0b1120 !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
 }
 .premium-filter-bar select option,
 .premium-coach-assign select option,
@@ -930,9 +938,10 @@ select option {
 }
 .dark .premium-filter-bar select option,
 .dark .premium-coach-assign select option,
-.dark select option {
-  background-color: #0b1736 !important;
-  color: #ffffff !important;
+.dark select option,
+.dark option {
+  background-color: #0b1120 !important;
+  color: #f8fafc !important;
 }
 .premium-members-list {
   display: grid;
