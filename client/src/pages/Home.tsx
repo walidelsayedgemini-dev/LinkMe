@@ -190,29 +190,29 @@ export default function Home() {
       <section className="container pt-6">
         <CompanionMotivationalBanner className="mb-6" />
 
-        {/* Interactive Free Playground Showcase — Rich Branded Visual Cards (60 FPS, zero blur-3xl/backdrop-blur) */}
-        <div className="relative mb-6 overflow-hidden rounded-[28px] border border-iris/20 bg-gradient-to-br from-[#0e2248] via-[#173673] to-[#1e40af] p-5 sm:p-8 text-white shadow-[0_24px_60px_-25px_rgba(37,99,255,0.45)]">
+        {/* Interactive Free Playground Showcase — Rich Branded Visual Cards (Adaptive Light/Dark Theme) */}
+        <div className="relative mb-6 overflow-hidden rounded-[28px] border border-line bg-gradient-to-br from-iris-soft/50 via-card to-sky-50/70 p-5 sm:p-8 text-ink shadow-sm dark:border-iris/20 dark:bg-gradient-to-br dark:from-[#0e2248] dark:via-[#173673] dark:to-[#1e40af] dark:text-white dark:shadow-[0_24px_60px_-25px_rgba(37,99,255,0.45)]">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0"
             style={{
               background:
-                "radial-gradient(520px circle at 90% 10%, rgba(56, 189, 248, 0.22), transparent 60%), radial-gradient(460px circle at 10% 90%, rgba(251, 191, 36, 0.16), transparent 60%)",
+                "radial-gradient(520px circle at 90% 10%, rgba(56, 189, 248, 0.16), transparent 60%), radial-gradient(460px circle at 10% 90%, rgba(251, 191, 36, 0.12), transparent 60%)",
             }}
           />
 
           <div className="relative flex flex-wrap items-end justify-between gap-3">
             <div>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold text-amber-300">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-iris/20 bg-iris/10 px-3 py-1 text-[11px] font-bold text-iris dark:border-white/20 dark:bg-white/10 dark:text-amber-300">
                 <Sparkles className="size-3.5" /> جرّب مجاناً من غير تسجيل
               </span>
-              <h2 className="mt-2.5 text-xl font-extrabold text-white sm:text-3xl">
+              <h2 className="mt-2.5 text-xl font-extrabold text-ink dark:text-white sm:text-3xl">
                 أدوات Link Me التفاعلية — اتعلّم والعب كل يوم 🔥
               </h2>
             </div>
             <Link
               href="/competitions"
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-white hover:text-iris"
+              className="inline-flex items-center gap-1.5 rounded-full border border-line bg-card px-4 py-2 text-xs font-bold text-ink shadow-xs transition-colors hover:border-iris hover:bg-iris hover:text-white dark:border-white/25 dark:bg-white/10 dark:text-white dark:hover:bg-white dark:hover:text-iris"
             >
               ادخل ساحة التحديات <ArrowLeft className="size-3.5" />
             </Link>
@@ -224,45 +224,45 @@ export default function Home() {
                 href: "/roleplay",
                 bgImage: "/img/ui/tool-roleplay.webp",
                 overlay: "from-[#0b1736]/95 via-[#132a5c]/80 to-[#1e3a8a]/55",
-                accentBorder: "hover:border-sky-300/80",
+                accentBorder: "hover:border-sky-400/80",
                 badge: "1,000 موقف (A1–C2) 👑",
                 title: "محاكي المواقف الحقيقية",
                 desc: "1,000 موقف حياتي مقسّمين مستويات (إنترفيو، سفر، آيلتس، فريلانس) بصوتك.",
                 icon: MessageCircle,
-                iconBg: "bg-sky-950/75 text-sky-200 border-sky-300/35",
+                iconBg: "bg-sky-50 text-sky-600 border-sky-200 dark:bg-sky-950/75 dark:text-sky-200 dark:border-sky-300/35",
               },
               {
                 href: "/flashcards",
                 bgImage: "/img/ui/tool-flashcards.webp",
                 overlay: "from-[#062b26]/95 via-[#0d4a40]/80 to-[#0f766e]/55",
-                accentBorder: "hover:border-emerald-300/80",
+                accentBorder: "hover:border-emerald-400/80",
                 badge: "180 بطاقة · 8 حزم",
                 title: "فلاش كاردز الكلمات",
                 desc: "180 بطاقة بصور واقعية فريدة + النطق الأمريكي وملخصات PDF للطباعة.",
                 icon: BookOpen,
-                iconBg: "bg-emerald-950/75 text-emerald-200 border-emerald-300/35",
+                iconBg: "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/75 dark:text-emerald-200 dark:border-emerald-300/35",
               },
               {
                 href: "/speed-quiz",
                 bgImage: "/img/ui/tool-speedquiz.webp",
                 overlay: "from-[#351806]/95 via-[#6b2d0c]/80 to-[#b45309]/55",
-                accentBorder: "hover:border-amber-300/80",
+                accentBorder: "hover:border-amber-400/80",
                 badge: "100 سؤال · ماراثون PRO",
                 title: "تحدي الـ 60 ثانية اليومي",
                 desc: "أسئلة سريعة بتايمر وكومبو وكارت نتيجة جاهز للمشاركة على واتساب.",
                 icon: Zap,
-                iconBg: "bg-amber-950/75 text-amber-200 border-amber-300/40",
+                iconBg: "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/75 dark:text-amber-200 dark:border-amber-300/40",
               },
               {
                 href: "/competitions",
                 bgImage: "/img/ui/tool-competitions.webp",
                 overlay: "from-[#220e42]/95 via-[#3b166e]/80 to-[#6d28d9]/55",
-                accentBorder: "hover:border-purple-300/80",
+                accentBorder: "hover:border-purple-400/80",
                 badge: "100 أفتار + سكنات 👑",
                 title: "دوري المسابقات والحماسة",
                 desc: "نافس أبطال اليوم والأسبوع والشهر والسنة واختار من 100 أفتار فخم!",
                 icon: Trophy,
-                iconBg: "bg-purple-950/75 text-purple-200 border-purple-300/40",
+                iconBg: "bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-950/75 dark:text-purple-200 dark:border-purple-300/40",
               },
             ].map(tool => {
               const Icon = tool.icon;
@@ -270,7 +270,7 @@ export default function Home() {
                 <Link
                   key={tool.href}
                   href={tool.href}
-                  className={`group flex flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#0c1d38] shadow-md transition-transform duration-200 hover:-translate-y-1 ${tool.accentBorder}`}
+                  className={`group flex flex-col overflow-hidden rounded-2xl border border-line bg-card shadow-xs transition-all duration-200 hover:-translate-y-1 hover:shadow-md dark:border-white/15 dark:bg-[#0c1d38] ${tool.accentBorder}`}
                 >
                   <div className="relative h-36 w-full overflow-hidden">
                     <img
@@ -292,14 +292,14 @@ export default function Home() {
 
                   <div className="flex flex-1 flex-col justify-between p-4">
                     <div>
-                      <h3 className="text-base font-extrabold text-white">
+                      <h3 className="text-base font-extrabold text-ink transition-colors group-hover:text-iris dark:text-white dark:group-hover:text-white">
                         {tool.title}
                       </h3>
-                      <p className="mt-1.5 text-xs leading-relaxed text-white/80">
+                      <p className="mt-1.5 text-xs leading-relaxed text-ink-soft dark:text-white/80">
                         {tool.desc}
                       </p>
                     </div>
-                    <span className="mt-3.5 inline-flex w-fit items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold text-white transition-colors group-hover:bg-white group-hover:text-iris">
+                    <span className="mt-3.5 inline-flex w-fit items-center gap-1 rounded-full border border-line bg-paper-deep/70 px-3 py-1 text-[11px] font-bold text-iris transition-colors group-hover:bg-iris group-hover:text-white dark:border-white/10 dark:bg-white/15 dark:text-white dark:group-hover:bg-white dark:group-hover:text-iris">
                       جرّبها الآن <ArrowLeft className="size-3" />
                     </span>
                   </div>

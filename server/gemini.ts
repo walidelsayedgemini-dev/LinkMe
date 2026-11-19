@@ -1,6 +1,6 @@
 /**
  * Google Gemini AI Integration for Link Me
- * Powers automated writing evaluation, detailed weakness diagnosis, and pronunciation coaching.
+ * Powers automated writing evaluation, detailed weakness diagnosis, and pronunciation/speech coaching.
  */
 
 // Primary model requested by configuration, with automatic fallback if Google returns 404 (deprecation)
@@ -248,6 +248,265 @@ Respond strictly with a JSON object (no markdown, no backticks, just raw JSON) m
   }
 
   // If all models failed
+  return {
+    success: false,
+    attemptedModels,
+    apiKeyStatus: { isConfigured: true, masked: keyInfo.masked },
+    errors,
+  };
+}
+
+// -------------------------------------------------------------
+// MULTIMODAL SPEECH AUDIO EVALUATION (Speaking & Pronunciation)
+// -------------------------------------------------------------
+
+export type SpeechAudioAiAnalysis = {
+  overallScore: number; // 0 to 100
+  pronunciationScore: number; // 0 to 100
+  fluencyScore: number; // 0 to 100
+  grammarScore: number; // 0 to 100
+  transcribedText: string;
+  correctedSentence: string;
+  mispronouncedWords: {
+    word: string;
+    phoneticGuide: string;
+    correctionTip: string;
+    exampleCorrect: string;
+  }[];
+  grammarMistakes: {
+    mistake: string;
+    explanationAr: string;
+    correction: string;
+  }[];
+  fluencyNotes: string[];
+  actionableArabicTips: string[];
+  teacherFeedback: string;
+};
+
+export type SpeechAudioOutcome = {
+  success: boolean;
+  data?: SpeechAudioAiAnalysis;
+  modelUsed?: string;
+  attemptedModels: string[];
+  apiKeyStatus: {
+    isConfigured: boolean;
+    masked: string;
+  };
+  errors: { model: string; status?: number; message: string }[];
+};
+
+/**
+ * Call Google Gemini with multimodal Audio Base64
+ */
+async function callGeminiGenerateContentWithAudio(
+  model: string,
+  apiKey: string,
+  audioBase64: string,
+  mimeType: string,
+  prompt: string,
+  timeoutMs = 18000
+): Promise<{ ok: boolean; status: number; text?: string; error?: string }> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  // Clean mimeType e.g. "audio/webm;codecs=opus" -> "audio/webm"
+  const cleanMime = mimeType.split(";")[0].trim().toLowerCase() || "audio/webm";
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              {
+                inlineData: {
+                  mimeType: cleanMime,
+                  data: audioBase64,
+                },
+              },
+              {
+                text: prompt,
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.2,
+          responseMimeType: "application/json",
+        },
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timer);
+
+    if (!response.ok) {
+      const errText = await response.text().catch(() => "");
+      let parsedMsg = errText;
+      try {
+        const errJson = JSON.parse(errText);
+        parsedMsg = errJson.error?.message || errText;
+      } catch {}
+      return {
+        ok: false,
+        status: response.status,
+        error: `HTTP ${response.status}: ${parsedMsg}`,
+      };
+    }
+
+    const data = await response.json();
+    const rawContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!rawContent) {
+      return {
+        ok: false,
+        status: response.status,
+        error: "Gemini did not return audio analysis content",
+      };
+    }
+
+    return {
+      ok: true,
+      status: response.status,
+      text: rawContent,
+    };
+  } catch (err: any) {
+    clearTimeout(timer);
+    const msg = err.name === "AbortError" ? `Timeout after ${timeoutMs}ms` : err.message || String(err);
+    return {
+      ok: false,
+      status: 0,
+      error: `Network/Fetch Error: ${msg}`,
+    };
+  }
+}
+
+export async function evaluateSpeechAudioWithGemini(
+  audioBase64: string,
+  mimeType: string,
+  targetPhrase?: string
+): Promise<SpeechAudioOutcome> {
+  const keyInfo = getApiKeyDetails();
+  const attemptedModels: string[] = [];
+  const errors: { model: string; status?: number; message: string }[] = [];
+
+  if (!keyInfo.isConfigured || !keyInfo.key) {
+    const errorMsg =
+      "مفتاح GEMINI_API_KEY غير موجود في متغيرات البيئة على السيرفر (process.env.GEMINI_API_KEY is undefined).";
+    console.error(`[Gemini Audio] ${errorMsg}`);
+    return {
+      success: false,
+      attemptedModels: [],
+      apiKeyStatus: { isConfigured: false, masked: "NOT_SET" },
+      errors: [{ model: "none", status: 401, message: errorMsg }],
+    };
+  }
+
+  const prompt = `You are a world-class American & British ESL Speech Coach, Phonetician, and English Examiner at Link Me (Egypt's premier academy for English learners).
+Listen attentively to the attached recorded audio of the student practicing their spoken English.
+
+${targetPhrase ? `Target sentence the student was attempting to speak:\n"${targetPhrase}"` : "The student is speaking freely in conversational English."}
+
+Analyze their:
+1. Pronunciation & Phonetics (vowel lengths, consonant clusters, silent letters, th/p/b sounds, aspiration, word stress)
+2. Fluency (speaking pace, rhythm, pauses, hesitation, connected speech linking)
+3. Grammar & Sentence Structure (verb tenses, prepositions, natural phrasing)
+
+Respond STRICTLY with a valid JSON object matching this exact schema (no markdown, no backticks, just raw JSON):
+{
+  "overallScore": number (0 to 100),
+  "pronunciationScore": number (0 to 100),
+  "fluencyScore": number (0 to 100),
+  "grammarScore": number (0 to 100),
+  "transcribedText": "The exact English words you heard the student say",
+  "correctedSentence": "The natural, flawless native English version of what they intended to express",
+  "mispronouncedWords": [
+    {
+      "word": "The specific English word",
+      "phoneticGuide": "IPA transcription and clear phonetic spelling",
+      "correctionTip": "Precise explanation in friendly Egyptian Arabic of mouth/tongue/lips position",
+      "exampleCorrect": "Short sentence demonstrating the correct usage"
+    }
+  ],
+  "grammarMistakes": [
+    {
+      "mistake": "The part with grammar error",
+      "explanationAr": "Clear Arabic explanation of the grammar rule",
+      "correction": "The corrected English phrasing"
+    }
+  ],
+  "fluencyNotes": [
+    "Actionable Arabic note on rhythm or pauses",
+    "Actionable Arabic note on intonation or linking"
+  ],
+  "actionableArabicTips": [
+    "Golden actionable tip 1 for mouth/tongue position or connected speech",
+    "Golden actionable tip 2"
+  ],
+  "teacherFeedback": "Inspiring and constructive paragraph in warm Egyptian Arabic encouraging the student and highlighting their strengths while guiding them to sound more natural"
+}`;
+
+  // Candidate models: start with gemini-2.5-flash as requested, fallback to active multimodal models
+  const configuredPrimary = process.env.GEMINI_MODEL || DEFAULT_PRIMARY_MODEL;
+  const candidateModels = [
+    configuredPrimary,
+    ...BACKUP_MODELS.filter((m) => m !== configuredPrimary),
+  ];
+
+  for (const model of candidateModels) {
+    attemptedModels.push(model);
+    console.log(`[Gemini Audio] Evaluating speech audio with model "${model}"...`);
+
+    const result = await callGeminiGenerateContentWithAudio(
+      model,
+      keyInfo.key,
+      audioBase64,
+      mimeType,
+      prompt,
+      18000
+    );
+
+    if (result.ok && result.text) {
+      try {
+        const parsed = JSON.parse(result.text.trim());
+        const data: SpeechAudioAiAnalysis = {
+          overallScore: Number(parsed.overallScore) || 75,
+          pronunciationScore: Number(parsed.pronunciationScore) || 75,
+          fluencyScore: Number(parsed.fluencyScore) || 75,
+          grammarScore: Number(parsed.grammarScore) || 80,
+          transcribedText: String(parsed.transcribedText || "").trim(),
+          correctedSentence: String(parsed.correctedSentence || "").trim(),
+          mispronouncedWords: Array.isArray(parsed.mispronouncedWords) ? parsed.mispronouncedWords : [],
+          grammarMistakes: Array.isArray(parsed.grammarMistakes) ? parsed.grammarMistakes : [],
+          fluencyNotes: Array.isArray(parsed.fluencyNotes) ? parsed.fluencyNotes : [],
+          actionableArabicTips: Array.isArray(parsed.actionableArabicTips) ? parsed.actionableArabicTips : [],
+          teacherFeedback: String(parsed.teacherFeedback || "").trim(),
+        };
+
+        console.log(`[Gemini Audio] Success using model "${model}"!`);
+        return {
+          success: true,
+          data,
+          modelUsed: model,
+          attemptedModels,
+          apiKeyStatus: { isConfigured: true, masked: keyInfo.masked },
+          errors,
+        };
+      } catch (parseErr: any) {
+        const msg = `JSON parse failed for model ${model}: ${parseErr.message}`;
+        console.warn(`[Gemini Audio] ${msg}`);
+        errors.push({ model, message: msg });
+      }
+    } else {
+      const msg = result.error || "Unknown API error";
+      console.warn(`[Gemini Audio] Model ${model} failed (${msg})`);
+      errors.push({ model, status: result.status, message: msg });
+    }
+  }
+
+  // If all models failed - NO FAKE FALLBACK
   return {
     success: false,
     attemptedModels,

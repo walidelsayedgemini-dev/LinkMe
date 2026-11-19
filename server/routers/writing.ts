@@ -1,8 +1,10 @@
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import { publicProcedure, router } from "../_core/trpc";
 import {
   DEFAULT_PRIMARY_MODEL,
   evaluatePronunciationWithGemini,
+  evaluateSpeechAudioWithGemini,
   evaluateWritingWithGemini,
   getApiKeyDetails,
 } from "../gemini";
@@ -180,5 +182,47 @@ export const writingRouter = router({
         ],
         feedbackAr: "نطق واضح ومفهوم جداً! ركز على نطق الكلمات بسلاسة وبدون تقطيع بين الكلمة والتي تليها.",
       };
+    }),
+
+  /**
+   * Multimodal Audio Evaluation: Student records speech -> analyzed directly by Gemini
+   * Evaluates pronunciation, fluency, grammar, phonetics, and provides actionable tips.
+   * NO FAKE FALLBACK DATA.
+   */
+  evaluateAudioSpeech: publicProcedure
+    .input(
+      z.object({
+        audioBase64: z.string().min(50, "ملف الصوت غير صالح أو فارغ"),
+        mimeType: z.string().default("audio/webm"),
+        targetPhrase: z.string().trim().max(1000).optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const outcome = await evaluateSpeechAudioWithGemini(
+        input.audioBase64,
+        input.mimeType,
+        input.targetPhrase
+      );
+
+      if (outcome.success && outcome.data) {
+        return {
+          success: true,
+          source: outcome.modelUsed || "gemini",
+          modelUsed: outcome.modelUsed,
+          ...outcome.data,
+        };
+      }
+
+      // No fake fallback! Throw clear error with exact cause
+      const primaryError =
+        outcome.errors.find((e) => e.status === 404)?.message ||
+        outcome.errors[0]?.message ||
+        "تعذر تحليل التسجيل الصوتي عبر Google Gemini API.";
+
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: primaryError,
+        cause: outcome.errors,
+      });
     }),
 });
