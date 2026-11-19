@@ -9,6 +9,7 @@ import {
   Menu,
   MessageCircle,
   Moon,
+  PenTool,
   Search,
   Settings,
   ShieldCheck,
@@ -285,6 +286,7 @@ export function SiteHeader() {
                   <DropdownMenuItem onClick={() => navigate("/admin?tab=curriculum")}><LayoutDashboard className="size-4" /> تعديل محتوى الكورسات</DropdownMenuItem>
                 </> : user.role === "instructor" ? <DropdownMenuItem onClick={() => navigate("/coaching")}><GraduationCap className="size-4" /> متابعة الطلاب المعيّنين لي</DropdownMenuItem> : <>
                   <DropdownMenuItem onClick={() => navigate("/dashboard")}><LayoutDashboard className="size-4" /> لوحة تعلّمي</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/writing")}><PenTool className="size-4 text-rose-500" /> مصحّح الكتابة الذكي والتشخيص ✍️</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/roleplay")}><GraduationCap className="size-4 text-indigo-500" /> محاكي المواقف الحقيقية 🎭</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/flashcards")}><GraduationCap className="size-4 text-emerald-600" /> فلاش كاردز الكلمات 🃏</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/speed-quiz")}><Trophy className="size-4 text-orange-500" /> تحدي الـ 60 ثانية ⚡</DropdownMenuItem>
@@ -332,15 +334,18 @@ export function SiteHeader() {
             </SheetTrigger>
             <SheetContent
               side="right"
-              className="w-[85vw] max-w-[320px] overflow-y-auto bg-paper p-0"
+              className="w-[85vw] max-w-[320px] bg-paper p-0 flex flex-col h-full overflow-hidden"
               dir="rtl"
             >
               <SheetTitle className="sr-only">قائمة التنقل</SheetTitle>
-              <div className="flex min-h-full flex-col gap-5 p-5 pt-6">
-                <div className="pe-10">
+              <div
+                className="flex-1 overflow-y-auto overscroll-contain px-5 py-6 space-y-5"
+                style={{ WebkitOverflowScrolling: "touch" }}
+              >
+                <div className="shrink-0 pe-10">
                   <Logo />
                 </div>
-                <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-card p-3">
+                <div className="shrink-0 flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-card p-3">
                   <HeaderStreakIndicator />
                   <button
                     type="button"
@@ -355,7 +360,7 @@ export function SiteHeader() {
                   </button>
                   {themeButton}
                 </div>
-                <nav aria-label="القائمة الجوالة" className="flex flex-col">
+                <nav aria-label="القائمة الجوالة" className="shrink-0 flex flex-col divide-y divide-line/60">
                   {NAV.map((item, i) => (
                     <Link
                       key={item.href}
@@ -365,10 +370,10 @@ export function SiteHeader() {
                         setOpen(false);
                       }}
                       className={cn(
-                        "flex items-center justify-between border-b border-line py-4 text-sm",
+                        "flex items-center justify-between py-3.5 text-sm transition-colors",
                         isActive(item)
-                          ? "font-semibold text-iris"
-                          : "text-ink-soft"
+                          ? "font-bold text-iris"
+                          : "text-ink-soft hover:text-ink"
                       )}
                     >
                       <span>{item.label}</span>
@@ -376,21 +381,21 @@ export function SiteHeader() {
                     </Link>
                   ))}
                 </nav>
-                <div className="mt-auto space-y-3">
+                <div className="shrink-0 pt-4 border-t border-line/70 space-y-3 pb-8">
                   {user ? (
                     <>
                       <Button
                         asChild
-                        className="w-full rounded-full bg-iris text-white"
+                        className="w-full rounded-full bg-iris text-white shadow-sm"
                       >
-                        <Link href="/dashboard">لوحة التعلّم</Link>
+                        <Link href="/dashboard" onClick={() => setOpen(false)}>لوحة التعلّم</Link>
                       </Button>
                       <Button
                         asChild
                         variant="outline"
                         className="w-full rounded-full"
                       >
-                        <Link href="/homework">واجباتي وتسليماتي</Link>
+                        <Link href="/homework" onClick={() => setOpen(false)}>واجباتي وتسليماتي</Link>
                       </Button>
                       {user.role === "admin" && (
                         <Button
@@ -398,7 +403,7 @@ export function SiteHeader() {
                           variant="outline"
                           className="w-full rounded-full"
                         >
-                          <Link href="/admin">
+                          <Link href="/admin" onClick={() => setOpen(false)}>
                             <ShieldCheck className="size-4" /> لوحة التحكم
                           </Link>
                         </Button>
@@ -408,22 +413,23 @@ export function SiteHeader() {
                     <>
                       <Button
                         asChild
-                        className="w-full rounded-full bg-iris text-white"
+                        className="w-full rounded-full bg-iris text-white shadow-sm"
                       >
-                        <Link href="/signup">اعمل حسابك</Link>
+                        <Link href="/signup" onClick={() => setOpen(false)}>اعمل حسابك</Link>
                       </Button>
                       <Button
                         asChild
                         variant="outline"
                         className="w-full rounded-full"
                       >
-                        <Link href="/login">تسجيل الدخول</Link>
+                        <Link href="/login" onClick={() => setOpen(false)}>تسجيل الدخول</Link>
                       </Button>
                     </>
                   )}
                   <Link
                     href="/contact"
-                    className="block py-2 text-center text-xs text-ink-soft"
+                    onClick={() => setOpen(false)}
+                    className="block py-2 text-center text-xs text-ink-soft hover:text-ink"
                   >
                     محتاج مساعدة؟ كلّمنا
                   </Link>

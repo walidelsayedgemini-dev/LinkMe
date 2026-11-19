@@ -9,12 +9,29 @@ import { publicUser } from "./_shared";
 
 const currentYear = new Date().getFullYear();
 const optionalText = (max: number) => z.string().trim().max(max).nullable().optional();
+
+function toWesternDigits(val: string): string {
+  return val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d).toString());
+}
+
 export const profileUpdateSchema = z.object({
   name: z.string().trim().min(2, "اكتب اسمك من حرفين على الأقل").max(120).nullable().optional(),
-  phone: z.string().trim().min(6, "اكتب رقم تليفون صحيح").max(40).regex(/^[+\d\s().-]+$/, "اكتب رقم تليفون صحيح").nullable().optional(),
-  country: optionalText(80), city: optionalText(80),
+  phone: z
+    .string()
+    .trim()
+    .nullable()
+    .optional()
+    .transform(v => (v ? toWesternDigits(v) : v))
+    .refine(
+      v => !v || (v.length >= 6 && v.length <= 40 && /^[+\d\s().-]+$/.test(v)),
+      "اكتب رقم تليفون صحيح"
+    ),
+  avatarUrl: optionalText(300),
+  country: optionalText(80),
+  city: optionalText(80),
   birthYear: z.number().int().min(1900).max(currentYear).nullable().optional(),
-  schoolGrade: optionalText(80), learningGoal: optionalText(120),
+  schoolGrade: optionalText(80),
+  learningGoal: optionalText(120),
   preferredStudyTime: z.enum(["morning", "afternoon", "evening", "flexible"]).nullable().optional(),
   dailyStudyMinutes: z.number().int().min(5).max(300).nullable().optional(),
   bio: optionalText(1200),
@@ -47,7 +64,7 @@ export const profileRouter = router({
     const db = await requireDb();
     const userChanges: Record<string, unknown> = {};
     const detailChanges: Record<string, unknown> = {};
-    for (const field of ["name", "phone", "country", "learningGoal", "bio"] as const) {
+    for (const field of ["name", "phone", "country", "learningGoal", "bio", "avatarUrl"] as const) {
       if (Object.prototype.hasOwnProperty.call(input, field)) userChanges[field] = input[field] ?? null;
     }
     for (const field of ["city", "birthYear", "schoolGrade", "learningGoal", "preferredStudyTime", "dailyStudyMinutes", "bio"] as const) {

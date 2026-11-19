@@ -104,20 +104,25 @@ export function ProfileDetailsForm({
     setFieldErrors(previous => ({ ...previous, [field]: "" }));
   };
 
+function normalizeDigits(val: string): string {
+  return val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d).toString());
+}
+
   const validate = () => {
     const errors: Record<string, string> = {};
+    const normPhone = normalizeDigits(form.phone.trim());
     if (form.name.trim().length < 2) errors.name = "اكتب اسمك على الأقل بحرفين";
-    if (form.phone.trim() && !/^[+\d\s().-]{6,40}$/.test(form.phone.trim())) {
+    if (normPhone && !/^[+\d\s().-]{6,40}$/.test(normPhone)) {
       errors.phone = "اكتب رقم هاتف صحيحًا";
     }
     if (form.birthYear.trim()) {
-      const year = Number(form.birthYear);
+      const year = Number(normalizeDigits(form.birthYear.trim()));
       const currentYear = new Date().getFullYear();
       if (!Number.isInteger(year) || year < 1900 || year > currentYear)
         errors.birthYear = "اكتب سنة ميلاد صحيحة";
     }
     if (form.dailyStudyMinutes.trim()) {
-      const minutes = Number(form.dailyStudyMinutes);
+      const minutes = Number(normalizeDigits(form.dailyStudyMinutes.trim()));
       if (!Number.isInteger(minutes) || minutes < 5 || minutes > 300)
         errors.dailyStudyMinutes = "اختار من 5 إلى 300 دقيقة";
     }
@@ -129,25 +134,31 @@ export function ProfileDetailsForm({
     event.preventDefault();
     if (!validate()) return;
     try {
+      const cleanPhone = textOrNull(normalizeDigits(form.phone));
+      const cleanYear = form.birthYear.trim()
+        ? Number(normalizeDigits(form.birthYear.trim()))
+        : null;
+      const cleanMinutes = form.dailyStudyMinutes.trim()
+        ? Number(normalizeDigits(form.dailyStudyMinutes.trim()))
+        : null;
+
       const saved = await updateProfile.mutateAsync({
         name: form.name.trim(),
-        phone: textOrNull(form.phone),
+        phone: cleanPhone,
         country: textOrNull(form.country),
         city: textOrNull(form.city),
-        birthYear: form.birthYear.trim() ? Number(form.birthYear) : null,
+        birthYear: cleanYear,
         schoolGrade: textOrNull(form.schoolGrade),
         learningGoal: textOrNull(form.learningGoal),
         preferredStudyTime: form.preferredStudyTime || null,
-        dailyStudyMinutes: form.dailyStudyMinutes.trim()
-          ? Number(form.dailyStudyMinutes)
-          : null,
+        dailyStudyMinutes: cleanMinutes,
         bio: textOrNull(form.bio),
       });
       // A successful mutation is the source of truth for this form. Keep the
       // saved state even if the follow-up auth/query refresh is unavailable.
       setForm(formFromProfile(saved as ProfileRecord));
       setDirty(false);
-      toast.success("اتحفظت بياناتك");
+      toast.success("اتحفظت بياناتك بنجاح ✅");
       try {
         await onSaved();
       } catch {
@@ -155,8 +166,12 @@ export function ProfileDetailsForm({
           "اتحفظت بياناتك، لكن تحديث الجلسة اتأخر. اعمل تحديث للصفحة لاحقًا."
         );
       }
-    } catch {
-      // The mutation's localized server message is rendered below with retry.
+    } catch (saveError: unknown) {
+      const msg =
+        saveError instanceof Error
+          ? saveError.message
+          : "تعذّر حفظ البيانات، يرجى المحاولة ثانية.";
+      toast.error(msg);
     }
   };
 

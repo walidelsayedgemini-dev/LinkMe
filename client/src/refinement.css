@@ -234,12 +234,15 @@
   padding: 26px 0;
   margin-top: 46px;
 }
-.home-trust > div {
+.home-trust > div,
+.home-trust > button,
+.home-trust > a {
   display: flex;
   gap: 13px;
   align-items: center;
+  text-align: start;
 }
-.home-trust > div + div {
+.home-trust > * + * {
   border-inline-start: 1px solid var(--color-line);
   padding-inline-start: 24px;
 }
@@ -442,7 +445,7 @@
     margin-top: 30px;
     padding: 23px 0;
   }
-  .home-trust > div + div {
+  .home-trust > * + * {
     border-inline-start: 0;
     padding-inline-start: 0;
   }

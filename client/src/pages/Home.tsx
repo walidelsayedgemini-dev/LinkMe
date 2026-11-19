@@ -15,7 +15,7 @@ import {
   Video,
   Zap,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { PageShell } from "@/components/layout/site-footer";
 import { SectionHeading } from "@/components/bits";
@@ -25,6 +25,7 @@ import { HeroLogo } from "@/components/hero-logo";
 import { Reveal } from "@/components/reveal";
 import { PlanCards } from "@/components/plan-cards";
 import { Button } from "@/components/ui/button";
+import { LiveBookingDialog } from "@/components/live-booking-dialog";
 import {
   Accordion,
   AccordionContent,
@@ -52,6 +53,7 @@ function Label({
 
 export default function Home() {
   const { companion } = useCompanion();
+  const [bookingOpen, setBookingOpen] = useState(false);
   const featured = trpc.catalog.featured.useQuery();
   const categories = trpc.catalog.categories.useQuery();
   const instructors = trpc.catalog.instructors.useQuery({});
@@ -129,32 +131,59 @@ export default function Home() {
             <HeroLogo />
           </div>
           <div className="home-trust">
-            {[
-              {
-                icon: Video,
-                title: "معلّم معاك، مش فيديو وبس",
-                text: "جلسات لايف ومساحة تسأل وتجرب",
-              },
-              {
-                icon: BookOpen,
-                title: "من أول كلمة لأول محادثة",
-                text: "مسار تأسيس واضح من 12 مستوى",
-              },
-              {
-                icon: GraduationCap,
-                title: "كل خطوة ليها متابعة",
-                text: "حضور، مهام وتقييم في حسابك",
-              },
-            ].map(({ icon: Icon, title, text }) => (
-              <div key={title}>
-                <Icon className="size-6 shrink-0 text-iris" strokeWidth={1.6} />
-                <div>
-                  <p>{title}</p>
-                  <small>{text}</small>
-                </div>
+            <button
+              type="button"
+              onClick={() => setBookingOpen(true)}
+              className="group flex items-center gap-3 text-start rounded-2xl p-2.5 transition-all hover:bg-iris-soft/50 hover:scale-[1.02] cursor-pointer"
+            >
+              <div className="grid size-10 place-items-center rounded-xl bg-iris-soft text-iris group-hover:bg-iris group-hover:text-white transition-colors shrink-0">
+                <Video className="size-5" strokeWidth={1.8} />
               </div>
-            ))}
+              <div>
+                <p className="font-bold text-ink flex items-center gap-1.5">
+                  معلّم معاك، مش فيديو وبس
+                  <span className="rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 text-[10px] px-2 py-0.5 font-bold">
+                    احجز موعدك 🎥
+                  </span>
+                </p>
+                <small className="text-ink-soft">حصتين لايف أسبوعياً ومساحة تسأل وتجرّب</small>
+              </div>
+            </button>
+
+            <Link
+              href="/path"
+              className="group flex items-center gap-3 text-start rounded-2xl p-2.5 transition-all hover:bg-iris-soft/50 hover:scale-[1.02]"
+            >
+              <div className="grid size-10 place-items-center rounded-xl bg-sky-500/10 text-sky-600 group-hover:bg-sky-600 group-hover:text-white transition-colors shrink-0">
+                <BookOpen className="size-5" strokeWidth={1.8} />
+              </div>
+              <div>
+                <p className="font-bold text-ink flex items-center gap-1.5">
+                  من أول كلمة لأول محادثة
+                  <ArrowLeft className="size-3.5 text-sky-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </p>
+                <small className="text-ink-soft">مسار تأسيس واضح من 12 مستوى</small>
+              </div>
+            </Link>
+
+            <Link
+              href="/dashboard"
+              className="group flex items-center gap-3 text-start rounded-2xl p-2.5 transition-all hover:bg-iris-soft/50 hover:scale-[1.02]"
+            >
+              <div className="grid size-10 place-items-center rounded-xl bg-purple-500/10 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors shrink-0">
+                <GraduationCap className="size-5" strokeWidth={1.8} />
+              </div>
+              <div>
+                <p className="font-bold text-ink flex items-center gap-1.5">
+                  كل خطوة ليها متابعة
+                  <ArrowLeft className="size-3.5 text-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </p>
+                <small className="text-ink-soft">حضور، مهام وتقييم في حسابك</small>
+              </div>
+            </Link>
           </div>
+
+          <LiveBookingDialog open={bookingOpen} onOpenChange={setBookingOpen} />
         </div>
       </section>
 
@@ -436,7 +465,7 @@ export default function Home() {
               return (
                 <Link
                   key={category.id}
-                  href={`/courses?category=${category.slug}`}
+                  href={category.slug === "writing" ? "/writing" : `/courses?category=${category.slug}`}
                   className="card-soft group flex flex-col overflow-hidden [content-visibility:auto]"
                 >
                   <div className="relative h-36 w-full overflow-hidden bg-paper-deep">
@@ -448,7 +477,7 @@ export default function Home() {
                       className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     <span className="latin absolute left-3 top-3 rounded-full bg-iris-deep px-2.5 py-1 text-[10px] font-bold text-white shadow-xs">
-                      {category.nameEn}
+                      {category.slug === "writing" ? "مصحّح الذكاء الاصطناعي ✍️" : category.nameEn}
                     </span>
                     <span className="absolute right-3 top-3 grid size-8 place-items-center rounded-full bg-paper/95 text-iris shadow-xs">
                       <Icon className="size-4" strokeWidth={1.9} />

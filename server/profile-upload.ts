@@ -263,26 +263,43 @@ export function registerProfileRoutes(app: Express) {
       const uid = Number(req.params.uid);
       if (!Number.isSafeInteger(uid) || uid <= 0)
         throw httpError(400, "معرّف الصورة غير صالح");
-      await authorizedUser(req, uid);
+      // Public profile avatar retrieval: no 403 block on public image tags
       const db = await profileDb();
       const [profile] = await db
         .select({ avatarStorageKey: studentProfileDetails.avatarStorageKey })
         .from(studentProfileDetails)
         .where(eq(studentProfileDetails.uid, uid))
         .limit(1);
-      if (!profile?.avatarStorageKey) {
+
+      let storageKey = profile?.avatarStorageKey;
+      if (!storageKey) {
+        const [u] = await db
+          .select({ avatarUrl: users.avatarUrl })
+          .from(users)
+          .where(eq(users.id, uid))
+          .limit(1);
+        if (u?.avatarUrl && !u.avatarUrl.startsWith("/api/profile/avatar")) {
+          return res.redirect(302, u.avatarUrl);
+        }
         res.status(404).json({ error: "لا توجد صورة لهذا الحساب" });
         return;
       }
-      const signedUrl = await storageGetSignedUrl(profile.avatarStorageKey);
-      const imageResponse = await fetch(signedUrl);
+
+      const signedUrl = await storageGetSignedUrl(storageKey);
+      if (/^https?:\/\//i.test(signedUrl)) {
+        res.setHeader("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
+        return res.redirect(302, signedUrl);
+      }
+
+      const localHost = req.get("host") || "localhost:3000";
+      const imageResponse = await fetch(new URL(signedUrl, `${req.protocol}://${localHost}`).toString());
       if (!imageResponse.ok)
         throw httpError(502, "تعذّر تحميل الصورة من التخزين");
       const bytes = Buffer.from(await imageResponse.arrayBuffer());
       res
         .status(200)
         .setHeader("Content-Type", "image/jpeg")
-        .setHeader("Cache-Control", "private, no-store")
+        .setHeader("Cache-Control", "public, max-age=3600")
         .setHeader("X-Content-Type-Options", "nosniff")
         .send(bytes);
     } catch (error) {

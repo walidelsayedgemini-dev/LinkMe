@@ -40,6 +40,7 @@ const Competitions = lazy(() => import("./pages/Competitions"));
 const Flashcards = lazy(() => import("./pages/Flashcards"));
 const Roleplay = lazy(() => import("./pages/Roleplay"));
 const SpeedQuiz = lazy(() => import("./pages/SpeedQuiz"));
+const Writing = lazy(() => import("./pages/Writing"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 import { CompanionProvider } from "./contexts/CompanionContext";
 import { CompanionFloatingWidget, CompanionSelectionDialog } from "./components/companion";
@@ -76,6 +77,7 @@ const ROUTE_LOADERS: Record<string, () => Promise<unknown>> = {
   "/flashcards": () => import("./pages/Flashcards"),
   "/roleplay": () => import("./pages/Roleplay"),
   "/speed-quiz": () => import("./pages/SpeedQuiz"),
+  "/writing": () => import("./pages/Writing"),
 };
 
 /** Warm the next page's chunk while the visitor hovers a link, so navigation feels instant. */
@@ -156,6 +158,7 @@ function Router() {
           <Route path="/flashcards" component={Flashcards} />
           <Route path="/roleplay" component={Roleplay} />
           <Route path="/speed-quiz" component={SpeedQuiz} />
+          <Route path="/writing" component={Writing} />
           <Route path="/method" component={Method} />
           <Route path="/about" component={About} />
           <Route path="/owner" component={Owner} />
