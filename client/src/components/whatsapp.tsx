@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 
 /**
@@ -34,11 +35,34 @@ function readPos(): Pos | null {
   return null;
 }
 
+function getContextualWhatsAppMessage(pathname: string): string {
+  if (pathname.startsWith("/premium")) {
+    return "السلام عليكم 👋 حابب أعرف تفاصيل وطرق دفع اشتراك خطة الإتقان (30 يوم أو سنة) وتفعيل الحساب.";
+  }
+  if (pathname.startsWith("/courses")) {
+    return "السلام عليكم 👋 بتصفح كورسات Link Me وعايز ترشيح للكورس الأنسب لمستواي وهدفي.";
+  }
+  if (pathname.startsWith("/level-test")) {
+    return "السلام عليكم 👋 عملت اختبار تحديد المستوى ومحتاج استفسر عن النتيجة وترشيح الخطوة الجاية.";
+  }
+  if (pathname.startsWith("/roleplay")) {
+    return "السلام عليكم 👋 بستفسر عن تدريبات محاكي التحدث والصوتيات مع الذكاء الاصطناعي وكوتش ياسين.";
+  }
+  if (pathname.startsWith("/kids")) {
+    return "السلام عليكم 👋 عايز استفسر عن كورسات وتأسيس الأطفال في Link Me.";
+  }
+  if (pathname.startsWith("/pricing")) {
+    return "السلام عليكم 👋 بستفسر عن باقات الأسعار المتاحة وطرق الدفع (فودافون كاش / إنستاباي).";
+  }
+  return "السلام عليكم 👋 عندي استفسار عن كورسات ودراسة الإنجليزي في Link Me.";
+}
+
 /**
  * Floating WhatsApp shortcut. Users can drag it anywhere on screen — the spot
  * is remembered, and a plain tap still opens the chat.
  */
 export function WhatsAppFab({ className }: { className?: string }) {
+  const [location] = useLocation();
   const [pos, setPos] = useState<Pos | null>(null);
   const [dragging, setDragging] = useState(false);
   const drag = useRef({ active: false, moved: false, offsetX: 0, offsetY: 0, startX: 0, startY: 0 });
@@ -126,7 +150,7 @@ export function WhatsAppFab({ className }: { className?: string }) {
           drag.current.moved = false;
           return;
         }
-        openWhatsApp();
+        openWhatsApp(getContextualWhatsAppMessage(location));
       }}
       title="اسحبني لأي مكان · اضغط للتواصل"
       aria-label="تواصل معنا على واتساب — تقدر تسحبه لأي مكان"

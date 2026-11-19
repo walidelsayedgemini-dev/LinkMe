@@ -14,6 +14,7 @@ import {
   Settings,
   ShieldCheck,
   ShoppingBag,
+  Sparkles,
   Sun,
   Trophy,
   User,
@@ -35,6 +36,8 @@ import { PwaInstallPrompt } from "@/components/pwa-install-banner";
 import { DailyMysteryChestHeaderButton } from "@/components/daily-mystery-chest";
 import { SocialShareCardButton } from "@/components/social-share-card";
 import { useGamification } from "@/components/gamification-badges";
+import { CommandPalette } from "@/components/command-palette";
+import { StudyPlanCalculatorDialog } from "@/components/study-plan-calculator";
 import {
   Sheet,
   SheetContent,
@@ -219,11 +222,19 @@ export function SiteHeader() {
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            aria-label="افتح بحث الكورسات"
-            className="grid size-9 sm:size-10 place-items-center rounded-full border border-line bg-card text-ink-soft hover:border-iris hover:text-iris"
+            aria-label="البحث السريع (Ctrl+K)"
+            title="البحث السريع والتنقل الذكي (Ctrl + K)"
+            className="flex items-center gap-2 h-9 sm:h-10 px-2.5 sm:px-3 rounded-full border border-line bg-card text-ink-soft hover:border-iris hover:text-iris transition-colors cursor-pointer"
           >
-            <Search className="size-[17px] sm:size-[18px]" />
+            <Search className="size-[16px] sm:size-[17px]" />
+            <span className="hidden lg:inline text-xs font-medium text-ink-soft">بحث سريع…</span>
+            <span className="latin hidden lg:inline-flex items-center rounded-md border border-line bg-paper px-1.5 py-0.5 text-[10px] font-semibold text-ink-soft/80">
+              Ctrl K
+            </span>
           </button>
+          <div className="hidden xl:inline-flex">
+            <StudyPlanCalculatorDialog />
+          </div>
           <HeaderStreakIndicator className="hidden md:inline-flex" />
           <div className="hidden sm:inline-flex">
             <DailyMysteryChestHeaderButton />
@@ -377,6 +388,20 @@ export function SiteHeader() {
                   {themeButton}
                 </div>
 
+                <div className="w-full">
+                  <StudyPlanCalculatorDialog
+                    trigger={
+                      <Button
+                        variant="outline"
+                        className="w-full justify-center rounded-2xl border-iris/30 bg-iris/5 py-2.5 text-xs font-bold text-iris hover:bg-iris hover:text-white"
+                      >
+                        <Sparkles className="size-3.5 me-1.5 text-amber-500" />
+                        حاسبة مسارك المناسب 🎯
+                      </Button>
+                    }
+                  />
+                </div>
+
                 <div className="space-y-2">
                   <p className="px-1 text-[11px] font-bold tracking-wider text-ink-soft uppercase opacity-75">
                     أقسام المنصة
@@ -476,59 +501,7 @@ export function SiteHeader() {
           </Sheet>
         </div>
       </div>
-      <Dialog open={searchOpen} onOpenChange={setSearchOpen}>
-        <DialogContent
-          dir="rtl"
-          className="rounded-3xl border-line bg-card p-6 text-ink sm:max-w-xl"
-        >
-          <DialogHeader className="text-start">
-            <DialogTitle className="text-xl">
-              خطوتك الجاية في <span className="hl-word">كورس.</span>
-            </DialogTitle>
-            <DialogDescription className="text-ink-soft">
-              دوّر باسم الكورس أو المهارة اللي عايز تطوّرها.
-            </DialogDescription>
-          </DialogHeader>
-          <form
-            onSubmit={submitSearch}
-            className="flex items-center gap-3 rounded-2xl border border-line bg-paper p-2 ps-4 focus-within:border-iris focus-within:ring-2 focus-within:ring-iris/15"
-          >
-            <Search aria-hidden className="size-5 shrink-0 text-ink-soft" />
-            <input
-              autoFocus
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              placeholder="محادثة، قواعد، آيلتس…"
-              aria-label="اسم الكورس أو المهارة"
-              className="h-10 min-w-0 flex-1 bg-transparent text-sm text-ink outline-none placeholder:text-ink-soft"
-            />
-            <button
-              type="submit"
-              className="grid size-10 shrink-0 place-items-center rounded-xl bg-iris text-white"
-              aria-label="تنفيذ البحث"
-            >
-              <ArrowLeft className="size-4" />
-            </button>
-          </form>
-          <div className="flex flex-wrap gap-2">
-            {[
-              { label: "محادثة", href: "/courses?category=speaking" },
-              { label: "قواعد", href: "/courses?category=grammar" },
-              { label: "آيلتس", href: "/courses?category=ielts" },
-              { label: "للأطفال", href: "/kids" },
-            ].map(item => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setSearchOpen(false)}
-                className="rounded-full border border-line px-3 py-1.5 text-xs text-ink-soft hover:border-iris hover:text-iris"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
   );
 }

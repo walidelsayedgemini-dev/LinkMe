@@ -40,6 +40,7 @@ import { SocialShareCardButton } from "@/components/social-share-card";
 import { IncomingCallButton } from "@/components/incoming-call-modal";
 import { DailyMorningSprintButton } from "@/components/daily-morning-sprint";
 import { AIFluencyCoachButton } from "@/components/ai-fluency-coach";
+import { StudyPlanCalculatorDialog } from "@/components/study-plan-calculator";
 import { trpc } from "@/lib/trpc";
 import { categoryIcon, FAQ_GROUPS } from "@/lib/content";
 
@@ -104,7 +105,7 @@ export default function Home() {
               <div className="mt-7 flex flex-wrap gap-3">
                 <Button
                   asChild
-                  className="h-12 rounded-full bg-iris px-6 text-white hover:bg-iris-deep"
+                  className="h-12 rounded-full bg-iris px-6 text-white hover:bg-iris-deep shadow-sm"
                 >
                   <Link href="/courses">
                     شوف الكورسات <ArrowLeft className="size-4" />
@@ -113,12 +114,23 @@ export default function Home() {
                 <Button
                   asChild
                   variant="outline"
-                  className="h-12 rounded-full border-line bg-card px-5 text-ink"
+                  className="h-12 rounded-full border-line bg-card px-5 text-ink hover:border-iris"
                 >
                   <Link href="/level-test">
                     <Gauge className="size-4 text-iris" /> اعرف مستواك
                   </Link>
                 </Button>
+                <StudyPlanCalculatorDialog
+                  trigger={
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-12 rounded-full border-iris/40 bg-iris/5 px-5 text-ink hover:bg-iris hover:text-white transition-all shadow-xs cursor-pointer"
+                    >
+                      <Sparkles className="size-4 text-amber-500 me-1" /> احسب مسارك في دقيقة
+                    </Button>
+                  }
+                />
               </div>
               <div className="hero-benefits">
                 <span>
@@ -228,6 +240,7 @@ export default function Home() {
               <DailyMorningSprintButton />
               <IncomingCallButton />
               <AIFluencyCoachButton />
+              <StudyPlanCalculatorDialog />
               <Link
                 href="/competitions"
                 className="inline-flex items-center gap-1.5 rounded-full border border-line bg-card px-4 py-2 text-xs font-bold text-ink shadow-xs transition-colors hover:border-iris hover:bg-iris hover:text-white dark:border-white/25 dark:bg-white/10 dark:text-white dark:hover:bg-white dark:hover:text-iris"
