@@ -67,6 +67,10 @@ type EvaluationResult = {
   overview: string;
   weaknesses: WeaknessDiagnosis[];
   encouragement: string;
+  isAi?: boolean;
+  modelUsed?: string | null;
+  errorReason?: string | null;
+  apiKeyMasked?: string | null;
 };
 
 const SAMPLE_PROMPTS = [
@@ -387,15 +391,23 @@ export default function WritingPage() {
         overview: serverResult.overview,
         weaknesses: serverResult.weaknesses as WeaknessDiagnosis[],
         encouragement: serverResult.encouragement,
+        isAi: serverResult.isAi,
+        modelUsed: serverResult.modelUsed,
+        errorReason: serverResult.errorReason,
+        apiKeyMasked: serverResult.apiKeyMasked,
       };
 
       setActiveResult(result);
       soundEffects.playCorrect();
-      toast.success(
-        serverResult.source === "gemini_3_8_flash"
-          ? "تم التقييم بنجاح بواسطة Google Gemini 3.8 Flash الذكي ⚡"
-          : "تم تقييم النص وتشخيص نقاط الضعف بنجاح 🎯"
-      );
+      if (serverResult.isAi) {
+        toast.success(`تم التقييم بنجاح بواسطة Google Gemini (${serverResult.modelUsed}) ⚡`);
+      } else {
+        toast.warning(
+          serverResult.errorReason
+            ? `استُخدم المحرك الاحتياطي: ${serverResult.errorReason.slice(0, 80)}...`
+            : "تم التقييم بالمحرك الاحتياطي 🎯"
+        );
+      }
 
       const updated = [result, ...history.slice(0, 19)];
       setHistory(updated);
@@ -554,6 +566,24 @@ export default function WritingPage() {
             <div className="rounded-3xl border border-iris/30 bg-gradient-to-r from-iris/10 via-iris-soft/40 to-card p-6 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
+                  <div className="mb-3">
+                    {activeResult.isAi ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 px-3 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                        <Sparkles className="size-3.5 text-emerald-500" />
+                        <span>تقييم مباشر عبر Google Gemini ({activeResult.modelUsed}) ⚡</span>
+                      </span>
+                    ) : (
+                      <div className="rounded-2xl border border-amber-300/80 bg-amber-50/90 dark:bg-amber-950/40 p-3.5 text-xs text-amber-900 dark:text-amber-200">
+                        <div className="font-bold flex items-center gap-1.5 mb-1 text-amber-800 dark:text-amber-300">
+                          <AlertCircle className="size-4 shrink-0 text-amber-600" />
+                          <span>تنبيه: تم استخدام المحرك التحليلي البديل (Fallback)</span>
+                        </div>
+                        <p className="text-ink-soft leading-relaxed">
+                          <strong>سبب عدم اتصال الذكاء الاصطناعي:</strong> {activeResult.errorReason || "لم يتم توفير تفاصيل الخطأ"}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2">
                     <span className="rounded-full bg-iris px-3 py-1 text-xs font-extrabold text-white">
                       مستوى النص التقديري: {activeResult.estimatedLevel}

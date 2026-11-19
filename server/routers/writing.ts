@@ -1,8 +1,63 @@
 import { z } from "zod";
 import { publicProcedure, router } from "../_core/trpc";
-import { evaluatePronunciationWithGemini, evaluateWritingWithGemini } from "../gemini";
+import {
+  DEFAULT_PRIMARY_MODEL,
+  evaluatePronunciationWithGemini,
+  evaluateWritingWithGemini,
+  getApiKeyDetails,
+} from "../gemini";
 
 export const writingRouter = router({
+  /**
+   * Diagnostic check to verify process.env.GEMINI_API_KEY and model availability
+   */
+  checkGeminiStatus: publicProcedure.query(async () => {
+    const keyDetails = getApiKeyDetails();
+    if (!keyDetails.isConfigured || !keyDetails.key) {
+      return {
+        configured: false,
+        keyMasked: "NOT_SET",
+        primaryModel: process.env.GEMINI_MODEL || DEFAULT_PRIMARY_MODEL,
+        message: "process.env.GEMINI_API_KEY is undefined on this server.",
+      };
+    }
+
+    // Ping check with gemini-2.5-flash (primary) and backup
+    const testModel = process.env.GEMINI_MODEL || DEFAULT_PRIMARY_MODEL;
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${testModel}:generateContent?key=${keyDetails.key}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: "ping" }] }],
+          }),
+          signal: AbortSignal.timeout(5000),
+        }
+      );
+
+      const errText = !res.ok ? await res.text().catch(() => "") : "";
+      return {
+        configured: true,
+        keyMasked: keyDetails.masked,
+        primaryModel: testModel,
+        status: res.status,
+        ok: res.ok,
+        details: res.ok ? "Connected successfully" : errText,
+      };
+    } catch (err: any) {
+      return {
+        configured: true,
+        keyMasked: keyDetails.masked,
+        primaryModel: testModel,
+        status: 0,
+        ok: false,
+        details: err.message || String(err),
+      };
+    }
+  }),
+
   evaluate: publicProcedure
     .input(
       z.object({
@@ -11,21 +66,49 @@ export const writingRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const aiResult = await evaluateWritingWithGemini(input.text, input.promptTopic);
-      if (aiResult) {
+      const outcome = await evaluateWritingWithGemini(input.text, input.promptTopic);
+
+      if (outcome.success && outcome.data) {
         return {
-          source: "gemini_3_8_flash",
-          ...aiResult,
+          source: outcome.modelUsed || "gemini",
+          isAi: true,
+          modelUsed: outcome.modelUsed,
+          attemptedModels: outcome.attemptedModels,
+          apiKeyMasked: outcome.apiKeyStatus.masked,
+          realErrors: outcome.errors,
+          errorReason: null,
+          ...outcome.data,
         };
       }
 
-      // High-quality deterministic fallback if API is unreachable
+      // Fallback with full real error diagnostics
       const words = input.text.trim().split(/\s+/).filter(Boolean);
       const wordCount = words.length;
+
+      const primaryError =
+        outcome.errors.find((e) => e.status === 404)?.message ||
+        outcome.errors[0]?.message ||
+        (outcome.apiKeyStatus.isConfigured
+          ? "فشل الاتصال بـ Google Gemini لجميع الموديلات المتاحة."
+          : "process.env.GEMINI_API_KEY غير موجود في بيئة التشغيل على السيرفر (undefined).");
+
       return {
         source: "engine",
-        correctedText: input.text.replace(/\bi was go\b/gi, "I went").replace(/\bthey was\b/gi, "they were"),
-        estimatedLevel: wordCount > 60 ? "B2" : wordCount > 30 ? "B1" : "A2",
+        isAi: false,
+        modelUsed: null,
+        attemptedModels: outcome.attemptedModels,
+        apiKeyMasked: outcome.apiKeyStatus.masked,
+        realErrors: outcome.errors,
+        errorReason: primaryError,
+        correctedText: input.text
+          .replace(/\bi was go\b/gi, "I went")
+          .replace(/\bthey was\b/gi, "they were"),
+        estimatedLevel: (wordCount > 60 ? "B2" : wordCount > 30 ? "B1" : "A2") as
+          | "A1"
+          | "A2"
+          | "B1"
+          | "B2"
+          | "C1",
         overallScore: 78,
         wordCount,
         scores: {
@@ -34,7 +117,7 @@ export const writingRouter = router({
           coherence: 74,
           style: 78,
         },
-        overview: "تم تحليل النص بنجاح. أفكارك واضحة وتحتاج لتركيز بسيط على تصريف الأزمنة وروابط الفقرات.",
+        overview: `تم استخدام المحرك الاحتياطي؛ سبب عدم استجابة الذكاء الاصطناعي: ${primaryError}`,
         weaknesses: [
           {
             id: "tenses_check",
@@ -66,29 +149,31 @@ export const writingRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const aiResult = await evaluatePronunciationWithGemini(
+      const outcome = await evaluatePronunciationWithGemini(
         input.expectedText,
         input.spokenText
       );
-      if (aiResult) {
+      if (outcome.success && outcome.data) {
         return {
-          source: "gemini_3_8_flash",
-          ...aiResult,
+          source: outcome.modelUsed || "gemini",
+          isAi: true,
+          ...outcome.data,
         };
       }
 
       // Heuristic fallback
       const expWords = input.expectedText.toLowerCase().split(/\s+/);
       const spkWords = input.spokenText.toLowerCase().split(/\s+/);
-      const matched = expWords.filter(w => spkWords.includes(w)).length;
+      const matched = expWords.filter((w) => spkWords.includes(w)).length;
       const accuracy = Math.round((matched / Math.max(1, expWords.length)) * 100);
 
       return {
         source: "engine",
+        isAi: false,
         score: Math.max(60, accuracy),
         accuracyRate: accuracy,
         fluencyScore: 80,
-        detectedErrors: expWords.filter(w => !spkWords.includes(w)),
+        detectedErrors: expWords.filter((w) => !spkWords.includes(w)),
         phoneticTips: [
           "احرص على إخراج أصوات الحروف اللثوية مثل TH في 'the' و 'think'",
           "ركز على التشديد (Word Stress) في المقاطع الأولى",
