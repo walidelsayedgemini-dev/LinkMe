@@ -10,6 +10,7 @@ import {
   RotateCcw,
   Search,
   Sparkles,
+  Star,
   Trophy,
   Volume2,
   Zap,
@@ -22,6 +23,7 @@ import { useCompanion } from "@/components/companion";
 import { trpc } from "@/lib/trpc";
 import { awardXP } from "@/lib/gamification";
 import { soundEffects } from "@/lib/sound-effects";
+import { triggerConfetti } from "@/lib/confetti";
 import { cn } from "@/lib/utils";
 import {
   ROLEPLAY_CATEGORIES,
@@ -202,6 +204,32 @@ export default function Roleplay() {
   const [pickedOption, setPickedOption] = useState<RoleplayOption | null>(null);
   const [scores, setScores] = useState<number[]>([]);
   const [finished, setFinished] = useState(false);
+  const [showSavedOnly, setShowSavedOnly] = useState(false);
+  const [savedIds, setSavedIds] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const raw = localStorage.getItem("linkme_saved_scenarios");
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const toggleSaveScenario = (id: string) => {
+    setSavedIds(prev => {
+      const next = prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id];
+      try {
+        localStorage.setItem("linkme_saved_scenarios", JSON.stringify(next));
+      } catch {}
+      if (!prev.includes(id)) {
+        soundEffects.playCorrect();
+        toast.success("تم حفظ الموقف في قائمتك المفضلة ⭐");
+      } else {
+        toast.info("تمت إزالة الموقف من المفضلة");
+      }
+      return next;
+    });
+  };
 
   // Lazy-load the complete 1,000-scenario vault ONLY when visiting /roleplay (keeps rest of site ultra-light!)
   useEffect(() => {
@@ -225,6 +253,7 @@ export default function Roleplay() {
   const filteredScenarios = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return allScenarios.filter(s => {
+      if (showSavedOnly && !savedIds.includes(s.id)) return false;
       if (selectedLevel !== "all" && s.level !== selectedLevel) return false;
       if (selectedCategory !== "all" && s.category !== selectedCategory)
         return false;
@@ -236,7 +265,7 @@ export default function Roleplay() {
         s.partnerName.toLowerCase().includes(q)
       );
     });
-  }, [allScenarios, selectedLevel, selectedCategory, searchQuery]);
+  }, [allScenarios, selectedLevel, selectedCategory, searchQuery, showSavedOnly, savedIds]);
 
   const levelCounts = useMemo(() => {
     const counts: Record<string, number> = { all: allScenarios.length };
@@ -316,6 +345,7 @@ export default function Roleplay() {
     } else {
       setFinished(true);
       soundEffects.playTrophy();
+      triggerConfetti(3000);
       awardXP(activeScenario.rewardXp, "audio_hero");
       if (user) {
         addXpMutation.mutate({
@@ -502,6 +532,23 @@ export default function Roleplay() {
               </div>
 
               <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    soundEffects.playClick();
+                    setShowSavedOnly(prev => !prev);
+                    setVisibleCount(18);
+                  }}
+                  className={cn(
+                    "rounded-full border px-3 py-1.5 text-xs font-bold transition-colors inline-flex items-center gap-1.5",
+                    showSavedOnly
+                      ? "border-amber-400 bg-amber-400 text-amber-950 shadow-xs"
+                      : "border-line bg-paper text-ink-soft hover:border-amber-400/50 hover:text-ink"
+                  )}
+                >
+                  <Star className={cn("size-3.5", showSavedOnly && "fill-amber-950")} />
+                  <span>المفضلة ⭐ ({savedIds.length})</span>
+                </button>
                 {ROLEPLAY_CATEGORIES.map(cat => {
                   const count = categoryCounts[cat.id] ?? 0;
                   if (cat.id !== "all" && count === 0) return null;
@@ -582,9 +629,28 @@ export default function Roleplay() {
                         className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#091833]/85 via-[#091833]/35 to-transparent"
                       />
                       <div className="absolute inset-x-3 top-3 flex flex-wrap items-center justify-between gap-1.5">
-                        <span className="latin rounded-full bg-iris-deep px-2.5 py-1 text-[10px] font-bold text-white shadow-xs">
-                          {scenario.level}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="latin rounded-full bg-iris-deep px-2.5 py-1 text-[10px] font-bold text-white shadow-xs">
+                            {scenario.level}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={e => {
+                              e.stopPropagation();
+                              toggleSaveScenario(scenario.id);
+                            }}
+                            aria-label={savedIds.includes(scenario.id) ? "إزالة من المفضلة" : "حفظ في المفضلة"}
+                            className={cn(
+                              "grid size-6 place-items-center rounded-full transition shadow-xs",
+                              savedIds.includes(scenario.id)
+                                ? "bg-amber-400 text-amber-950"
+                                : "bg-black/40 text-white/80 hover:bg-black/60 hover:text-amber-300"
+                            )}
+                            title={savedIds.includes(scenario.id) ? "محفوظ في المفضلة ⭐" : "حفظ في المفضلة"}
+                          >
+                            <Star className={cn("size-3", savedIds.includes(scenario.id) && "fill-amber-950")} />
+                          </button>
+                        </div>
                         <div className="flex flex-wrap items-center gap-1">
                           {scenario.isPro ? (
                             <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-2.5 py-0.5 text-[10px] font-black text-white shadow-sm">
@@ -729,9 +795,24 @@ export default function Roleplay() {
                     {activeScenario.emoji} {activeScenario.titleAr}
                   </h2>
                 </div>
-                <span className="latin rounded-full bg-iris px-3 py-1 text-xs font-black text-white shadow-xs">
-                  الجولة {turnIndex + 1} / {activeScenario.turns.length}
-                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => toggleSaveScenario(activeScenario.id)}
+                    className={cn(
+                      "grid size-8 place-items-center rounded-full transition shadow-xs",
+                      savedIds.includes(activeScenario.id)
+                        ? "bg-amber-400 text-amber-950"
+                        : "bg-white/20 text-white hover:bg-white/30"
+                    )}
+                    title={savedIds.includes(activeScenario.id) ? "محفوظ في المفضلة ⭐" : "حفظ في المفضلة"}
+                  >
+                    <Star className={cn("size-4", savedIds.includes(activeScenario.id) && "fill-amber-950")} />
+                  </button>
+                  <span className="latin rounded-full bg-iris px-3 py-1 text-xs font-black text-white shadow-xs">
+                    الجولة {turnIndex + 1} / {activeScenario.turns.length}
+                  </span>
+                </div>
               </div>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-paper-deep">

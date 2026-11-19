@@ -30,7 +30,12 @@ import NotFound from "./NotFound";
 import { CourseRecording } from "@/components/course-recording";
 import { VoicePractice } from "@/components/voice-practice";
 import { soundEffects } from "@/lib/sound-effects";
-import { recordDailyActivity } from "@/lib/gamification";
+import { recordDailyActivity, awardXP } from "@/lib/gamification";
+import {
+  LessonAudioController,
+  LessonPrintCheatSheet,
+  LessonQuickQuiz,
+} from "@/components/lesson-interactive-features";
 
 export default function Learn() {
   const [, params] = useRoute("/learn/:slug");
@@ -261,17 +266,23 @@ export default function Learn() {
           ) : lessonData ? (
             <article className="space-y-6">
               <div>
-                <div className="flex flex-wrap items-center gap-2 text-xs text-ink-soft">
-                  <span>
-                    الدرس {currentIndex + 1} من {total}
-                  </span>
-                  <span>·</span>
-                  <span>{lessonData.lesson.durationMinutes} دقيقة</span>
-                  {lessonData.lesson.isPreview && (
-                    <span className="rounded-full bg-acid px-2 py-0.5 text-[10px] font-semibold text-ink">
-                      درس معاينة
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-ink-soft">
+                    <span>
+                      الدرس {currentIndex + 1} من {total}
                     </span>
-                  )}
+                    <span>·</span>
+                    <span>{lessonData.lesson.durationMinutes} دقيقة</span>
+                    {lessonData.lesson.isPreview && (
+                      <span className="rounded-full bg-acid px-2 py-0.5 text-[10px] font-semibold text-ink">
+                        درس معاينة
+                      </span>
+                    )}
+                  </div>
+                  <LessonPrintCheatSheet
+                    lessonTitle={lessonData.lesson.title}
+                    courseTitle={access.course.titleAr || access.course.title}
+                  />
                 </div>
                 <h1 className="mt-2 text-3xl leading-tight text-ink">
                   {lessonData.lesson.title}
@@ -280,6 +291,11 @@ export default function Learn() {
                   {lessonData.lesson.description}
                 </p>
               </div>
+
+              {/* Audio Pronunciation Controller */}
+              {lessonData.lesson.content && (
+                <LessonAudioController content={lessonData.lesson.content} />
+              )}
 
               <CourseRecording url={lessonData.lesson.videoUrl} />
               <VoicePractice />
@@ -335,6 +351,15 @@ export default function Learn() {
                   </ReactMarkdown>
                 </div>
               </div>
+
+              {/* Quick Lesson Comprehension Quiz */}
+              {lessonData.lesson.content && (
+                <LessonQuickQuiz
+                  lessonTitle={lessonData.lesson.title}
+                  content={lessonData.lesson.content}
+                  onPassed={() => awardXP(30)}
+                />
+              )}
 
               {/* Actions */}
               <div className="flex flex-col gap-3 rounded-3xl border border-line bg-card p-5 sm:flex-row sm:items-center sm:justify-between">

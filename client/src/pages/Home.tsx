@@ -33,6 +33,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useCompanion, CompanionAvatar, CompanionMotivationalBanner } from "@/components/companion";
+import { LiveActivityTicker } from "@/components/live-ticker";
+import { PwaInstallPrompt } from "@/components/pwa-install-banner";
 import { trpc } from "@/lib/trpc";
 import { categoryIcon, FAQ_GROUPS } from "@/lib/content";
 
@@ -78,6 +80,9 @@ export default function Home() {
         <div className="container">
           <div className="hero-layout">
             <div>
+              <div className="mb-4 max-w-sm sm:max-w-md">
+                <LiveActivityTicker />
+              </div>
               <p className="editorial-label">
                 LINK ME · إنجليزي أونلاين، بروح مصرية
               </p>
@@ -189,6 +194,10 @@ export default function Home() {
 
       <section className="container pt-6">
         <CompanionMotivationalBanner className="mb-6" />
+
+        <div className="mb-6">
+          <PwaInstallPrompt />
+        </div>
 
         {/* Interactive Free Playground Showcase — Rich Branded Visual Cards (Adaptive Light/Dark Theme) */}
         <div className="relative mb-6 overflow-hidden rounded-[28px] border border-line bg-gradient-to-br from-iris-soft/50 via-card to-sky-50/70 p-5 sm:p-8 text-ink shadow-sm dark:border-iris/20 dark:bg-gradient-to-br dark:from-[#0e2248] dark:via-[#173673] dark:to-[#1e40af] dark:text-white dark:shadow-[0_24px_60px_-25px_rgba(37,99,255,0.45)]">

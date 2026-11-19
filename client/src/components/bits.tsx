@@ -35,36 +35,94 @@ export function UserAvatar({
   src,
   size = 40,
   className,
+  xpProgress,
 }: {
   name?: string | null;
   src?: string | null;
   size?: number;
   className?: string;
+  xpProgress?: number; // 0 to 1
 }) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const tone = AVATAR_TONES[(name?.length ?? 0) % AVATAR_TONES.length];
-  if (src && src !== failedSrc) {
-    return (
-      <img
-        src={src}
-        alt={name ?? ""}
-        onError={() => setFailedSrc(src)}
-        width={size}
-        height={size}
-        className={cn("shrink-0 rounded-full object-cover ring-2 ring-card", className)}
-        style={{ width: size, height: size }}
-      />
-    );
-  }
-  return (
+
+  const content = src && src !== failedSrc ? (
+    <img
+      src={src}
+      alt={name ?? ""}
+      onError={() => setFailedSrc(src)}
+      width={size}
+      height={size}
+      className={cn("shrink-0 rounded-full object-cover", className)}
+      style={{ width: size, height: size }}
+    />
+  ) : (
     <span
-      className={cn("grid shrink-0 place-items-center rounded-full font-semibold ring-2 ring-card", tone, className)}
-      style={{ width: size, height: size, fontSize: size * (initials(name).length > 1 ? 0.3 : 0.42), lineHeight: 1, transform: "translateY(0.1em)" }}
+      className={cn("grid shrink-0 place-items-center rounded-full font-semibold", tone, className)}
+      style={{
+        width: size,
+        height: size,
+        fontSize: size * (initials(name).length > 1 ? 0.3 : 0.42),
+        lineHeight: 1,
+        transform: "translateY(0.1em)",
+      }}
       aria-hidden
     >
       {initials(name)}
     </span>
   );
+
+  if (typeof xpProgress === "number") {
+    const strokeWidth = 2.5;
+    const radius = size / 2 + 2;
+    const circumference = 2 * Math.PI * radius;
+    const offset = circumference - Math.min(1, Math.max(0, xpProgress)) * circumference;
+    const svgSize = size + 8;
+
+    return (
+      <div className="relative inline-flex items-center justify-center shrink-0" style={{ width: svgSize, height: svgSize }}>
+        <svg
+          className="absolute inset-0 -rotate-90 pointer-events-none"
+          width={svgSize}
+          height={svgSize}
+          viewBox={`0 0 ${svgSize} ${svgSize}`}
+        >
+          {/* Background Ring */}
+          <circle
+            cx={svgSize / 2}
+            cy={svgSize / 2}
+            r={radius}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={strokeWidth}
+            className="text-line/60"
+          />
+          {/* Progress Ring */}
+          <circle
+            cx={svgSize / 2}
+            cy={svgSize / 2}
+            r={radius}
+            fill="none"
+            stroke="url(#xp-grad)"
+            strokeWidth={strokeWidth}
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="round"
+            className="transition-all duration-500 ease-out"
+          />
+          <defs>
+            <linearGradient id="xp-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#4f46e5" />
+              <stop offset="100%" stopColor="#f59e0b" />
+            </linearGradient>
+          </defs>
+        </svg>
+        {content}
+      </div>
+    );
+  }
+
+  return content;
 }
 
 export function ProgressBar({ value, className }: { value: number; className?: string }) {

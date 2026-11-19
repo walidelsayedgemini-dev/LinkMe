@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
-import { Flame, Zap, Trophy, Award, Lock, Sparkles, Check } from "lucide-react";
+import { Flame, Zap, Trophy, Award, Lock, Sparkles, Check, Snowflake } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   getGamificationState,
   recordDailyActivity,
   ALL_BADGES,
+  getLevelInfo,
+  toggleStreakFreeze,
   type GamificationState,
   type Badge,
 } from "@/lib/gamification";
@@ -19,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { soundEffects } from "@/lib/sound-effects";
 import { useCompanion } from "@/components/companion";
+import { triggerConfetti } from "@/lib/confetti";
 
 export function useGamification() {
   const [state, setState] = useState<GamificationState>(getGamificationState());
@@ -47,8 +50,9 @@ export function useGamification() {
 
 /** Streak Indicator Button for Header */
 export function HeaderStreakIndicator({ className }: { className?: string }) {
-  const { streak, xp } = useGamification();
+  const { streak, xp, streakFreeze } = useGamification();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const { level } = getLevelInfo(xp);
 
   return (
     <>
@@ -56,15 +60,25 @@ export function HeaderStreakIndicator({ className }: { className?: string }) {
         type="button"
         onClick={() => setDialogOpen(true)}
         className={cn(
-          "inline-flex items-center gap-1.5 rounded-full border border-amber-300/60 bg-amber-50/80 px-2.5 py-1 text-xs font-bold text-amber-700 shadow-sm transition hover:scale-105 active:scale-95 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300",
+          "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-bold shadow-sm transition hover:scale-105 active:scale-95",
+          streakFreeze
+            ? "border-sky-300/80 bg-sky-50 text-sky-700 dark:border-sky-700 dark:bg-sky-950/40 dark:text-sky-300"
+            : "border-amber-300/60 bg-amber-50/80 text-amber-700 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300",
           className
         )}
-        title={`استمرارك: ${streak} أيام متتالية | ${xp} نقطة خبرة XP`}
+        title={`استمرارك: ${streak} أيام | المستوى ${level} (${xp} XP) ${streakFreeze ? "| حماية الشعلة مفعلة ❄️" : ""}`}
       >
-        <Flame className="size-3.5 fill-amber-500 text-amber-500" />
+        {streakFreeze ? (
+          <Snowflake className="size-3.5 text-sky-500 animate-spin-slow" />
+        ) : (
+          <Flame className="size-3.5 fill-amber-500 text-amber-500" />
+        )}
         <span className="latin font-extrabold">{streak}</span>
-        <span className="hidden md:inline text-[11px] font-normal text-amber-600 dark:text-amber-400">
-          أيام 🔥
+        <span className="hidden md:inline text-[11px] font-normal">
+          {streakFreeze ? "محمية ❄️" : "أيام 🔥"}
+        </span>
+        <span className="latin ms-0.5 rounded-full bg-iris/15 px-1.5 py-0.2 text-[10px] font-bold text-iris">
+          L{level}
         </span>
       </button>
 
@@ -81,8 +95,19 @@ export function BadgesModal({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const { streak, xp, unlockedBadgeIds } = useGamification();
+  const { streak, xp, unlockedBadgeIds, streakFreeze } = useGamification();
   const { companion } = useCompanion();
+  const { level, currentLevelXp, nextLevelXp, progress } = getLevelInfo(xp);
+  const [freezeMsg, setFreezeMsg] = useState<string | null>(null);
+
+  const handleFreeze = () => {
+    const res = toggleStreakFreeze();
+    setFreezeMsg(res.message);
+    if (res.active) {
+      soundEffects.playTrophy();
+      triggerConfetti(1500);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -92,15 +117,34 @@ export function BadgesModal({
             <Trophy className="size-6 text-amber-500" />
           </div>
           <DialogTitle className="text-center text-xl font-bold">
-            إنجازاتك وشعلة الحماس 🏆🔥
+            إنجازاتك ومستوى تقدمك 🏆🔥
           </DialogTitle>
           <DialogDescription className="text-center text-sm text-ink-soft">
             استمرارك اليومي هو سر تفوقك في الإنجليزي!
           </DialogDescription>
         </DialogHeader>
 
+        {/* Level & XP Progress Card */}
+        <div className="my-2 rounded-2xl border border-iris/25 bg-iris/5 p-3.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-bold text-iris flex items-center gap-1.5">
+              <Zap className="size-4 fill-iris text-iris" />
+              المستوى الحالي: <b>Level {level}</b>
+            </span>
+            <span className="latin font-bold text-ink-soft">
+              {currentLevelXp} / {nextLevelXp} XP للمستوى التالي
+            </span>
+          </div>
+          <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-iris/15">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-iris via-indigo-500 to-amber-500 transition-all duration-500"
+              style={{ width: `${Math.round(progress * 100)}%` }}
+            />
+          </div>
+        </div>
+
         {/* Stats Row */}
-        <div className="grid grid-cols-2 gap-3 my-3">
+        <div className="grid grid-cols-2 gap-3 my-2">
           <div className="rounded-2xl border border-amber-200 bg-amber-50/60 dark:border-amber-900/40 dark:bg-amber-950/20 p-3 text-center">
             <div className="flex items-center justify-center gap-1 text-amber-600 dark:text-amber-400">
               <Flame className="size-4 fill-amber-500 text-amber-500" />
@@ -114,13 +158,46 @@ export function BadgesModal({
           <div className="rounded-2xl border border-purple-200 bg-purple-50/60 dark:border-purple-900/40 dark:bg-purple-950/20 p-3 text-center">
             <div className="flex items-center justify-center gap-1 text-purple-600 dark:text-purple-400">
               <Zap className="size-4 fill-purple-500 text-purple-500" />
-              <span className="text-xs font-semibold">نقاط الخبرة XP</span>
+              <span className="text-xs font-semibold">إجمالي الخبرة</span>
             </div>
             <p className="mt-1 text-2xl font-black text-purple-700 dark:text-purple-300 latin">
               {xp} <span className="text-xs font-normal">XP</span>
             </p>
           </div>
         </div>
+
+        {/* Streak Freeze Feature Card */}
+        <div className="rounded-2xl border border-sky-400/40 bg-sky-500/10 p-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-sky-500 text-white shadow-xs">
+              <Snowflake className="size-5" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-ink">حماية الشعلة (Streak Freeze ❄️)</p>
+              <p className="text-[11px] text-ink-soft">
+                {streakFreeze ? "مفعّلة — شعلتك في أمان لو فاتك يوم!" : "تحمي تتابعك من الضياع لو انشغلت يوماً"}
+              </p>
+            </div>
+          </div>
+          <Button
+            size="sm"
+            onClick={handleFreeze}
+            variant={streakFreeze ? "secondary" : "default"}
+            className={cn(
+              "h-8 rounded-full text-xs font-bold shrink-0",
+              streakFreeze
+                ? "bg-sky-200 text-sky-900 hover:bg-sky-300"
+                : "bg-sky-600 text-white hover:bg-sky-700"
+            )}
+          >
+            {streakFreeze ? "إلغاء التفعيل" : "تفعيل (50 XP)"}
+          </Button>
+        </div>
+        {freezeMsg && (
+          <p className="text-center text-xs font-semibold text-sky-600 dark:text-sky-400">
+            {freezeMsg}
+          </p>
+        )}
 
         {/* Companion Cheer */}
         <div className="rounded-2xl border border-line bg-paper/70 p-3 text-xs leading-relaxed text-ink flex items-center gap-3">

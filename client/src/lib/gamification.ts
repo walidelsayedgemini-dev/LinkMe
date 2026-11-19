@@ -61,6 +61,36 @@ export interface GamificationState {
   lastActiveDate: string; // YYYY-MM-DD
   xp: number;
   unlockedBadgeIds: string[];
+  streakFreeze?: boolean;
+}
+
+export function getLevelInfo(xp: number) {
+  const level = Math.floor(xp / 100) + 1;
+  const currentLevelXp = xp % 100;
+  const nextLevelXp = 100;
+  const progress = currentLevelXp / nextLevelXp;
+  return { level, currentLevelXp, nextLevelXp, progress };
+}
+
+export function toggleStreakFreeze(): { success: boolean; active: boolean; message: string } {
+  const state = getGamificationState();
+  if (state.streakFreeze) {
+    state.streakFreeze = false;
+    saveGamificationState(state);
+    return { success: true, active: false, message: "تم إلغاء تجميد الشعلة." };
+  }
+
+  // Equipping streak freeze costs 50 XP if xp >= 50
+  if (state.xp >= 50) {
+    state.xp -= 50;
+    state.streakFreeze = true;
+    saveGamificationState(state);
+    return { success: true, active: true, message: "تم تفعيل حماية الشعلة ❄️ بنجاح! شعلتك محمية ليوم إضافي." };
+  } else {
+    state.streakFreeze = true;
+    saveGamificationState(state);
+    return { success: true, active: true, message: "تم تفعيل حماية الشعلة ❄️ كهدية تشجيعية!" };
+  }
 }
 
 const STORAGE_KEY = "linkme_gamification_state";

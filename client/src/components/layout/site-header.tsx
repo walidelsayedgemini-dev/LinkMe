@@ -31,6 +31,8 @@ import { isSoundEnabled, setSoundEnabled, soundEffects } from "@/lib/sound-effec
 import { Logo } from "@/components/brand";
 import { UserAvatar } from "@/components/bits";
 import { Button } from "@/components/ui/button";
+import { PwaInstallPrompt } from "@/components/pwa-install-banner";
+import { useGamification } from "@/components/gamification-badges";
 import {
   Sheet,
   SheetContent,
@@ -66,6 +68,7 @@ const NAV = [
 export function SiteHeader() {
   const [location, navigate] = useLocation();
   const { user, logout } = useAuth();
+  const gamification = useGamification();
   const { theme, toggleTheme } = useTheme();
   const { companion, toggleCompanion, setIsModalOpen } = useCompanion();
   const [soundOn, setSoundOn] = useState(() => isSoundEnabled());
@@ -255,9 +258,14 @@ export function SiteHeader() {
               <DropdownMenuTrigger asChild>
                 <button
                   aria-label="قائمة حسابي"
-                  className="rounded-full border border-line bg-card p-1"
+                  className="rounded-full border border-line bg-card p-0.5 transition hover:scale-105"
                 >
-                  <UserAvatar name={user.name} src={user.avatarUrl} size={30} />
+                  <UserAvatar
+                    name={user.name}
+                    src={user.avatarUrl}
+                    size={30}
+                    xpProgress={(gamification.xp % 100) / 100}
+                  />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -443,6 +451,9 @@ export function SiteHeader() {
                       </Button>
                     </div>
                   )}
+                  <div className="pt-2">
+                    <PwaInstallPrompt compact />
+                  </div>
                   <Link
                     href="/contact"
                     onClick={() => setOpen(false)}
