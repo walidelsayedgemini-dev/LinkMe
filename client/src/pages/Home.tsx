@@ -35,6 +35,8 @@ import {
 import { useCompanion, CompanionAvatar, CompanionMotivationalBanner } from "@/components/companion";
 import { LiveActivityTicker } from "@/components/live-ticker";
 import { PwaInstallPrompt } from "@/components/pwa-install-banner";
+import { SlangChallengeCard } from "@/components/slang-challenge";
+import { SocialShareCardButton } from "@/components/social-share-card";
 import { trpc } from "@/lib/trpc";
 import { categoryIcon, FAQ_GROUPS } from "@/lib/content";
 
@@ -316,19 +318,30 @@ export default function Home() {
               );
             })}
           </div>
+
+          {/* Interactive Egyptian vs Native Slang Matcher */}
+          <SlangChallengeCard className="mt-8" />
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-iris/25 bg-gradient-to-l from-iris-soft/80 via-card to-sky-50/70 p-5 dark:from-iris-soft/40 dark:via-card dark:to-card">
-          <p className="text-sm font-medium leading-relaxed text-ink">
-            ليه Link Me؟ فهم وممارسة ومتابعة —{" "}
-            <span className="font-bold text-iris">رحلة ليها معنى.</span>
-          </p>
-          <Link
-            href="/about"
-            className="inline-flex items-center gap-2 rounded-full bg-iris px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-iris-deep"
-          >
-            اعرف المنصة وقيمها <ArrowLeft className="size-3.5" />
-          </Link>
+          <div className="space-y-1">
+            <p className="text-sm font-medium leading-relaxed text-ink">
+              ليه Link Me؟ فهم وممارسة ومتابعة —{" "}
+              <span className="font-bold text-iris">رحلة ليها معنى.</span>
+            </p>
+            <p className="text-xs text-ink-soft">
+              احفظ تقدمك، واستلم كارت إنجازاتك لمشاركته على واتساب وإنستجرام.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <SocialShareCardButton />
+            <Link
+              href="/about"
+              className="inline-flex items-center gap-2 rounded-full bg-iris px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-iris-deep"
+            >
+              اعرف المنصة وقيمها <ArrowLeft className="size-3.5" />
+            </Link>
+          </div>
         </div>
       </section>
       <section id="courses" className="home-section container">

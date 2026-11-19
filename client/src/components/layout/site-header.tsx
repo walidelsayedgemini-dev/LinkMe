@@ -32,6 +32,8 @@ import { Logo } from "@/components/brand";
 import { UserAvatar } from "@/components/bits";
 import { Button } from "@/components/ui/button";
 import { PwaInstallPrompt } from "@/components/pwa-install-banner";
+import { DailyMysteryChestHeaderButton } from "@/components/daily-mystery-chest";
+import { SocialShareCardButton } from "@/components/social-share-card";
 import { useGamification } from "@/components/gamification-badges";
 import {
   Sheet,
@@ -223,6 +225,9 @@ export function SiteHeader() {
             <Search className="size-[17px] sm:size-[18px]" />
           </button>
           <HeaderStreakIndicator className="hidden md:inline-flex" />
+          <div className="hidden sm:inline-flex">
+            <DailyMysteryChestHeaderButton />
+          </div>
           <NotificationBell />
           <button
             type="button"
@@ -453,6 +458,10 @@ export function SiteHeader() {
                   )}
                   <div className="pt-2">
                     <PwaInstallPrompt compact />
+                  </div>
+                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-line/60">
+                    <DailyMysteryChestHeaderButton />
+                    <SocialShareCardButton />
                   </div>
                   <Link
                     href="/contact"

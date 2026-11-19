@@ -36,6 +36,7 @@ import {
   LessonPrintCheatSheet,
   LessonQuickQuiz,
 } from "@/components/lesson-interactive-features";
+import { ShadowingChallenge } from "@/components/shadowing-challenge";
 
 export default function Learn() {
   const [, params] = useRoute("/learn/:slug");
@@ -360,6 +361,9 @@ export default function Learn() {
                   onPassed={() => awardXP(30)}
                 />
               )}
+
+              {/* Instant Accent Shadowing Challenge */}
+              <ShadowingChallenge className="mt-4" />
 
               {/* Actions */}
               <div className="flex flex-col gap-3 rounded-3xl border border-line bg-card p-5 sm:flex-row sm:items-center sm:justify-between">

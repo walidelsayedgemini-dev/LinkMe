@@ -24,6 +24,7 @@ import { trpc } from "@/lib/trpc";
 import { awardXP } from "@/lib/gamification";
 import { soundEffects } from "@/lib/sound-effects";
 import { triggerConfetti } from "@/lib/confetti";
+import { IncomingCallButton } from "@/components/incoming-call-modal";
 import { cn } from "@/lib/utils";
 import {
   ROLEPLAY_CATEGORIES,
@@ -582,16 +583,19 @@ export default function Roleplay() {
               </p>
             )}
 
-            <div className="flex items-center justify-between text-xs text-ink-soft">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-ink-soft">
               <span>
                 معروض <b className="latin text-ink">{Math.min(visibleCount, filteredScenarios.length)}</b>{" "}
                 من أصل <b className="latin text-iris">{filteredScenarios.length.toLocaleString()}</b> موقف
               </span>
-              {isVip && (
-                <span className="rounded-full bg-emerald-500/15 px-3 py-1 font-bold text-emerald-700 dark:text-emerald-300">
-                  👑 حساب PRO مفعّل — كل الـ 1,000 موقف مفتوحين لك!
-                </span>
-              )}
+              <div className="flex items-center gap-2">
+                <IncomingCallButton />
+                {isVip && (
+                  <span className="rounded-full bg-emerald-500/15 px-3 py-1 font-bold text-emerald-700 dark:text-emerald-300">
+                    👑 حساب PRO مفعّل
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
