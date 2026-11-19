@@ -38,6 +38,8 @@ import { PwaInstallPrompt } from "@/components/pwa-install-banner";
 import { SlangChallengeCard } from "@/components/slang-challenge";
 import { SocialShareCardButton } from "@/components/social-share-card";
 import { IncomingCallButton } from "@/components/incoming-call-modal";
+import { DailyMorningSprintButton } from "@/components/daily-morning-sprint";
+import { AIFluencyCoachButton } from "@/components/ai-fluency-coach";
 import { trpc } from "@/lib/trpc";
 import { categoryIcon, FAQ_GROUPS } from "@/lib/content";
 
@@ -223,7 +225,9 @@ export default function Home() {
               </h2>
             </div>
             <div className="flex flex-wrap items-center gap-2">
+              <DailyMorningSprintButton />
               <IncomingCallButton />
+              <AIFluencyCoachButton />
               <Link
                 href="/competitions"
                 className="inline-flex items-center gap-1.5 rounded-full border border-line bg-card px-4 py-2 text-xs font-bold text-ink shadow-xs transition-colors hover:border-iris hover:bg-iris hover:text-white dark:border-white/25 dark:bg-white/10 dark:text-white dark:hover:bg-white dark:hover:text-iris"
