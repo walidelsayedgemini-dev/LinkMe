@@ -247,7 +247,9 @@ export const catalogRouter = router({
       instructor: instructorRow ?? null,
       modules: moduleRows.map(module => ({
         ...module,
-        lessons: lessonRows.filter(lesson => lesson.moduleId === module.id).map(publicCurriculumLesson),
+        lessons: lessonRows
+          .filter(lesson => lesson.moduleId === module.id)
+          .map(lesson => publicCurriculumLesson(lesson, course.slug)),
       })),
       reviews: reviewRows,
       ratingDistribution: [5, 4, 3, 2, 1].map(stars => ({

@@ -287,8 +287,51 @@ export default function Learn() {
               {/* Content */}
               <div className="rounded-3xl border border-line bg-card p-6 sm:p-8">
                 <div className="prose-ar max-w-none">
-                  <ReactMarkdown>
-                    {lessonData.lesson.content?.trim() || (lessonData.lesson.videoUrl ? "### شوف تسجيل المحاضرة\n\nاتفرج على التسجيل، وطبّق الأمثلة مع المدرّس قبل ما تعلّم الدرس كمكتمل." : "### شرح الدرس لسه مش مرفوع\n\nالمدرّس محتاج يضيف محتوى الدرس وملفاته. ما تعتبرش الدرس مكتمل من غير شرح. تقدر تسأله من المحادثة عن موعد رفعه.")}
+                  <ReactMarkdown
+                    components={{
+                      h2: ({ children }) => (
+                        <h2 className="mt-8 mb-3 text-xl font-black text-ink dark:text-white border-b border-line/70 pb-2 flex items-center gap-2">
+                          {children}
+                        </h2>
+                      ),
+                      h3: ({ children }) => (
+                        <h3 className="mt-5 mb-2 text-base font-extrabold text-iris dark:text-sky-400">
+                          {children}
+                        </h3>
+                      ),
+                      table: ({ children }) => (
+                        <div className="my-5 overflow-x-auto rounded-2xl border border-line bg-card shadow-xs">
+                          <table className="w-full text-start text-sm divide-y divide-line">
+                            {children}
+                          </table>
+                        </div>
+                      ),
+                      th: ({ children }) => (
+                        <th className="bg-paper-deep px-4 py-3 font-bold text-ink dark:text-white text-start text-xs uppercase tracking-wider">
+                          {children}
+                        </th>
+                      ),
+                      td: ({ children }) => (
+                        <td className="px-4 py-3 text-sm text-ink-soft dark:text-slate-300 leading-relaxed border-t border-line/50">
+                          {children}
+                        </td>
+                      ),
+                      blockquote: ({ children }) => (
+                        <blockquote className="my-4 border-s-4 border-iris bg-iris/5 dark:bg-iris/15 px-4 py-3 rounded-e-2xl text-ink dark:text-white">
+                          {children}
+                        </blockquote>
+                      ),
+                      strong: ({ children }) => (
+                        <strong className="font-extrabold text-iris dark:text-amber-300">
+                          {children}
+                        </strong>
+                      ),
+                    }}
+                  >
+                    {lessonData.lesson.content?.trim() ||
+                      (lessonData.lesson.videoUrl
+                        ? "### شوف تسجيل المحاضرة\n\nاتفرج على التسجيل، وطبّق الأمثلة مع المدرّس قبل ما تعلّم الدرس كمكتمل."
+                        : "### شرح الدرس لسه مش مرفوع\n\nالمدرّس محتاج يضيف محتوى الدرس وملفاته. ما تعتبرش الدرس مكتمل من غير شرح. تقدر تسأله من المحادثة عن موعد رفعه.")}
                   </ReactMarkdown>
                 </div>
               </div>

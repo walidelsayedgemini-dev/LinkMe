@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { and, asc, count, desc, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { publicCurriculumLesson } from "../course-visibility";
+import { getLessonDetailedExplanation } from "../content/curriculum-data";
 import {
   categories,
   courses,
@@ -273,7 +274,9 @@ export const learningRouter = router({
         enrollment: enrollment ?? null,
         modules: moduleRows.map(module => ({
           ...module,
-          lessons: lessonRows.filter(lesson => lesson.moduleId === module.id).map(publicCurriculumLesson),
+          lessons: lessonRows
+            .filter(lesson => lesson.moduleId === module.id)
+            .map(lesson => publicCurriculumLesson(lesson, course.slug)),
         })),
         completedLessonIds: progressRows.map(row => row.lessonId),
         lastLessonId: enrollment?.lastLessonId ?? null,
@@ -334,7 +337,19 @@ export const learningRouter = router({
           .where(eq(enrollments.id, enrollment.id));
       }
 
-      return { lesson, course, unlocked, completed: Boolean(progress) };
+      const resolvedContent =
+        lesson.content?.trim() ||
+        getLessonDetailedExplanation(course.slug, lesson.title, lesson.position);
+
+      return {
+        lesson: {
+          ...lesson,
+          content: resolvedContent,
+        },
+        course,
+        unlocked,
+        completed: Boolean(progress),
+      };
     }),
 
   toggleLesson: protectedProcedure
