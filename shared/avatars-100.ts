@@ -12,12 +12,12 @@ export const AVATAR_CATEGORIES: {
   label: string;
   emoji: string;
 }[] = [
-  { id: "all", label: "الكل (100)", emoji: "✨" },
+  { id: "all", label: "الكل (100 أفتار 3D)", emoji: "✨" },
   { id: "pixar3d", label: "3D خاص بـ Link Me", emoji: "🎬" },
-  { id: "adventure", label: "أبطال المغامرة", emoji: "🎨" },
-  { id: "artistic", label: "بورتريهات فنية", emoji: "🌸" },
-  { id: "cartoon", label: "كرتون مرح", emoji: "😊" },
-  { id: "pro_vip", label: "ملكي وحصري PRO", emoji: "👑" },
+  { id: "adventure", label: "3D أبطال وطلاب", emoji: "🎓" },
+  { id: "artistic", label: "3D مهن وشخصيات", emoji: "💼" },
+  { id: "cartoon", label: "3D حيوانات لطيفة", emoji: "🐾" },
+  { id: "pro_vip", label: "3D ملكي وVIP PRO", emoji: "👑" },
 ];
 
 export const EXPANDED_AVATARS_87: AvatarPreset[] = [
@@ -105,7 +105,7 @@ export const EXPANDED_AVATARS_87: AvatarPreset[] = [
   { id: "pro_08", label: "فارس المجرة PRO", emoji: "🌌", imageUrl: "/avatars/pro_08.webp", bgClass: "from-purple-600 to-pink-500", category: "pro_vip", isPro: true },
   { id: "pro_09", label: "نجمة الألماس PRO", emoji: "💎", imageUrl: "/avatars/pro_09.webp", bgClass: "from-sky-400 to-indigo-500", category: "pro_vip", isPro: true },
   { id: "pro_10", label: "سيدة الأعمال PRO", emoji: "✨", imageUrl: "/avatars/pro_10.webp", bgClass: "from-amber-500 to-orange-600", category: "pro_vip", isPro: true },
-  { id: "pro_11", label: "حكيم اللغات PRO", emoji: "🦉", imageUrl: "/avatars/pro_11.webp", bgClass: "from-emerald-600 to-sky-600", category: "pro_vip", isPro: true },
+  { id: "pro_11", label: "حكيم اللغات 3D PRO", emoji: "🦉", imageUrl: "/avatars/owl.webp", bgClass: "from-emerald-600 to-sky-600", category: "pro_vip", isPro: true },
   { id: "pro_12", label: "أسطورة الزمرد PRO", emoji: "❇️", imageUrl: "/avatars/pro_12.webp", bgClass: "from-emerald-500 to-green-700", category: "pro_vip", isPro: true },
   { id: "pro_13", label: "بطل الذهب PRO", emoji: "🥇", imageUrl: "/avatars/pro_13.webp", bgClass: "from-yellow-500 to-orange-500", category: "pro_vip", isPro: true },
   { id: "pro_14", label: "ملكة الكاريزما PRO", emoji: "🌟", imageUrl: "/avatars/pro_14.webp", bgClass: "from-pink-500 to-violet-600", category: "pro_vip", isPro: true },

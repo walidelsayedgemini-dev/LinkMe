@@ -52,7 +52,7 @@ export const AVATAR_PRESETS: AvatarPreset[] = [
 ];
 
 const LEGACY_AVATAR_FALLBACK: Record<string, string> = {
-  owl: "book",
+  owl: "pro_11",
   fox: "lion",
   panda: "cat",
   tiger: "yassin_hero",
