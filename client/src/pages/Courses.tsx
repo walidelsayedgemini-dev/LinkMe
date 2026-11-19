@@ -46,6 +46,11 @@ export default function Courses() {
 
   useEffect(() => setSearchInput(q), [q]);
 
+  // Scroll to top smoothly when page changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [page]);
+
   const update = (patch: Record<string, string | number | undefined>) => {
     const next = new URLSearchParams(params.toString());
     Object.entries(patch).forEach(([key, value]) => {
@@ -54,6 +59,7 @@ export default function Courses() {
     });
     if (!("page" in patch)) next.delete("page");
     navigate(`/courses${next.toString() ? `?${next.toString()}` : ""}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const { data: categories } = trpc.catalog.categories.useQuery();
@@ -71,6 +77,23 @@ export default function Courses() {
   });
 
   const totalPages = Math.max(1, Math.ceil((data?.total ?? 0) / 9));
+  const paginationItems = useMemo(() => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    const items: (number | "...")[] = [];
+    const left = Math.max(2, page - 1);
+    const right = Math.min(totalPages - 1, page + 1);
+
+    items.push(1);
+    if (left > 2) items.push("...");
+    for (let i = left; i <= right; i++) {
+      items.push(i);
+    }
+    if (right < totalPages - 1) items.push("...");
+    items.push(totalPages);
+    return items;
+  }, [page, totalPages]);
   const activeFilters = [
     category && { key: "category", label: categories?.find(item => item.slug === category)?.nameAr ?? category },
     instructor && { key: "instructor", label: instructors?.find(item => item.slug === instructor)?.name ?? instructor },
@@ -233,7 +256,10 @@ export default function Courses() {
                 <h2 className="text-sm font-bold text-ink">الفلاتر</h2>
                 {activeFilters.length > 0 && (
                   <button
-                    onClick={() => navigate("/courses")}
+                    onClick={() => {
+                      navigate("/courses");
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
                     className="text-xs text-ink-soft underline-offset-2 hover:text-ink hover:underline"
                   >
                     مسح الكل
@@ -262,10 +288,10 @@ export default function Courses() {
                 <select
                   value={sort}
                   onChange={event => update({ sort: event.target.value })}
-                  className="h-9 rounded-full border border-line bg-card px-3 text-xs text-ink focus:border-ink focus:outline-none"
+                  className="h-9 rounded-full border border-line bg-card px-3 text-xs text-ink focus:border-ink focus:outline-none dark:bg-[#0b1736] dark:text-white dark:border-white/20"
                 >
                   {SORTS.map(item => (
-                    <option key={item.value} value={item.value}>
+                    <option key={item.value} value={item.value} className="bg-card text-ink dark:bg-[#0b1736] dark:text-white font-medium">
                       {item.label}
                     </option>
                   ))}
@@ -283,7 +309,14 @@ export default function Courses() {
               <div className="rounded-3xl border border-dashed border-ink/20 bg-card/60 p-16 text-center">
                 <p className="text-lg font-semibold text-ink">لا توجد كورسات مطابقة</p>
                 <p className="mt-2 text-sm text-ink-soft">جرّب مسح بعض الفلاتر أو البحث بكلمة أخرى.</p>
-                <Button variant="outline" className="mt-6 rounded-full border-ink/20" onClick={() => navigate("/courses")}>
+                <Button
+                  variant="outline"
+                  className="mt-6 rounded-full border-ink/20"
+                  onClick={() => {
+                    navigate("/courses");
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                >
                   عرض كل الكورسات
                 </Button>
               </div>
@@ -298,40 +331,60 @@ export default function Courses() {
                 </div>
 
                 {totalPages > 1 && (
-                  <div className="mt-10 flex items-center justify-center gap-2">
+                  <nav aria-label="تنقل صفحات الكورسات" className="mt-10 flex flex-wrap items-center justify-center gap-2">
                     <Button
                       variant="outline"
                       size="icon"
-                      className="rounded-full border-ink/20"
+                      className="rounded-full border-ink/20 transition-transform active:scale-95"
                       disabled={page <= 1}
-                      onClick={() => update({ page: page - 1 })}
-                      aria-label="السابق"
+                      onClick={() => {
+                        update({ page: page - 1 });
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      aria-label="الصفحة السابقة"
                     >
                       <ChevronRight className="size-4" />
                     </Button>
-                    {Array.from({ length: totalPages }).map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => update({ page: index + 1 })}
-                        className={cn(
-                          "latin size-9 rounded-full text-sm font-medium transition-colors",
-                          page === index + 1 ? "bg-iris text-white" : "text-ink-soft hover:bg-ink/5",
-                        )}
-                      >
-                        {index + 1}
-                      </button>
-                    ))}
+                    {paginationItems.map((item, index) =>
+                      item === "..." ? (
+                        <span key={`dots-${index}`} className="latin px-2 text-sm text-ink-soft select-none">
+                          …
+                        </span>
+                      ) : (
+                        <button
+                          key={item}
+                          type="button"
+                          onClick={() => {
+                            update({ page: item });
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                          className={cn(
+                            "latin size-9 rounded-full text-sm font-medium transition-all duration-200",
+                            page === item
+                              ? "bg-iris text-white shadow-md shadow-iris/25 font-bold scale-105"
+                              : "text-ink-soft hover:bg-ink/5 hover:text-ink",
+                          )}
+                          aria-current={page === item ? "page" : undefined}
+                          aria-label={`انتقل إلى صفحة ${item}`}
+                        >
+                          {item}
+                        </button>
+                      ),
+                    )}
                     <Button
                       variant="outline"
                       size="icon"
-                      className="rounded-full border-ink/20"
+                      className="rounded-full border-ink/20 transition-transform active:scale-95"
                       disabled={page >= totalPages}
-                      onClick={() => update({ page: page + 1 })}
-                      aria-label="التالي"
+                      onClick={() => {
+                        update({ page: page + 1 });
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      aria-label="الصفحة التالية"
                     >
                       <ChevronLeft className="size-4" />
                     </Button>
-                  </div>
+                  </nav>
                 )}
               </>
             )}
