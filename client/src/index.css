@@ -160,6 +160,17 @@
     overflow-x: clip;
     max-width: 100%;
   }
+  select option {
+    background-color: #ffffff;
+    color: #0a1b33;
+    font-weight: 600;
+  }
+  .dark select option,
+  .dark option {
+    background-color: #0f1b2d !important;
+    color: #f3f7ff !important;
+    font-weight: 600;
+  }
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);

@@ -58,7 +58,7 @@ export const UNIQUE_SCENARIO_PHOTOS = [
   "/img/hero.webp",
   "/img/ielts.webp",
   "/img/mall.webp",
-  "/img/oneonone.webp",
+  "/img/ui/tool-roleplay.webp",
   "/img/online.webp",
   "/img/pronunciation.webp",
   "/img/travel.webp",
@@ -72,7 +72,7 @@ export const CATEGORY_SCENARIO_PHOTOS: Record<string, string[]> = {
     "/img/scenarios/scenario-5.webp",
     "/img/scenarios/scenario-9.webp",
     "/img/scenarios/scenario-13.webp",
-    "/img/oneonone.webp",
+    "/img/ui/tool-roleplay.webp",
   ],
   travel: [
     "/img/travel.webp",

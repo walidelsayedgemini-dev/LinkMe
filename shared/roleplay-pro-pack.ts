@@ -531,7 +531,7 @@ export const ROLEPLAY_PRO_EXPANSION: RoleplayScenario[] = [
   },
   {
     id: "performance-review-pro",
-    imageUrl: "/img/oneonone.webp",
+    imageUrl: "/img/scenarios/scenario-14.webp",
     category: "work",
     titleAr: "جلسة التقييم والرد على النقد البنّاء",
     titleEn: "Handling Constructive Feedback",

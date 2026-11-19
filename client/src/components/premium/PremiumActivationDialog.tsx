@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { BadgeCheck, Calculator, ShieldCheck } from "lucide-react";
+import { BadgeCheck, Calculator, Calendar, CheckCircle2, Crown, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import {
   ASSESSMENT_LEVELS,
@@ -24,6 +24,7 @@ import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { formatPrice } from "@/lib/format";
 import { inputClass } from "@/pages/auth-layout";
+import { cn } from "@/lib/utils";
 
 export type PremiumActivationDialogProps = {
   userId: number;
@@ -135,19 +136,68 @@ export function PremiumActivationDialog({
             </div>
           </div>
           <div>
-            <Label className="mb-2 block">مدة العضوية</Label>
-            <div className="grid grid-cols-2 gap-2">
-              {PREMIUM_DURATIONS.map(duration => (
-                <button
-                  key={duration}
-                  type="button"
-                  className={`premium-duration-choice ${durationDays === duration ? "premium-duration-choice-selected" : ""}`}
-                  onClick={() => setDurationDays(duration)}
-                >
-                  <span className="latin">{duration}</span> يوم
-                  {duration === 365 && <small>لخطة السنة</small>}
-                </button>
-              ))}
+            <Label className="mb-2.5 block text-sm font-bold text-ink">
+              مدة العضوية (اختر شهري أو سنوي)
+            </Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {PREMIUM_DURATIONS.map(duration => {
+                const isSelected = durationDays === duration;
+                const isYearly = duration === 365;
+                return (
+                  <button
+                    key={duration}
+                    type="button"
+                    onClick={() => setDurationDays(duration)}
+                    className={cn(
+                      "relative flex items-center justify-between rounded-2xl border-2 p-3.5 text-start transition-all cursor-pointer",
+                      isSelected
+                        ? "border-iris bg-iris/15 text-white shadow-md shadow-iris/10 ring-2 ring-iris/40 dark:bg-iris/20"
+                        : "border-line bg-card/60 text-ink-soft hover:border-iris/40 hover:bg-card"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      {/* Active Radio Pill */}
+                      <div
+                        className={cn(
+                          "flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-all",
+                          isSelected
+                            ? "border-iris bg-iris text-white"
+                            : "border-line bg-transparent"
+                        )}
+                      >
+                        {isSelected && <span className="size-2 rounded-full bg-white" />}
+                      </div>
+
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          {isYearly ? (
+                            <Crown className={cn("size-4 shrink-0", isSelected ? "text-amber-400" : "text-ink-soft")} />
+                          ) : (
+                            <Calendar className={cn("size-4 shrink-0", isSelected ? "text-iris" : "text-ink-soft")} />
+                          )}
+                          <span className="font-extrabold text-sm text-ink">
+                            {isYearly ? "365 يوم (سنة كاملة)" : "30 يوم (شهري)"}
+                          </span>
+                          {isYearly && (
+                            <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-extrabold text-amber-600 dark:text-amber-300 border border-amber-500/30">
+                              خطة السنة 👑
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-0.5 text-[11px] text-ink-soft">
+                          {isYearly
+                            ? "سنة كاملة من التدريب والوصول غير المحدود"
+                            : "عضوية قياسية تتجدد شهرياً (30 يوم)"}
+                        </p>
+                      </div>
+                    </div>
+
+                    {isSelected && (
+                      <CheckCircle2 className="size-5 shrink-0 text-iris" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
           <div className="premium-price-summary">
@@ -178,14 +228,14 @@ export function PremiumActivationDialog({
             <label className="space-y-1.5 text-sm">
               <span className="font-medium text-ink">مرشد مسجّل (اختياري)</span>
               <select
-                className={inputClass}
+                className={cn(inputClass, "dark:bg-[#0b1736] dark:text-white")}
                 value={coachUserId}
                 disabled={staff.isLoading || staff.isError}
                 onChange={event => setCoachUserId(event.target.value)}
               >
-                <option value="">من غير تعيين دلوقتي</option>
+                <option value="" className="bg-white text-slate-900 dark:bg-[#0b1736] dark:text-white">من غير تعيين دلوقتي</option>
                 {coachCandidates.map(coach => (
-                  <option key={coach.id} value={coach.id}>
+                  <option key={coach.id} value={coach.id} className="bg-white text-slate-900 dark:bg-[#0b1736] dark:text-white">
                     {coach.name ?? `حساب ${coach.id}`}
                   </option>
                 ))}

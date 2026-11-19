@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "wouter";
 import {
   Phone,
   PhoneOff,
@@ -11,6 +12,9 @@ import {
   CheckCircle2,
   Clock,
   User,
+  Crown,
+  Zap,
+  ArrowRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -18,6 +22,8 @@ import {
   DialogContent,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { trpc } from "@/lib/trpc";
 import { awardXP } from "@/lib/gamification";
 import { soundEffects } from "@/lib/sound-effects";
 import { triggerConfetti } from "@/lib/confetti";
@@ -134,6 +140,12 @@ export function IncomingCallModal({
   onOpenChange: (open: boolean) => void;
   scenario?: CallScenario;
 }) {
+  const { user } = useAuth();
+  const { data: gameProfile } = trpc.community.myGameProfile.useQuery(undefined, {
+    enabled: Boolean(user),
+  });
+  const isVip = Boolean(gameProfile?.isVip);
+
   const [callState, setCallState] = useState<"ringing" | "connected" | "ended">("ringing");
   const [duration, setDuration] = useState(0);
   const [turnIndex, setTurnIndex] = useState(0);
@@ -226,7 +238,9 @@ export function IncomingCallModal({
     }
 
     setTimeout(() => {
-      if (turnIndex + 1 < scenario.turns.length) {
+      // Free users get 1 turn teaser, PRO users get all turns
+      const isTeaserFinished = !isVip && turnIndex >= 0;
+      if (!isTeaserFinished && turnIndex + 1 < scenario.turns.length) {
         setTurnIndex(i => i + 1);
         setSelectedOption(null);
       } else {
@@ -234,8 +248,12 @@ export function IncomingCallModal({
         setCallState("ended");
         soundEffects.playTrophy();
         triggerConfetti(3000);
-        awardXP(50);
-        toast.success("أنهيت المكالمة بنجاح وحققت +50 XP! 🏆");
+        awardXP(isVip ? 50 : 25);
+        if (!isVip) {
+          toast.success("أنهيت الجولة التجريبية المجانية بنجاح! 🎁");
+        } else {
+          toast.success("أنهيت المكالمة بنجاح وحققت +50 XP! 🏆");
+        }
       }
     }, 2000);
   };
@@ -260,10 +278,19 @@ export function IncomingCallModal({
               className="pointer-events-none absolute inset-x-0 top-1/4 mx-auto size-48 rounded-full bg-emerald-500/15 blur-3xl animate-pulse"
             />
 
-            <div className="space-y-1">
+            <div className="space-y-1.5 flex flex-col items-center">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-3 py-1 text-xs font-bold text-emerald-300">
                 <PhoneCall className="size-3.5 animate-bounce" /> {scenario.callerLocation}
               </span>
+              {isVip ? (
+                <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-500/15 px-2.5 py-0.5 text-[10px] font-extrabold text-amber-300">
+                  <Crown className="size-3 text-amber-400" /> ميزة PRO: مكالمات غير محدودة
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 rounded-full border border-sky-400/30 bg-sky-500/15 px-2.5 py-0.5 text-[10px] font-extrabold text-sky-300">
+                  🎁 تجربة مجانية: جولة واحدة تليفونية
+                </span>
+              )}
             </div>
 
             {/* Caller Identity */}
@@ -287,7 +314,7 @@ export function IncomingCallModal({
                   type="button"
                   onClick={handleDecline}
                   aria-label="رفض المكالمة"
-                  className="flex size-16 items-center justify-center rounded-full bg-destructive text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
+                  className="flex size-16 items-center justify-center rounded-full bg-destructive text-white shadow-lg transition-transform hover:scale-105 active:scale-95 cursor-pointer"
                 >
                   <PhoneOff className="size-7" />
                 </button>
@@ -300,7 +327,7 @@ export function IncomingCallModal({
                   type="button"
                   onClick={handleAnswer}
                   aria-label="رد على المكالمة"
-                  className="relative flex size-16 items-center justify-center rounded-full bg-emerald-600 text-white shadow-[0_0_30px_rgba(16,185,129,0.5)] transition-transform hover:scale-110 active:scale-95 animate-bounce"
+                  className="relative flex size-16 items-center justify-center rounded-full bg-emerald-600 text-white shadow-[0_0_30px_rgba(16,185,129,0.5)] transition-transform hover:scale-110 active:scale-95 animate-bounce cursor-pointer"
                 >
                   <Phone className="size-7" />
                 </button>
@@ -332,24 +359,35 @@ export function IncomingCallModal({
                 type="button"
                 onClick={() => speak(currentTurn.promptEn)}
                 aria-label="إعادة سماع الجملة"
-                className="rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
+                className="rounded-full bg-white/10 p-2 text-white hover:bg-white/20 cursor-pointer"
                 title="إعادة سماع الجملة"
               >
                 <Volume2 className="size-4" />
               </button>
             </div>
 
-            {/* Caller Spoken Bubble with Audio Wave Simulation */}
-            <div className="my-4 rounded-2xl border border-iris/40 bg-iris-deep/30 p-4">
+            {/* Free Teaser Notice Pill */}
+            {!isVip && (
+              <div className="my-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-center text-[11px] font-bold text-amber-300">
+                🎁 جولة تجريبية مجانية • اشترك في PRO لفتح المكالمة الكاملة والممتدة 👑
+              </div>
+            )}
+
+            {/* Caller Spoken Bubble with Multi-band Sound Wave Visualizer */}
+            <div className="my-3 rounded-2xl border border-iris/40 bg-iris-deep/30 p-4">
               <div className="mb-2 flex items-center justify-between">
                 <span className="text-[11px] font-bold text-iris-soft">
                   {scenario.callerName} بيتكلم:
                 </span>
-                {/* 3 Animated Sound Bars */}
+                {/* 7-Band Animated Sound Spectrum Bars */}
                 <div className="flex items-center gap-1">
                   <span className="h-3 w-1 rounded-full bg-emerald-400 animate-pulse" />
                   <span className="h-5 w-1 rounded-full bg-emerald-400 animate-bounce" />
-                  <span className="h-2 w-1 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="h-3.5 w-1 rounded-full bg-emerald-400 animate-pulse delay-75" />
+                  <span className="h-6 w-1 rounded-full bg-emerald-300 animate-bounce delay-150" />
+                  <span className="h-4 w-1 rounded-full bg-emerald-400 animate-pulse delay-100" />
+                  <span className="h-2.5 w-1 rounded-full bg-emerald-400 animate-bounce delay-200" />
+                  <span className="h-2 w-1 rounded-full bg-emerald-500 animate-pulse" />
                 </div>
               </div>
               <p className="latin font-bold text-white text-sm leading-relaxed" dir="ltr">
@@ -375,7 +413,7 @@ export function IncomingCallModal({
                       disabled={selectedOption !== null}
                       onClick={() => handlePickOption(i, opt.isBest)}
                       className={cn(
-                        "latin w-full rounded-2xl border p-3.5 text-start font-semibold text-xs leading-relaxed transition-all active:scale-98",
+                        "latin w-full rounded-2xl border p-3.5 text-start font-semibold text-xs leading-relaxed transition-all active:scale-98 cursor-pointer",
                         selectedOption === null &&
                           "border-white/15 bg-white/5 hover:border-iris hover:bg-white/10 text-white",
                         isPicked &&
@@ -400,27 +438,83 @@ export function IncomingCallModal({
             {/* End Call Bar */}
             <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3">
               <span className="text-xs text-white/60">
-                الجولة {turnIndex + 1} من {scenario.turns.length}
+                {isVip
+                  ? `الجولة ${turnIndex + 1} من ${scenario.turns.length}`
+                  : `جولة تجريبية (1 من 1) 🎁`}
               </span>
               <Button
                 type="button"
                 onClick={handleDecline}
                 size="sm"
-                className="rounded-full bg-destructive text-white hover:bg-destructive/90 text-xs font-bold"
+                className="rounded-full bg-destructive text-white hover:bg-destructive/90 text-xs font-bold cursor-pointer"
               >
                 <PhoneOff className="me-1.5 size-3.5" /> إنهاء المكالمة
               </Button>
             </div>
           </div>
+        ) : !isVip ? (
+          /* ================= FREE TEASER CONVERSION SCREEN ================= */
+          <div className="p-6 text-center space-y-4">
+            <div className="relative mx-auto flex size-20 items-center justify-center rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/20 text-amber-400 border border-amber-400/40 shadow-[0_0_30px_rgba(245,158,11,0.25)]">
+              <Crown className="size-10 text-amber-400 animate-pulse" />
+            </div>
+
+            <div className="space-y-1.5">
+              <span className="rounded-full bg-amber-500/15 border border-amber-400/30 px-3 py-1 text-xs font-extrabold text-amber-300">
+                🎁 انتهت الجولة التجريبية المجانية بنجاح!
+              </span>
+              <h3 className="text-xl font-black text-white">
+                عاش على ردك التليفوني الذكي! 👏
+              </h3>
+              <p className="text-xs leading-relaxed text-white/70 max-w-sm mx-auto">
+                ميزة المكالمات الهاتفية الكاملة متعددة الجولات بجميع السيناريوهات واللكنات العالمية حصرية لمشتركي باقة <b className="text-amber-300">PRO 👑</b>.
+              </p>
+            </div>
+
+            {/* PRO Perks List */}
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-3.5 text-start space-y-2 text-xs">
+              <div className="flex items-center gap-2 text-white/90">
+                <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
+                <span>مكالمات تليفونية صوتية غير محدودة وبدون أي قيود</span>
+              </div>
+              <div className="flex items-center gap-2 text-white/90">
+                <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
+                <span>محاكاة كاملة لمقابلات العمل (HR & Tech Interviews)</span>
+              </div>
+              <div className="flex items-center gap-2 text-white/90">
+                <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
+                <span>تقييم لحظي لنبرة الصوت وسرعة البديهة والطلاقة</span>
+              </div>
+            </div>
+
+            <div className="space-y-2 pt-1">
+              <Button
+                asChild
+                className="w-full rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 font-extrabold text-white shadow-lg hover:from-amber-600 hover:to-orange-600 py-5 text-sm cursor-pointer"
+              >
+                <Link href="/pricing" onClick={() => onOpenChange(false)}>
+                  <Crown className="me-2 size-4" /> افتح كل المكالمات في باقة PRO 👑
+                </Link>
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => onOpenChange(false)}
+                className="w-full text-xs text-white/60 hover:text-white hover:bg-white/5 rounded-full"
+              >
+                تم والمتابعة في النسخة المجانية
+              </Button>
+            </div>
+          </div>
         ) : (
-          /* ================= CALL SUMMARY EVALUATION ================= */
+          /* ================= PRO FULL CELEBRATION SUMMARY ================= */
           <div className="p-6 text-center space-y-4">
             <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-400/40">
               <Trophy className="size-10" />
             </div>
 
             <h3 className="text-xl font-black text-white">
-              أحسنت! أنهيت المكالمة بنجاح 📞
+              أحسنت! أنهيت المكالمة كاملة بنجاح 📞
             </h3>
             <p className="text-xs text-white/70">
               تجاوزت رهبة المكالمات الإنجليزية وتواصلت باحترافية مع {scenario.callerName}.
@@ -441,7 +535,7 @@ export function IncomingCallModal({
             <Button
               type="button"
               onClick={() => onOpenChange(false)}
-              className="w-full rounded-full bg-iris font-bold text-white hover:bg-iris-deep"
+              className="w-full rounded-full bg-iris font-bold text-white hover:bg-iris-deep py-5 cursor-pointer"
             >
               تم ومتابعة المواقف 🚀
             </Button>
@@ -461,6 +555,11 @@ export function IncomingCallButton({
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const { user } = useAuth();
+  const { data: gameProfile } = trpc.community.myGameProfile.useQuery(undefined, {
+    enabled: Boolean(user),
+  });
+  const isVip = Boolean(gameProfile?.isVip);
 
   return (
     <>
@@ -471,12 +570,15 @@ export function IncomingCallButton({
           setOpen(true);
         }}
         className={cn(
-          "inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/15 px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-300 transition hover:scale-105 active:scale-95 shadow-xs",
+          "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition hover:scale-105 active:scale-95 shadow-xs cursor-pointer",
+          isVip
+            ? "border-amber-500/40 bg-gradient-to-r from-amber-500/15 to-orange-500/15 text-amber-800 dark:text-amber-300"
+            : "border-emerald-500/40 bg-emerald-500/15 text-emerald-800 dark:text-emerald-300",
           className
         )}
       >
-        <PhoneCall className="size-3.5 text-emerald-500 animate-pulse" />
-        <span>وضع المكالمة الهاتفية 📞</span>
+        <PhoneCall className={cn("size-3.5 animate-pulse", isVip ? "text-amber-500" : "text-emerald-500")} />
+        <span>{isVip ? "مكالمة تليفونية PRO 👑" : "مكالمة تليفونية (تجربة مجانية 🎁)"}</span>
       </button>
 
       <IncomingCallModal open={open} onOpenChange={setOpen} scenario={scenario} />

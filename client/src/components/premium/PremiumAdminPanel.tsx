@@ -84,29 +84,35 @@ export function PremiumAdminPanel({ userId }: { userId?: number }) {
         />
       )}
       <div className="premium-filter-bar">
-        <label>
-          <span>الحالة</span>
+        <label className="text-xs font-bold text-ink-soft">
+          <span className="mb-1 block">الحالة</span>
           <select
             value={status}
             onChange={event => setStatus(event.target.value as typeof status)}
+            className="h-10 min-w-[160px] rounded-xl border border-line bg-card px-3 text-xs font-bold text-ink shadow-xs focus:border-iris focus:outline-none dark:bg-[#0b1736] dark:text-white"
           >
-            <option value="">كل الحالات</option>
+            <option value="" className="bg-white text-slate-900 dark:bg-[#0b1736] dark:text-white font-bold py-1">
+              كل الحالات
+            </option>
             {(Object.keys(STATUS_LABELS) as PremiumStatus[]).map(item => (
-              <option key={item} value={item}>
+              <option key={item} value={item} className="bg-white text-slate-900 dark:bg-[#0b1736] dark:text-white font-bold py-1">
                 {STATUS_LABELS[item]}
               </option>
             ))}
           </select>
         </label>
-        <label>
-          <span>المستوى</span>
+        <label className="text-xs font-bold text-ink-soft">
+          <span className="mb-1 block">المستوى</span>
           <select
             value={level}
             onChange={event => setLevel(event.target.value as typeof level)}
+            className="h-10 min-w-[160px] rounded-xl border border-line bg-card px-3 text-xs font-bold text-ink shadow-xs focus:border-iris focus:outline-none dark:bg-[#0b1736] dark:text-white"
           >
-            <option value="">كل المستويات</option>
+            <option value="" className="bg-white text-slate-900 dark:bg-[#0b1736] dark:text-white font-bold py-1">
+              كل المستويات
+            </option>
             {ASSESSMENT_LEVELS.map(item => (
-              <option key={item} value={item}>
+              <option key={item} value={item} className="bg-white text-slate-900 dark:bg-[#0b1736] dark:text-white font-bold py-1">
                 {item}
               </option>
             ))}

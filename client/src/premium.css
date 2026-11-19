@@ -918,6 +918,21 @@
   background: var(--color-background);
   color: var(--color-ink);
   font: inherit;
+  color-scheme: light dark;
+}
+.premium-filter-bar select option,
+.premium-coach-assign select option,
+select option {
+  background-color: #ffffff;
+  color: #0b1736;
+  font-weight: 600;
+  padding: 0.5rem;
+}
+.dark .premium-filter-bar select option,
+.dark .premium-coach-assign select option,
+.dark select option {
+  background-color: #0b1736 !important;
+  color: #ffffff !important;
 }
 .premium-members-list {
   display: grid;

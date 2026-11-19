@@ -2898,7 +2898,7 @@
         ]
       }
     ],
-    "imageUrl": "/img/oneonone.webp"
+    "imageUrl": "/img/scenarios/scenario-14.webp"
   },
   {
     "id": "rp-a1-001",
@@ -6262,7 +6262,7 @@
     "accent": "from-emerald-500 to-teal-600",
     "rewardXp": 30,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-15.webp",
     "turns": [
       {
         "id": "t1",
@@ -9746,7 +9746,7 @@
     "accent": "from-emerald-500 to-teal-600",
     "rewardXp": 30,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-16.webp",
     "turns": [
       {
         "id": "t1",
@@ -13230,7 +13230,7 @@
     "accent": "from-emerald-500 to-teal-600",
     "rewardXp": 30,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-7.webp",
     "turns": [
       {
         "id": "t1",
@@ -16714,7 +16714,7 @@
     "accent": "from-emerald-500 to-teal-600",
     "rewardXp": 30,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-8.webp",
     "turns": [
       {
         "id": "t1",
@@ -20198,7 +20198,7 @@
     "accent": "from-emerald-500 to-teal-600",
     "rewardXp": 30,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-12.webp",
     "turns": [
       {
         "id": "t1",
@@ -23682,7 +23682,7 @@
     "accent": "from-emerald-500 to-teal-600",
     "rewardXp": 30,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-14.webp",
     "turns": [
       {
         "id": "t1",
@@ -27142,7 +27142,7 @@
     "accent": "from-sky-500 to-blue-600",
     "rewardXp": 40,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-15.webp",
     "turns": [
       {
         "id": "t1",
@@ -30574,7 +30574,7 @@
     "accent": "from-sky-500 to-blue-600",
     "rewardXp": 40,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-16.webp",
     "turns": [
       {
         "id": "t1",
@@ -34006,7 +34006,7 @@
     "accent": "from-sky-500 to-blue-600",
     "rewardXp": 40,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-7.webp",
     "turns": [
       {
         "id": "t1",
@@ -37438,7 +37438,7 @@
     "accent": "from-sky-500 to-blue-600",
     "rewardXp": 40,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-8.webp",
     "turns": [
       {
         "id": "t1",
@@ -40870,7 +40870,7 @@
     "accent": "from-sky-500 to-blue-600",
     "rewardXp": 40,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-12.webp",
     "turns": [
       {
         "id": "t1",
@@ -44302,7 +44302,7 @@
     "accent": "from-sky-500 to-blue-600",
     "rewardXp": 40,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-14.webp",
     "turns": [
       {
         "id": "t1",
@@ -47734,7 +47734,7 @@
     "accent": "from-indigo-500 to-blue-700",
     "rewardXp": 50,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-15.webp",
     "turns": [
       {
         "id": "t1",
@@ -51166,7 +51166,7 @@
     "accent": "from-indigo-500 to-blue-700",
     "rewardXp": 50,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-16.webp",
     "turns": [
       {
         "id": "t1",
@@ -54598,7 +54598,7 @@
     "accent": "from-indigo-500 to-blue-700",
     "rewardXp": 50,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-7.webp",
     "turns": [
       {
         "id": "t1",
@@ -58030,7 +58030,7 @@
     "accent": "from-indigo-500 to-blue-700",
     "rewardXp": 50,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-8.webp",
     "turns": [
       {
         "id": "t1",
@@ -61462,7 +61462,7 @@
     "accent": "from-indigo-500 to-blue-700",
     "rewardXp": 50,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-12.webp",
     "turns": [
       {
         "id": "t1",
@@ -64894,7 +64894,7 @@
     "accent": "from-indigo-500 to-blue-700",
     "rewardXp": 50,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-14.webp",
     "turns": [
       {
         "id": "t1",
@@ -68326,7 +68326,7 @@
     "accent": "from-indigo-500 to-blue-700",
     "rewardXp": 50,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-15.webp",
     "turns": [
       {
         "id": "t1",
@@ -71758,7 +71758,7 @@
     "accent": "from-violet-500 to-purple-700",
     "rewardXp": 65,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-16.webp",
     "turns": [
       {
         "id": "t1",
@@ -75190,7 +75190,7 @@
     "accent": "from-violet-500 to-purple-700",
     "rewardXp": 65,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-7.webp",
     "turns": [
       {
         "id": "t1",
@@ -78622,7 +78622,7 @@
     "accent": "from-violet-500 to-purple-700",
     "rewardXp": 65,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-8.webp",
     "turns": [
       {
         "id": "t1",
@@ -82054,7 +82054,7 @@
     "accent": "from-violet-500 to-purple-700",
     "rewardXp": 65,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-12.webp",
     "turns": [
       {
         "id": "t1",
@@ -85486,7 +85486,7 @@
     "accent": "from-violet-500 to-purple-700",
     "rewardXp": 65,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-14.webp",
     "turns": [
       {
         "id": "t1",
@@ -88918,7 +88918,7 @@
     "accent": "from-violet-500 to-purple-700",
     "rewardXp": 65,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-15.webp",
     "turns": [
       {
         "id": "t1",
@@ -92350,7 +92350,7 @@
     "accent": "from-amber-500 to-orange-600",
     "rewardXp": 80,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-16.webp",
     "turns": [
       {
         "id": "t1",
@@ -95782,7 +95782,7 @@
     "accent": "from-amber-500 to-orange-600",
     "rewardXp": 80,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-7.webp",
     "turns": [
       {
         "id": "t1",
@@ -99214,7 +99214,7 @@
     "accent": "from-amber-500 to-orange-600",
     "rewardXp": 80,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-8.webp",
     "turns": [
       {
         "id": "t1",
@@ -102646,7 +102646,7 @@
     "accent": "from-amber-500 to-orange-600",
     "rewardXp": 80,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-12.webp",
     "turns": [
       {
         "id": "t1",
@@ -106078,7 +106078,7 @@
     "accent": "from-amber-500 to-orange-600",
     "rewardXp": 80,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-14.webp",
     "turns": [
       {
         "id": "t1",
@@ -109510,7 +109510,7 @@
     "accent": "from-amber-500 to-orange-600",
     "rewardXp": 80,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-15.webp",
     "turns": [
       {
         "id": "t1",
@@ -112942,7 +112942,7 @@
     "accent": "from-rose-600 to-amber-600",
     "rewardXp": 100,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-16.webp",
     "turns": [
       {
         "id": "t1",
@@ -116374,7 +116374,7 @@
     "accent": "from-rose-600 to-amber-600",
     "rewardXp": 100,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-7.webp",
     "turns": [
       {
         "id": "t1",
@@ -119806,7 +119806,7 @@
     "accent": "from-rose-600 to-amber-600",
     "rewardXp": 100,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-8.webp",
     "turns": [
       {
         "id": "t1",
@@ -123238,7 +123238,7 @@
     "accent": "from-rose-600 to-amber-600",
     "rewardXp": 100,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-12.webp",
     "turns": [
       {
         "id": "t1",
@@ -126670,7 +126670,7 @@
     "accent": "from-rose-600 to-amber-600",
     "rewardXp": 100,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-14.webp",
     "turns": [
       {
         "id": "t1",
@@ -130102,7 +130102,7 @@
     "accent": "from-rose-600 to-amber-600",
     "rewardXp": 100,
     "isPro": true,
-    "imageUrl": "/img/oneonone.webp",
+    "imageUrl": "/img/scenarios/scenario-15.webp",
     "turns": [
       {
         "id": "t1",

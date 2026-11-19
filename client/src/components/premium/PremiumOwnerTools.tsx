@@ -9,9 +9,9 @@ export function PremiumActivatePicker({ onChoose }: { onChoose: (student: { id: 
   const student = students.data?.students.find(item => item.id === Number(selected));
   return <div className="flex flex-wrap items-end gap-3 rounded-2xl border border-line bg-card p-4">
     <label className="min-w-0 flex-1 text-sm text-ink"><span className="mb-2 block">تفعيل خطة لطالب بعد مراجعة الدفع</span>
-      <select className="w-full rounded-xl border border-line bg-card p-3" value={selected} onChange={event => setSelected(event.target.value)} disabled={students.isPending}>
-        <option value="">{students.isPending ? "بنحمّل الطلاب…" : "اختار الطالب"}</option>
-        {(students.data?.students ?? []).map(item => <option key={item.id} value={item.id}>{item.name || item.email || `طالب ${item.id}`}</option>)}
+      <select className="w-full rounded-xl border border-line bg-card p-3 text-ink dark:bg-[#0b1736] dark:text-white" value={selected} onChange={event => setSelected(event.target.value)} disabled={students.isPending}>
+        <option value="" className="bg-white text-slate-900 dark:bg-[#0b1736] dark:text-white">{students.isPending ? "بنحمّل الطلاب…" : "اختار الطالب"}</option>
+        {(students.data?.students ?? []).map(item => <option key={item.id} value={item.id} className="bg-white text-slate-900 dark:bg-[#0b1736] dark:text-white">{item.name || item.email || `طالب ${item.id}`}</option>)}
       </select>
     </label>
     <Button disabled={!student} className="rounded-xl bg-iris text-white" onClick={() => student && onChoose({ id: student.id, name: student.name || "الطالب" })}>راجع الدفع وفعّل الخطة</Button>
@@ -27,9 +27,9 @@ export function PremiumCoachSelect({ membershipId, coachUserId }: { membershipId
     onError: error => toast.error(error.message),
   });
   return <label className="block text-sm text-ink"><span className="mb-2 block">المدرّس المسؤول عن المتابعة</span>
-    <select className="w-full rounded-xl border border-line bg-card p-3" value={coachUserId ?? ""} disabled={staff.isPending || update.isPending} onChange={event => update.mutate({ membershipId, coachUserId: event.target.value ? Number(event.target.value) : null })}>
-      <option value="">من غير مرشد معيّن</option>
-      {(staff.data ?? []).map(item => <option key={item.id} value={item.id}>{item.name || `حساب ${item.id}`}{item.role === "admin" ? " — المالك" : ""}</option>)}
+    <select className="w-full rounded-xl border border-line bg-card p-3 text-ink dark:bg-[#0b1736] dark:text-white" value={coachUserId ?? ""} disabled={staff.isPending || update.isPending} onChange={event => update.mutate({ membershipId, coachUserId: event.target.value ? Number(event.target.value) : null })}>
+      <option value="" className="bg-white text-slate-900 dark:bg-[#0b1736] dark:text-white">من غير مرشد معيّن</option>
+      {(staff.data ?? []).map(item => <option key={item.id} value={item.id} className="bg-white text-slate-900 dark:bg-[#0b1736] dark:text-white">{item.name || `حساب ${item.id}`}{item.role === "admin" ? " — المالك" : ""}</option>)}
     </select>
     {staff.isError && <button type="button" className="mt-2 text-iris" onClick={() => void staff.refetch()}>قائمة المدرسين ما اتحمّلتش — جرّب تاني</button>}
   </label>;
